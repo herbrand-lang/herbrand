@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #define HASHSIZE 256
 
 
@@ -18,7 +19,7 @@
 
 typedef struct Hashmap {
     struct Hashmap *next;
-    unsigned char key;
+    unsigned char *key;
     int value;
 } Hashmap;
 
@@ -27,13 +28,13 @@ typedef struct Hashmap {
 
 
 /** Calculate the hash for lookup an element. */
-unsigned int hashmap_hash(unsigned char key);
+unsigned long hashmap_hash(unsigned char *key);
 
 /** Look an element in a hashmap. */
-int hashmap_lookup(Hashmap **h, unsigned char key);
+int hashmap_lookup(Hashmap **h, unsigned char *key);
 
 /** Insert an element into a hashmap. */
-void hashmap_append(Hashmap **h, unsigned char key, int value);
+void hashmap_append(Hashmap **h, unsigned char *key, int value);
 
 /** Allocate a new hashmap in memory. */
 Hashmap **hashmap_alloc();

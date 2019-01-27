@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "hashmap.h"
 #define N_RULES 32
 
@@ -42,7 +43,7 @@ typedef struct Clause {
 } Clause;
 
 typedef struct Rule {
-	Clause **clauses;
+	Clause *clauses;
 	char *name;
 	int arity;
 	int nb_clauses;
@@ -70,26 +71,26 @@ Program *program_alloc();
   * This function ...
   * 
   **/
-int *program_realloc(Program *program);
+int program_realloc(Program *program);
 /**
   * 
   * This function ...
   * 
   **/
-int *program_is_full(Program *program);
+int program_is_full(Program *program);
 /**
   * 
   * This function ...
   * 
   **/
-int program_add_rule(Program *program, char *name, int arity, Term **clauses);
+int program_add_rule(Program *program, char *name, int arity, Term *command);
 /**
   * 
   * This function creates a clause with $nb_atoms atoms in the body,
   * returning a pointer to a newly initialized Clause struct.
   * 
   **/
-Clause *clause_alloc(int nb_atoms, Term *head, Term **body);
+Clause *clause_alloc(int nb_args, int nb_atoms);
 /**
   * 
   * This function ...

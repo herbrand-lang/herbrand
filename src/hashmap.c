@@ -26,7 +26,7 @@ unsigned long hashmap_hash(unsigned char *key) {
 int hashmap_lookup(Hashmap **h, unsigned char *key) {
     Hashmap *p;
 	for(p = h[hashmap_hash(key)]; p != NULL; p = p->next)
-		if(p->key == key)
+		if(strcmp(p->key, key) == 0)
 			return p->value;
 	return -1;
 }
@@ -43,7 +43,7 @@ void hashmap_append(Hashmap **h, unsigned char *key, int value) {
 		return;
 	}
 	while(p != NULL) {
-		if(p->key == key) {
+		if(strcmp(p->key, key) == 0) {
 			p->value = value;
 			free(q);
 			return;

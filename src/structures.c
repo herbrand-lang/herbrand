@@ -42,7 +42,7 @@ int program_realloc(Program *program) {
   * 
   **/
 int program_is_full(Program *program) {
-	return program->nb_clauses == program->max_clauses;
+	return program->nb_rules == program->max_rules;
 }
 
 /**
@@ -50,14 +50,13 @@ int program_is_full(Program *program) {
   * This function ...
   * 
   **/
-int program_add_rule(Program *program, char *name, int arity, Term **clauses) {
-	Rule *rule;
+int program_add_rule(Program *program, char *name, int arity, Term *command) {
+	Rule rule;
 	hashmap_append(program->indices, name, program->nb_rules);
 	rule = program->rules[program->nb_rules];
-	strcpy(rule->name, name);
-	rule->arity = arity;
-	rule->clauses = clauses;
-	rule->nb_clauses++;
+	strcpy(rule.name, name);
+	rule.arity = arity;
+	rule.nb_clauses++;
 	if(program_is_full(program))
 		return program_realloc(program);
 	return 1;

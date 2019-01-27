@@ -82,15 +82,6 @@ Program *parser_program(Tokenizer *tokenizer) {
   * This function ...
   * 
   **/
-parser_declare_predicate(Program *program, Term *term) {
-	
-}
-
-/**
-  * 
-  * This function ...
-  * 
-  **/
 ParserState *parser_expression(Tokenizer *tokenizer, int token) {
 	List *list, *prev = NULL;
 	Term *container;
@@ -165,4 +156,13 @@ ParserState *parser_expression(Tokenizer *tokenizer, int token) {
 			break;
 	}
 	return state;
+}
+
+/**
+  * 
+  * This function ...
+  * 
+  **/
+int parser_declare_predicate(Program *program, Term *term) {
+	return 1;
 }

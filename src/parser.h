@@ -45,3 +45,9 @@ Program *parser_program(Tokenizer *tokenizer);
   * 
   **/
 ParserState *parser_expression(Tokenizer *tokenizer, int token);
+/**
+  * 
+  * This function ...
+  * 
+  **/
+int parser_declare_predicate(Program *program, Term *term);
