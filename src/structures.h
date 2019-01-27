@@ -36,21 +36,22 @@ typedef struct List {
 } List;
 
 typedef struct Clause {
-	Term *head;
-	Term *body;
+	Term **head;
+	Term **body;
 	int nb_args;
 	int nb_atoms;
 } Clause;
 
 typedef struct Rule {
-	Clause *clauses;
+	Clause **clauses;
+	Term **type;
 	char *name;
 	int arity;
 	int nb_clauses;
 } Rule;
 
 typedef struct Program {
-	Rule *rules;
+	Rule **rules;
 	Hashmap **indices;
 	int nb_rules;
 	int max_rules;
@@ -83,7 +84,13 @@ int program_is_full(Program *program);
   * This function ...
   * 
   **/
-int program_add_rule(Program *program, char *name, int arity, Term *command);
+int program_add_rule(Program *program, char *name, int arity, int nb_clauses, Term **type, Clause **clauses);
+/**
+  * 
+  * This function ...
+  * 
+  **/
+Rule *rule_alloc(int name_length, int arity, int nb_clauses);
 /**
   * 
   * This function creates a clause with $nb_atoms atoms in the body,
@@ -91,6 +98,12 @@ int program_add_rule(Program *program, char *name, int arity, Term *command);
   * 
   **/
 Clause *clause_alloc(int nb_args, int nb_atoms);
+/**
+  * 
+  * This function ...
+  * 
+  **/
+void program_listing(Program *program);
 /**
   * 
   * This function ...

@@ -164,5 +164,41 @@ ParserState *parser_expression(Tokenizer *tokenizer, int token) {
   * 
   **/
 int parser_declare_predicate(Program *program, Term *term) {
+	int i;
+	char *name = NULL;
+	int arity = 0, nb_clauses = 0;
+	Term **type = NULL, *list;
+	Clause **clauses = NULL;
+	// Check predicate name
+	if(term->term.list->tail->type != LIST) {
+		// TODO error
+		return 0;
+	} else if(term->term.list->tail->term.list->head->type != ATOM) {
+		// TODO error
+		return 0;
+	}
+	name = term->term.list->tail->term.list->head->term.string;
+	// Check predicate type
+	if(term->term.list->tail->term.list->tail->term.list->head->type != LIST) {
+		// TODO error
+		return 0;
+	}
+	list = term->term.list->tail->term.list->tail->term.list->head;
+	while(list->type == LIST && list->term.list->head != NULL) {
+		arity++;
+		list = list->term.list->tail;
+	}
+	if(list->type != LIST) {
+		// TODO error
+		return 0;
+	}
+	type = malloc(sizeof(Term*)*arity);
+	list = term->term.list->tail->term.list->tail->term.list->head;
+	for(i = 0; i < arity; i++) {
+		type[i] = list->term.list->head;
+		list = list->term.list->tail;
+	}
+	// Check predicate clauses
+	program_add_rule(program, name, arity, nb_clauses, type, clauses);
 	return 1;
 }
