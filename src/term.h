@@ -45,6 +45,22 @@ void term_free(Term *term);
 
 /**
   * 
+  * This function creates an empty list, returning a
+  * pointer to a newly initialized Term struct.
+  * 
+  **/
+Term *term_list_empty();
+
+/**
+  * 
+  * This function adds an element to a list, returning
+  * the pointer to the last element inserted in the struct.
+  * 
+  **/
+Term *term_list_add_element(Term *list, Term *term);
+
+/**
+  * 
   * This function prints for the standard output a term.
   * 
   **/

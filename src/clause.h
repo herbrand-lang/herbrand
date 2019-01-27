@@ -31,7 +31,7 @@ typedef struct Clause {
   * to a newly initialized Clause struct.
   * 
   **/
-Clause *clause_alloc(int arity);
+Clause *clause_alloc();
 
 /**
   * 

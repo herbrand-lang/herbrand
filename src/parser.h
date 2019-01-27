@@ -19,12 +19,13 @@
 #ifndef LOGIC_PARSER_H
 #define LOGIC_PARSER_H
 
-typedef struct ParserState {
-    Term *value;
+typedef struct Parser {
+    void *value;
     int start;
+    int next;
     int success;
     char error[100];
-} ParserState;
+} Parser;
 
 #endif
 
@@ -32,31 +33,43 @@ typedef struct ParserState {
 
 /**
   * 
-  * This function ...
+  * This function frees a previously allocated state.
+  * The terms underlying the rule will not be deallocated.
   * 
   **/
-void parser_state_free(ParserState *state);
+void parser_free(Parser *state);
+
 /**
   * 
-  * This function ...
+  * This function parses an stream and returns a program.
   * 
   **/
 Program *parser_stream(FILE *stream);
+
 /**
   * 
-  * This function ...
+  * This function takes a tokenizer and returns a program.
   * 
   **/
 Program *parser_program(Tokenizer *tokenizer);
+
 /**
   * 
-  * This function ...
+  * This function parses a predicate declaration.
   * 
   **/
-ParserState *parser_expression(Tokenizer *tokenizer, int token);
+Parser *parser_predicate(Tokenizer *tokenizer, int start);
+
 /**
   * 
-  * This function ...
+  * This function parses a clause of a predicate declaration.
   * 
   **/
-int parser_declare_predicate(Program *program, Term *term);
+Parser *parser_clause(Tokenizer *tokenizer, int start, int arity);
+
+/**
+  * 
+  * This function parses an expression.
+  * 
+  **/
+Parser *parser_expression(Tokenizer *tokenizer, int start);

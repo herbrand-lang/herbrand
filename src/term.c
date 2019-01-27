@@ -36,6 +36,35 @@ void term_free(Term *term) {
 
 /**
   * 
+  * This function creates an empty list, returning a
+  * pointer to a newly initialized Term struct.
+  * 
+  **/
+Term *term_list_empty() {
+    Term *list = malloc(sizeof(Term));
+    list->type = TYPE_LIST;
+    list->term.list = malloc(sizeof(List));
+    list->term.list->head = NULL;
+    list->term.list->tail = NULL;
+    return list;
+}
+
+/**
+  * 
+  * This function adds an element to a list, returning
+  * the pointer to the last element inserted in the struct.
+  * 
+  **/
+Term *term_list_add_element(Term *list, Term *term) {
+    while(list->term.list->head != NULL)
+        list = list->term.list->tail;
+    list->term.list->head = term;
+    list->term.list->tail = term_list_empty();
+    return list->term.list->tail;
+}
+
+/**
+  * 
   * This function prints for the standard output a term.
   * 
   **/

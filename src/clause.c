@@ -17,10 +17,10 @@
   * to a newly initialized Clause struct.
   * 
   **/
-Clause *clause_alloc(int arity) {
+Clause *clause_alloc() {
 	Clause *clause = malloc(sizeof(Clause*));
-	clause->head = malloc(sizeof(Term));
-	clause->body = malloc(sizeof(Term));
+	clause->head = NULL;
+	clause->body = NULL;
 	return clause;
 }
 

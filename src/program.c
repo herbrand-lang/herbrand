@@ -73,14 +73,11 @@ int program_add_rule(Program *program, Rule *rule) {
   * 
   **/
 void program_listing(Program *program) {
-	int i, j;
+	int i;
 	for(i = 0; i < program->nb_rules; i++) {
-		printf("%s/%d :: (", program->rules[i]->name, program->rules[i]->arity);
-		for(j = 0; j < program->rules[i]->arity; j++) {
-			if(j > 0) printf(" ");
-			term_print(&program->rules[i]->type[j]);
-		}
-		printf(")\n");
+		printf("%s/%d :: ", program->rules[i]->name, program->rules[i]->arity);
+		term_print(program->rules[i]->type);
+		printf("\n");
 	}
 }
 
@@ -93,7 +90,7 @@ void program_listing(Program *program) {
 void program_print(Program *program) {
 	int i, j, k;
 	for(i = 0; i < program->nb_rules; i++) {
-		printf("(predicate %s ", program->rules[i]->name);
+		printf("(predicate %s %d ", program->rules[i]->name, program->rules[i]->arity);
 		term_print(program->rules[i]->type);
 		printf("\n");
 		for(j = 0; j < program->rules[i]->nb_clauses; j++) {
