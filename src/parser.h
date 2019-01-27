@@ -9,7 +9,10 @@
 
 #include <string.h>
 #include "tokenizer.h"
-#include "structures.h"
+#include "program.h"
+#include "rule.h"
+#include "clause.h"
+#include "term.h"
 
 
 
@@ -27,6 +30,12 @@ typedef struct ParserState {
 
 
 
+/**
+  * 
+  * This function ...
+  * 
+  **/
+void parser_state_free(ParserState *state);
 /**
   * 
   * This function ...

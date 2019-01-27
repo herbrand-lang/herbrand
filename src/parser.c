@@ -16,6 +16,17 @@
   * This function ...
   * 
   **/
+void parser_state_free(ParserState *state) {
+	if(state->value != NULL)
+		term_free(state->value);
+	free(state);
+}
+
+/**
+  * 
+  * This function ...
+  * 
+  **/
 Program *parser_stream(FILE *stream) {
 	Tokenizer *tokenizer;
 	Program *program;
@@ -46,10 +57,11 @@ Program *parser_program(Tokenizer *tokenizer) {
 				tokenizer->tokens[token]->column+1,
 				state->error,
 				tokenizer->tokens[token]->text);
+			parser_state_free(state);
 			break;
 		}
 		// Check command
-		if(state->value->type == LIST && state->value->term.list->head->type == ATOM) {
+		if(state->value->type == TYPE_LIST && state->value->term.list->head->type == TYPE_ATOM) {
 			// Predicate declaration
 			if(strcmp(state->value->term.list->head->term.string, "predicate") == 0) {
 				parser_declare_predicate(program, state->value);
@@ -61,6 +73,7 @@ Program *parser_program(Tokenizer *tokenizer) {
 					tokenizer->tokens[last_token]->column+1);
 				term_print(state->value);
 				printf(")\n");
+				parser_state_free(state);
 				break;
 			}
 		// Unknown command
@@ -71,8 +84,10 @@ Program *parser_program(Tokenizer *tokenizer) {
 				tokenizer->tokens[last_token]->column+1);
 			term_print(state->value);
 			printf(")\n");
+			parser_state_free(state);
 			break;
 		}
+		parser_state_free(state);
 	}
 	return program;
 }
@@ -94,21 +109,21 @@ ParserState *parser_expression(Tokenizer *tokenizer, int token) {
 	Token *ptr_token = tokenizer->tokens[token];
 	switch(ptr_token->category) {
 		case TOKEN_ATOM:
-			term->type = ATOM;
+			term->type = TYPE_ATOM;
 			term->term.string = malloc(sizeof(char)*(ptr_token->length+1));
 			strcpy(term->term.string, ptr_token->text);
 			break;
 		case TOKEN_VARIABLE:
-			term->type = VARIABLE;
+			term->type = TYPE_VARIABLE;
 			term->term.string = malloc(sizeof(char)*(ptr_token->length+1));
 			strcpy(term->term.string, ptr_token->text);
 			break;
 		case TOKEN_NUMBER:
-			term->type = NUMERAL;
+			term->type = TYPE_NUMERAL;
 			term->term.numeral = atoi(ptr_token->text);
 			break;
 		case TOKEN_LPAR:
-			term->type = LIST;
+			term->type = TYPE_LIST;
 			term->term.list = malloc(sizeof(List));
 			list = term->term.list;
 			list->head = NULL;
@@ -125,7 +140,7 @@ ParserState *parser_expression(Tokenizer *tokenizer, int token) {
 				list->head = state->value;
 				state->value = term;
 				container = malloc(sizeof(Term));
-				container->type = LIST;
+				container->type = TYPE_LIST;
 				container->term.list = malloc(sizeof(List));
 				list->tail = container;
 				prev = list;
@@ -164,41 +179,5 @@ ParserState *parser_expression(Tokenizer *tokenizer, int token) {
   * 
   **/
 int parser_declare_predicate(Program *program, Term *term) {
-	int i;
-	char *name = NULL;
-	int arity = 0, nb_clauses = 0;
-	Term **type = NULL, *list;
-	Clause **clauses = NULL;
-	// Check predicate name
-	if(term->term.list->tail->type != LIST) {
-		// TODO error
-		return 0;
-	} else if(term->term.list->tail->term.list->head->type != ATOM) {
-		// TODO error
-		return 0;
-	}
-	name = term->term.list->tail->term.list->head->term.string;
-	// Check predicate type
-	if(term->term.list->tail->term.list->tail->term.list->head->type != LIST) {
-		// TODO error
-		return 0;
-	}
-	list = term->term.list->tail->term.list->tail->term.list->head;
-	while(list->type == LIST && list->term.list->head != NULL) {
-		arity++;
-		list = list->term.list->tail;
-	}
-	if(list->type != LIST) {
-		// TODO error
-		return 0;
-	}
-	type = malloc(sizeof(Term*)*arity);
-	list = term->term.list->tail->term.list->tail->term.list->head;
-	for(i = 0; i < arity; i++) {
-		type[i] = list->term.list->head;
-		list = list->term.list->tail;
-	}
-	// Check predicate clauses
-	program_add_rule(program, name, arity, nb_clauses, type, clauses);
-	return 1;
+
 }

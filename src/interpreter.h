@@ -7,7 +7,7 @@
  * 
  *H*/
 
-#include "structures.h"
+#include "program.h"
 #include "parser.h"
 #include <stdio.h>
 
