@@ -56,6 +56,7 @@ void program_free(Program *program) {
 }
 
 /**
+  *
   * This function checks if a program cannot store new
   * rules.
   * 
@@ -93,6 +94,11 @@ void program_listing(Program *program) {
 	for(i = 0; i < program->nb_rules; i++) {
 		printf("%s/%d :: ", program->rules[i]->name, program->rules[i]->arity);
 		term_print(program->rules[i]->type);
+        if(program->rules[i]->dynamic) printf(" #dynamic");
+        if(program->rules[i]->determinist)
+            printf(" #det");
+        else
+            printf(" #nondet");
 		printf("\n");
 	}
 }
@@ -106,6 +112,12 @@ void program_listing(Program *program) {
 void program_print(Program *program) {
 	int i, j, k;
 	for(i = 0; i < program->nb_rules; i++) {
+        if(program->rules[i]->dynamic) printf("#dynamic ");
+        if(program->rules[i]->determinist)
+            printf("#det ");
+        else
+            printf("#nondet ");
+        printf("\n");
 		printf("(predicate %s %d ", program->rules[i]->name, program->rules[i]->arity);
 		term_print(program->rules[i]->type);
 		printf("\n");

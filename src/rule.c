@@ -17,7 +17,7 @@
   * to a newly initialized Rule struct.
   * 
   **/
-Rule *rule_alloc(int dynamic) {
+Rule *rule_alloc(int dynamic, int determinist) {
 	Rule *rule = malloc(sizeof(Rule));
     rule->name = NULL;
 	rule->type = NULL;
@@ -25,6 +25,7 @@ Rule *rule_alloc(int dynamic) {
     rule->max_clauses = dynamic ? N_DYN_CLAUSES : N_CLAUSES;
     rule->clauses = malloc(sizeof(Clause*)*rule->max_clauses);
     rule->dynamic = dynamic;
+    rule->determinist = determinist;
 	return rule;
 }
 
@@ -76,7 +77,7 @@ int rule_is_full(Rule *rule) {
 int rule_set_name(Rule *rule, char *name) {
 	if(rule->name != NULL)
         free(rule->name);
-    rule->name = malloc(sizeof(char)*strlen(name)+1);
+    rule->name = malloc(sizeof(char)*(strlen(name)+1));
     strcpy(rule->name, name);
     return name != NULL;
 }

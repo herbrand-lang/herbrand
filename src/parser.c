@@ -69,17 +69,29 @@ Program *parser_program(Tokenizer *tokenizer) {
   * 
   **/
 Parser *parser_predicate(Tokenizer *tokenizer, int start) {
-	int arity;
+	int arity, dynamic = 0, determinist = 0;
 	Rule *rule;
 	Token *token;
 	Parser *state = malloc(sizeof(Parser)), *state_expr;
 	state->success = 1;
 	state->start = start;
 	state->next = start;
-	rule = rule_alloc(0);
+	
+	// Tags
+	token = tokenizer->tokens[start];
+	while(start < tokenizer->nb_tokens && token->category == TOKEN_TAG) {
+		if(strcmp(token->text, "det") == 0) {
+			determinist = 1;
+		} else if(strcmp(token->text, "dynamic") == 0) {
+			dynamic = 1;
+		}
+		start++;
+		state->next = start;
+		token = tokenizer->tokens[start];
+	}
+	rule = rule_alloc(dynamic, determinist);
 	state->value = rule;
 	// Left parenthesis
-	token = tokenizer->tokens[start];
 	if(token->category != TOKEN_LPAR) {
 		strcpy(state->error, "predicate declaration expected");
 		state->success = 0;

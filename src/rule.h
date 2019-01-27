@@ -28,6 +28,7 @@ typedef struct Rule {
 	int nb_clauses;
     int max_clauses;
     int dynamic;
+    int determinist;
 } Rule;
 
 #endif
@@ -40,7 +41,7 @@ typedef struct Rule {
   * to a newly initialized Rule struct.
   * 
   **/
-Rule *rule_alloc(int dynamic);
+Rule *rule_alloc(int dynamic, int determinist);
 
 /**
   * 
