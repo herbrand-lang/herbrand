@@ -40,4 +40,4 @@ void hashmap_append(Hashmap **h, unsigned char *key, int value);
 Hashmap **hashmap_alloc();
 
 /** Deallocate a hashmap in memory. */
-void hashmap_dealloc(Hashmap **h);
+void hashmap_free(Hashmap **h);

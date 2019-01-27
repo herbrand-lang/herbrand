@@ -40,6 +40,22 @@ int program_realloc(Program *program) {
 }
 
 /**
+  * 
+  * This function frees a previously allocated program.
+  * The rules, clauses and terms underlying the program
+  * will also be deallocated.
+  * 
+  **/
+void program_free(Program *program) {
+    int i;
+    for(i = 0; i < program->nb_rules; i++)
+        rule_free(program->rules[i]);
+    hashmap_free(program->indices);
+    free(program->rules);
+    free(program);
+}
+
+/**
   * This function checks if a program cannot store new
   * rules.
   * 

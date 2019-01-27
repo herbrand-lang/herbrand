@@ -67,7 +67,7 @@ Hashmap **hashmap_alloc()
 }
 
 /** Deallocate a hashmap in memory. */
-void hashmap_dealloc(Hashmap **h) {
+void hashmap_free(Hashmap **h) {
 	int i;
 	for(i = 0; i < HASHSIZE; i++)
 		if(h[i] != NULL)

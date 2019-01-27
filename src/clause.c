@@ -18,7 +18,7 @@
   * 
   **/
 Clause *clause_alloc() {
-	Clause *clause = malloc(sizeof(Clause*));
+	Clause *clause = malloc(sizeof(Clause));
 	clause->head = NULL;
 	clause->body = NULL;
 	return clause;

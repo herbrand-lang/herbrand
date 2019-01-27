@@ -24,5 +24,6 @@ int main(int argc, char *argv[]) {
 	program = parser_stream(file);
 	program_listing(program);
 	program_print(program);
+	program_free(program);
 	return 0;
 }

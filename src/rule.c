@@ -20,7 +20,8 @@
 Rule *rule_alloc(int dynamic) {
 	Rule *rule = malloc(sizeof(Rule));
     rule->name = NULL;
-	rule->type = malloc(sizeof(Term));
+	rule->type = NULL;
+    rule->nb_clauses = 0;
     rule->max_clauses = dynamic ? N_DYN_CLAUSES : N_CLAUSES;
     rule->clauses = malloc(sizeof(Clause*)*rule->max_clauses);
     rule->dynamic = dynamic;

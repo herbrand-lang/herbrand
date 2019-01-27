@@ -47,6 +47,15 @@ Program *program_alloc();
 int program_realloc(Program *program);
 
 /**
+  * 
+  * This function frees a previously allocated program.
+  * The rules, clauses and terms underlying the program
+  * will also be deallocated.
+  * 
+  **/
+void program_free(Program *program);
+
+/**
   * This function checks if a program cannot store new
   * rules.
   * 

@@ -46,11 +46,19 @@ Program *parser_program(Tokenizer *tokenizer) {
 	Program *program = program_alloc();
 	while(start < tokenizer->nb_tokens) {
 		state = parser_predicate(tokenizer, start);
-		if(!state->success)
+		if(!state->success) {
+			printf(
+				"(parser-error (line %d) (column %d)\n\t(msg \"%s\"))",
+				tokenizer->tokens[state->start]->line,
+				tokenizer->tokens[state->start]->column,
+				state->error);
+			rule_free(state->value);
+			parser_free(state);
 			break;
-		else
-			program_add_rule(program, state->value);
+		}
+		program_add_rule(program, state->value);
 		start = state->next;
+		parser_free(state);
 	}
 	return program;
 }
@@ -229,65 +237,56 @@ Parser *parser_clause(Tokenizer *tokenizer, int start, int arity) {
   * 
   **/
 Parser *parser_expression(Tokenizer *tokenizer, int start) {
-	List *list, *prev = NULL;
-	Term *container;
 	int length = 0;
 	Parser *state = malloc(sizeof(Parser));
-	Term *term = malloc(sizeof(Term));
-	state->value = term;
+	Term *term, *list;
 	state->success = 1;
 	state->start = start;
 	state->next = start+1;
 	Token *token = tokenizer->tokens[start];
 	switch(token->category) {
 		case TOKEN_ATOM:
+			term = malloc(sizeof(Term));
+			state->value = term;
 			term->type = TYPE_ATOM;
 			term->term.string = malloc(sizeof(char)*(token->length+1));
 			strcpy(term->term.string, token->text);
 			break;
 		case TOKEN_VARIABLE:
+			term = malloc(sizeof(Term));
+			state->value = term;
 			term->type = TYPE_VARIABLE;
 			term->term.string = malloc(sizeof(char)*(token->length+1));
 			strcpy(term->term.string, token->text);
 			break;
 		case TOKEN_NUMBER:
+			term = malloc(sizeof(Term));
+			state->value = term;
 			term->type = TYPE_NUMERAL;
 			term->term.numeral = atoi(token->text);
 			break;
 		case TOKEN_LPAR:
-			term->type = TYPE_LIST;
-			term->term.list = malloc(sizeof(List));
-			list = term->term.list;
-			list->head = NULL;
-			list->tail = NULL;
+			term = term_list_empty();
+			list = term;
+			state->value = term;
 			start++;
 			token = tokenizer->tokens[start];
 			while(start < tokenizer->nb_tokens && token->category != TOKEN_RPAR && token->category != TOKEN_BAR) {
-				free(state);
+				parser_free(state);
 				state = parser_expression(tokenizer, start);
 				if(!state->success)
 					return state;
 				start = state->next;
 				token = tokenizer->tokens[start];
-				list->head = state->value;
-				state->value = term;
-				container = malloc(sizeof(Term));
-				container->type = TYPE_LIST;
-				container->term.list = malloc(sizeof(List));
-				list->tail = container;
-				prev = list;
-				list = list->tail->term.list;
-				list->head = NULL;
-				list->tail = NULL;
+				list = term_list_add_element(list, state->value);
 			}
 			if(start < tokenizer->nb_tokens && token->category == TOKEN_BAR) {
+				parser_free(state);
 				state = parser_expression(tokenizer, start+1);
 				if(!state->success)
 					return state;
 				start = state->next;
-				free(prev->tail);
-				prev->tail = state->value;
-				state->value = term;
+				term_list_set_tail(term, state->value);
 			}
 			if(start >= tokenizer->nb_tokens || tokenizer->tokens[start]->category != TOKEN_RPAR){
 				state->success = 0;
@@ -295,6 +294,7 @@ Parser *parser_expression(Tokenizer *tokenizer, int start) {
 				strcpy(state->error, "right parenthesis ')' or expression expected");
 			}
 			state->next++;
+			state->value = term;
 			break;
 		default:
 			state->success = 0;

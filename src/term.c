@@ -65,6 +65,22 @@ Term *term_list_add_element(Term *list, Term *term) {
 
 /**
   * 
+  * This function adds an element as a tail list. The 
+  * tail underlying the list will be deallocated.
+  * 
+  **/
+Term *term_list_set_tail(Term *list, Term *term) {
+    Term *prev;
+    while(list->term.list->head != NULL) {
+        prev = list;
+        list = list->term.list->tail;
+    }
+    term_free(prev->term.list->tail);
+    prev->term.list->tail = term;
+}
+
+/**
+  * 
   * This function prints for the standard output a term.
   * 
   **/
