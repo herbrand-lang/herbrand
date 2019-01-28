@@ -129,7 +129,19 @@ Tokenizer *tokenizer_read_stream(FILE *stream) {
 			tokenizer->tokens[token]->category = TOKEN_TAG;
 			tokenizer_add_char_token(tokenizer, token, character);
 			tokenizer->column++;
-			tokenizer_read_tag(tokenizer, token, stream);
+			tokenizer_read_tag(tokenizer, token, stream);// Read tag
+		// Read comment
+		} else if(character == ';') {
+			while(character != EOF && character != '\n') {
+				tokenizer->column++;
+				fscanf(stream, "%c", &character);
+			}
+			tokenizer->column = 1;
+			tokenizer->line++;
+			if(character == EOF)
+				break;
+			else
+				continue;
 		// Read variable
 		} else if(character >= 65 && character <= 90 || character == '_') {
 			tokenizer->tokens[token]->category = TOKEN_VARIABLE;
@@ -143,7 +155,7 @@ Tokenizer *tokenizer_read_stream(FILE *stream) {
 			tokenizer->column++;
 			tokenizer_read_atom(tokenizer, token, stream);
 		// Read graphic atom
-		} else if(strchr("+-*/.^&,;:<>=?~$@!", character) != NULL) {
+		} else if(strchr("+-*/.^&:<>=?~$@!", character) != NULL) {
 			tokenizer->tokens[token]->category = TOKEN_ATOM;
 			tokenizer_add_char_token(tokenizer, token, character);
 			tokenizer->column++;
@@ -299,13 +311,13 @@ void tokenizer_read_atom(Tokenizer *tokenizer, int token, FILE *stream) {
 /**
   * 
   * This function reads a lexical component of the category atom. A graphical
-  % atom is a non-empty sequence of characters + - * / . ^ & , ; < > = ? ~ $ @ !.
+  % atom is a non-empty sequence of characters + - * / . ^ & < > = ? ~ $ @ !.
   *
   **/
 void tokenizer_read_graphic_atom(Tokenizer *tokenizer, int token, FILE *stream) {
 	char character;
 	while(fscanf(stream, "%c", &character) != EOF) {
-		if(strchr("+-*/.^&,;:<>=?~$@!", character) != NULL) {
+		if(strchr("+-*/.^&:<>=?~$@!", character) != NULL) {
 			tokenizer_add_char_token(tokenizer, token, character);
 			tokenizer->column++;
 		} else {

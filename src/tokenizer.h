@@ -134,7 +134,7 @@ void tokenizer_read_atom(Tokenizer *tokenizer, int token, FILE *stream);
 /**
   * 
   * This function reads a lexical component of the category atom. A graphical
-  % atom is a non-empty sequence of characters + - * / . ^ & , ; : < > = ? ~ $ @ !.
+  % atom is a non-empty sequence of characters + - * / . ^ & : < > = ? ~ $ @ !.
   *
   **/
 void tokenizer_read_graphic_atom(Tokenizer *tokenizer, int token, FILE *stream);
