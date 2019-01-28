@@ -3,7 +3,7 @@
  * FILENAME: tokenizer.c
  * DESCRIPTION: Split source code into lexical components
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 25.01.2019
+ * UPDATED: 28.01.2019
  * 
  *H*/
 
@@ -22,8 +22,8 @@ Tokenizer *tokenizer_alloc() {
 	tokenizer->tokens = malloc(sizeof(Token*)*N_TOKENS);
 	tokenizer->nb_tokens = 0;
 	tokenizer->max_tokens = N_TOKENS;
-	tokenizer->line = 0;
-	tokenizer->column = 0;
+	tokenizer->line = 1;
+	tokenizer->column = 1;
 	return tokenizer;
 }
 
@@ -91,6 +91,10 @@ void *tokenizer_init_token(Tokenizer *tokenizer, int token) {
   **/
 int tokenizer_add_char_token(Tokenizer *tokenizer, int token, char character) {
 	Token *ptr_token = tokenizer->tokens[token];
+	if(ptr_token->length == 0) {
+		ptr_token->line = tokenizer->line;
+		ptr_token->column = tokenizer->column;
+	}
 	if(ptr_token->length+1 == ptr_token->max_length) {
 		ptr_token->max_length += N_CHARS_TOKEN;
 		ptr_token->text = realloc(ptr_token->text, sizeof(char)*ptr_token->max_length);
@@ -115,54 +119,66 @@ Tokenizer *tokenizer_read_stream(FILE *stream) {
 	Tokenizer *tokenizer = tokenizer_alloc();
 	tokenizer_init_token(tokenizer, 0);
 	while(fscanf(stream, "%c", &character) != EOF) {
-		tokenizer->column++;
 		// Read string
 		if(character == '"') {
 			tokenizer->tokens[token]->category = TOKEN_STRING;
 			tokenizer_add_char_token(tokenizer, token, character);
+			tokenizer->column++;
 			tokenizer_read_string(tokenizer, token, stream);
+		// Read tag
+		} else if(character == '#') {
+			tokenizer->tokens[token]->category = TOKEN_TAG;
+			tokenizer_add_char_token(tokenizer, token, character);
+			tokenizer_read_tag(tokenizer, token, stream);
 		// Read variable
-		} else if(character >= 65 && character <= 90) {
+		} else if(character >= 65 && character <= 90 || character == '_') {
 			tokenizer->tokens[token]->category = TOKEN_VARIABLE;
 			tokenizer_add_char_token(tokenizer, token, character);
+			tokenizer->column++;
 			tokenizer_read_variable(tokenizer, token, stream);
 		// Read atom
 		} else if(character >= 97 && character <= 122) {
 			tokenizer->tokens[token]->category = TOKEN_ATOM;
 			tokenizer_add_char_token(tokenizer, token, character);
+			tokenizer->column++;
 			tokenizer_read_atom(tokenizer, token, stream);
 		// Read number
 		} else if(character >= 48 && character <= 57) {
 			tokenizer->tokens[token]->category = TOKEN_NUMBER;
 			tokenizer_add_char_token(tokenizer, token, character);
+			tokenizer->column++;
 			tokenizer_read_number(tokenizer, token, stream);
-		// Read tag
-		} else if(character == '#') {
-			tokenizer->tokens[token]->category = TOKEN_TAG;
-			tokenizer_read_tag(tokenizer, token, stream);
 		// Read left parenthesis
 		} else if(character == '(') {
 			tokenizer->tokens[token]->category = TOKEN_LPAR;
 			tokenizer_add_char_token(tokenizer, token, character);
+			tokenizer->column++;
 		// Read right parenthesis
 		} else if(character == ')') {
 			tokenizer->tokens[token]->category = TOKEN_RPAR;
 			tokenizer_add_char_token(tokenizer, token, character);
+			tokenizer->column++;
 		// Read bar
 		} else if(character == '|') {
 			tokenizer->tokens[token]->category = TOKEN_BAR;
 			tokenizer_add_char_token(tokenizer, token, character);
+			tokenizer->column++;
 		// Read whitespace
-		} else if(character == ' ' || character == '\t') {
+		} else if(character == ' ' || character == '\t' || character == '\r') {
+			tokenizer->column++;
 			continue;
 		// Read break line
 		} else if(character == '\n') {
 			tokenizer->line++;
-			tokenizer->column = 0;
+			tokenizer->column = 1;
 			continue;
 		// Read unexpected input
 		} else {
-			printf("unexpected input\n");
+			printf(
+				"(parser-error (line %d) (column %d) (found '%c')\n\t(message \"unexpected input\"))\n",
+				tokenizer->line,
+				tokenizer->column,
+				character);
 			return tokenizer;
 		}
 		// Resize text of the token
@@ -190,7 +206,7 @@ void tokenizer_read_string(Tokenizer *tokenizer, int token, FILE *stream) {
 		tokenizer->column++;
 		if(character == '\n') {
 			tokenizer->line++;
-			tokenizer->column = 0;
+			tokenizer->column = 1;
 		} else if(character == '"') {
 			fscanf(stream, "%c", &character);
 			if(character != '"') {
@@ -213,7 +229,7 @@ void tokenizer_read_string(Tokenizer *tokenizer, int token, FILE *stream) {
 void tokenizer_read_variable(Tokenizer *tokenizer, int token, FILE *stream) {
 	char character;
 	while(fscanf(stream, "%c", &character) != EOF) {
-		if(character >= 65 && character <= 90 || character >= 97 && character <= 122 || character >= 48 && character <= 57) {
+		if(character >= 65 && character <= 90 || character >= 97 && character <= 122 || character >= 48 && character <= 57 || character == '_') {
 			tokenizer_add_char_token(tokenizer, token, character);
 			tokenizer->column++;
 		} else {
@@ -252,7 +268,7 @@ void tokenizer_read_number(Tokenizer *tokenizer, int token, FILE *stream) {
 void tokenizer_read_atom(Tokenizer *tokenizer, int token, FILE *stream) {
 	char character;
 	while(fscanf(stream, "%c", &character) != EOF) {
-		if(character >= 65 && character <= 90 || character >= 97 && character <= 122 || character >= 48 && character <= 57) {
+		if(character >= 65 && character <= 90 || character >= 97 && character <= 122 || character >= 48 && character <= 57 || character == '_' || character == '-') {
 			tokenizer_add_char_token(tokenizer, token, character);
 			tokenizer->column++;
 		} else {

@@ -19,13 +19,13 @@
   **/
 Rule *rule_alloc(int dynamic, int determinist) {
 	Rule *rule = malloc(sizeof(Rule));
-    rule->name = NULL;
+	rule->name = NULL;
 	rule->type = NULL;
-    rule->nb_clauses = 0;
-    rule->max_clauses = dynamic ? N_DYN_CLAUSES : N_CLAUSES;
-    rule->clauses = malloc(sizeof(Clause*)*rule->max_clauses);
-    rule->dynamic = dynamic;
-    rule->determinist = determinist;
+	rule->nb_clauses = 0;
+	rule->max_clauses = dynamic ? N_DYN_CLAUSES : N_CLAUSES;
+	rule->clauses = malloc(sizeof(Clause*)*rule->max_clauses);
+	rule->dynamic = dynamic;
+	rule->determinist = determinist;
 	return rule;
 }
 
@@ -50,13 +50,16 @@ int rule_realloc(Rule *rule) {
   * 
   **/
 void rule_free(Rule *rule) {
-    int i;
-    for(i = 0; i < rule->nb_clauses; i++)
-        clause_free(rule->clauses[i]);
-    free(rule->clauses);
-    term_free(rule->type);
-    free(rule->name);
-    free(rule);
+	int i;
+	for(i = 0; i < rule->nb_clauses; i++)
+		clause_free(rule->clauses[i]);
+	if(rule->clauses != NULL)
+		free(rule->clauses);
+	if(rule->type != NULL)
+		term_free(rule->type);
+	if(rule->name != NULL)
+		free(rule->name);
+	free(rule);
 }
 
 /**
@@ -76,10 +79,10 @@ int rule_is_full(Rule *rule) {
   **/
 int rule_set_name(Rule *rule, char *name) {
 	if(rule->name != NULL)
-        free(rule->name);
-    rule->name = malloc(sizeof(char)*(strlen(name)+1));
-    strcpy(rule->name, name);
-    return name != NULL;
+		free(rule->name);
+	rule->name = malloc(sizeof(char)*(strlen(name)+1));
+	strcpy(rule->name, name);
+	return name != NULL;
 }
 
 /**
@@ -90,9 +93,9 @@ int rule_set_name(Rule *rule, char *name) {
   * 
   **/
 int rule_add_clause(Rule *rule, Clause *clause) {
-    if(rule_is_full(rule))
+	if(rule_is_full(rule))
 		if(rule_realloc(rule) == 0)
-            return 0;
+			return 0;
 	rule->clauses[rule->nb_clauses] = clause;
 	rule->nb_clauses++;
 	return 1;

@@ -41,17 +41,17 @@ void parser_free(Parser *state);
 
 /**
   * 
-  * This function parses an stream and returns a program.
+  * This function parses an stream and loads a program.
   * 
   **/
-Program *parser_stream(FILE *stream);
+void parser_stream(Program *program, FILE *stream);
 
 /**
   * 
-  * This function takes a tokenizer and returns a program.
+  * This function takes a tokenizer and loads a program.
   * 
   **/
-Program *parser_program(Tokenizer *tokenizer);
+void parser_program(Program *program, Tokenizer *tokenizer);
 
 /**
   * 

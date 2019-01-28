@@ -3,7 +3,7 @@
  * FILENAME: parse.c
  * DESCRIPTION: Parse programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 25.01.2019
+ * UPDATED: 28.01.2019
  * 
  *H*/
 
@@ -23,34 +23,32 @@ void parser_free(Parser *state) {
 
 /**
   * 
-  * This function parses an stream and returns a program.
+  * This function parses an stream and loads a program.
   * 
   **/
-Program *parser_stream(FILE *stream) {
+void parser_stream(Program *program, FILE *stream) {
 	Tokenizer *tokenizer;
-	Program *program;
 	tokenizer = tokenizer_read_stream(stream);
-	program = parser_program(tokenizer);
+	parser_program(program, tokenizer);
 	tokenizer_free(tokenizer);
-	return program;
 }
 
 /**
   * 
-  * This function takes a tokenizer and returns a program.
+  * This function takes a tokenizer and loads a program.
   * 
   **/
-Program *parser_program(Tokenizer *tokenizer) {
+void parser_program(Program *program, Tokenizer *tokenizer) {
 	int start = 0;
 	Parser *state;
-	Program *program = program_alloc();
 	while(start < tokenizer->nb_tokens) {
 		state = parser_predicate(tokenizer, start);
 		if(!state->success) {
 			printf(
-				"(parser-error (line %d) (column %d)\n\t(msg \"%s\"))",
-				tokenizer->tokens[state->start]->line,
-				tokenizer->tokens[state->start]->column,
+				"(parser-error (line %d) (column %d) (found \"%s\")\n\t(message \"%s\"))\n",
+				tokenizer->tokens[state->next]->line,
+				tokenizer->tokens[state->next]->column,
+				state->next < tokenizer->nb_tokens ? tokenizer->tokens[state->next]->text : "",
 				state->error);
 			rule_free(state->value);
 			parser_free(state);
@@ -60,7 +58,6 @@ Program *parser_program(Tokenizer *tokenizer) {
 		start = state->next;
 		parser_free(state);
 	}
-	return program;
 }
 
 /**
@@ -76,13 +73,14 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
 	state->success = 1;
 	state->start = start;
 	state->next = start;
-	
 	// Tags
 	token = tokenizer->tokens[start];
 	while(start < tokenizer->nb_tokens && token->category == TOKEN_TAG) {
-		if(strcmp(token->text, "det") == 0) {
+		if(strcmp(token->text, "#det") == 0) {
 			determinist = 1;
-		} else if(strcmp(token->text, "dynamic") == 0) {
+		} else if(strcmp(token->text, "#nondet") == 0) {
+			determinist = 0;
+		} else if(strcmp(token->text, "#dynamic") == 0) {
 			dynamic = 1;
 		}
 		start++;
@@ -177,52 +175,63 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
   * 
   **/
 Parser *parser_clause(Tokenizer *tokenizer, int start, int arity) {
+	int expected = arity;
 	Token *token;
 	Parser *state = malloc(sizeof(Parser)), *state_expr;
-	Term *list = term_list_empty();
-	Clause *clause = clause_alloc();
+	Term *list;
+	Clause *clause;
 	state->success = 1;
 	state->start = start;
 	state->next = start;
-	state->value = clause;
 	// Left parenthesis
 	token = tokenizer->tokens[start];
 	if(token->category != TOKEN_LPAR) {
-		strcpy(state->error, "predicate declaration expected");
+		strcpy(state->error, "clause definition or right parenthesis ')' expected");
 		state->success = 0;
 		return state;
 	}
+	list = term_list_empty();
+	clause = clause_alloc();
+	state->value = clause;
 	// Head
 	start++;
 	state->next = start;
 	token = tokenizer->tokens[start];
-	while(arity > 0 && start < tokenizer->nb_tokens) {
+	while(arity > 0 && start < tokenizer->nb_tokens && token->category != TOKEN_RPAR) {
 		state_expr = parser_expression(tokenizer, start);
 		if(!state_expr->success) {
+			clause_free(clause);
+			term_free(list);
 			parser_free(state);
-			state_expr->value = clause;
+			state_expr->value = NULL;
 			return state_expr;
 		}
 		start = state_expr->next;
 		state->next = start;
+		token = tokenizer->tokens[start];
 		term_list_add_element(list, state_expr->value);
 		parser_free(state_expr);
 		arity--;
 	}
-	clause->head = list;
 	if(arity > 0) {
-		strcpy(state->error, "not enough arguments in clause definition");
+		clause_free(clause);
+		term_free(list);
+		sprintf(state->error, "not enough arguments in clause definition (%d given, %d expected)", expected-arity, expected);
 		state->success = 0;
+		state->value = NULL;
 		return state;
 	}
+	clause->head = list;
 	// Body
 	list = term_list_empty();
 	token = tokenizer->tokens[start];
 	while(start < tokenizer->nb_tokens && token->category != TOKEN_RPAR) {
 		state_expr = parser_expression(tokenizer, start);
 		if(!state_expr->success) {
+			clause_free(clause);
+			term_free(list);
 			parser_free(state);
-			state_expr->value = clause;
+			state_expr->value = NULL;
 			return state_expr;
 		}
 		start = state_expr->next;
@@ -234,8 +243,11 @@ Parser *parser_clause(Tokenizer *tokenizer, int start, int arity) {
 	clause->body = list;
 	// Right parenthesis
 	if(token->category != TOKEN_RPAR) {
+		clause_free(clause);
+		term_free(list);
 		strcpy(state->error, "right parenthesis ')' expected at the end of predicate declaration");
 		state->success = 0;
+		state->value = NULL;
 		return state;
 	}
 	start++;

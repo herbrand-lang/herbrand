@@ -31,7 +31,9 @@ Clause *clause_alloc() {
   * 
   **/
 void clause_free(Clause *clause) {
-    term_free(clause->head);
-    term_free(clause->body);
+    if(clause->head != NULL)
+        term_free(clause->head);
+    if(clause->body != NULL)
+        term_free(clause->body);
     free(clause);
 }
