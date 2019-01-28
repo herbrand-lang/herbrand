@@ -13,33 +13,46 @@
 
 
 
-/** Calculate the hash for an element. */
-unsigned long hashmap_hash(unsigned char *key) {
+/**
+  *
+  * This function calculates the hash for lookup an element
+  * into a map.
+  *
+  **/
+unsigned long hashmap_hash(Hashmap *map, unsigned char *key) {
     unsigned long hash = 5381;
     int c;
     while(c = *key++)
         hash = ((hash << 5) + hash) + c;
-    return hash % HASHSIZE;
+    return hash % map->nb_registers;
 }
 
-/** Look an element in a hashmap. */
-int hashmap_lookup(Hashmap **h, unsigned char *key) {
-    Hashmap *p;
-	for(p = h[hashmap_hash(key)]; p != NULL; p = p->next)
+/**
+  *
+  * This function looks up an element into a map.
+  *
+  **/
+int hashmap_lookup(Hashmap *map, unsigned char *key) {
+    HashmapRegister *p;
+	for(p = map->map[hashmap_hash(map, key)]; p != NULL; p = p->next)
 		if(strcmp(p->key, key) == 0)
 			return p->value;
 	return -1;
 }
 
-/** Insert an element into a hashmap. */
-void hashmap_append(Hashmap **h, unsigned char *key, int value) {
-	int hash = hashmap_hash(key);
-	Hashmap *p = h[hash], *q = malloc(sizeof(Hashmap)), *r;
+/**
+  *
+  * This function adds an element into a map.
+  *
+  **/
+void hashmap_append(Hashmap *map, unsigned char *key, int value) {
+	int hash = hashmap_hash(map, key);
+	HashmapRegister *p = map->map[hash], *q = malloc(sizeof(HashmapRegister)), *r;
 	q->next = NULL;
 	q->key = key;
 	q->value = value;
 	if(p == NULL) {
-		h[hash] = q;
+		map->map[hash] = q;
 		return;
 	}
 	while(p != NULL) {
@@ -54,23 +67,64 @@ void hashmap_append(Hashmap **h, unsigned char *key, int value) {
 	r->next = q;
 }
 
-/** Allocate a new hashmap in memory. */
-Hashmap **hashmap_alloc()
-{
+/**
+  * 
+  * This function creates a map, returning a pointer
+  * to a newly initialized Hashmap struct.
+  * 
+  **/
+Hashmap *hashmap_alloc(int nb_registers) {
 	int i;
-	Hashmap **h = malloc(HASHSIZE * sizeof(Hashmap));
-	if(h == NULL)
-		return NULL;
-	for(i = 0; i < HASHSIZE; i++)
-		h[i] = NULL;
-	return h;
+	Hashmap *map = malloc(sizeof(Hashmap));
+	if(map != NULL) {
+		map->nb_registers = nb_registers;
+		map->map = malloc(sizeof(HashmapRegister*)*nb_registers);
+		for(i = 0; i < nb_registers; i++)
+			map->map[i] = NULL;
+	}
+	return map;
 }
 
-/** Deallocate a hashmap in memory. */
-void hashmap_free(Hashmap **h) {
+/**
+  * 
+  * This function frees a previously allocated map.
+  * The strings and register underlying the map will 
+  * also be deallocated.
+  * 
+  **/
+void hashmap_free(Hashmap *map) {
 	int i;
-	for(i = 0; i < HASHSIZE; i++)
-		if(h[i] != NULL)
-			free(h[i]);
-	free(h);
+	HashmapRegister *p, *q;
+	for(i = 0; i < map->nb_registers; i++) {
+		p = map->map[i];
+		while(p != NULL) {
+			q = p->next;
+			free(p);
+			p = q;
+		}
+	}
+	free(map);
+}
+
+/**
+  * 
+  * This function prints for the standard output
+  * the whole map.
+  * 
+  **/
+void hashmap_print(Hashmap *map) {
+	int i;
+	HashmapRegister *p;
+	printf("(hashmap (size %d)", map->nb_registers);
+	for(i = 0; i < map->nb_registers; i++) {
+		p = map->map[i];
+		if(p != NULL) {
+			printf("\n\t(hash %d", i);
+			while(p != NULL) {
+				printf("\n\t\t((key \"%s\") (value %d))", p->key, p->value);
+				p = p->next;
+			}
+		}
+	}
+	printf(")\n");
 }

@@ -10,34 +10,70 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define HASHSIZE 256
 
 
 
 #ifndef LOGIC_HASHMAP_H
 #define LOGIC_HASHMAP_H
 
-typedef struct Hashmap {
-    struct Hashmap *next;
+typedef struct HashmapRegister {
+    struct HashmapRegister *next;
     unsigned char *key;
     int value;
+} HashmapRegister;
+
+typedef struct Hashmap {
+    HashmapRegister **map;
+    int nb_registers;
 } Hashmap;
 
 #endif
 
 
 
-/** Calculate the hash for lookup an element. */
-unsigned long hashmap_hash(unsigned char *key);
+/**
+  *
+  * This function calculates the hash for lookup an element
+  * into a map.
+  *
+  **/
+unsigned long hashmap_hash(Hashmap *map, unsigned char *key);
 
-/** Look an element in a hashmap. */
-int hashmap_lookup(Hashmap **h, unsigned char *key);
+/**
+  *
+  * This function looks up an element into a map.
+  *
+  **/
+int hashmap_lookup(Hashmap *map, unsigned char *key);
 
-/** Insert an element into a hashmap. */
-void hashmap_append(Hashmap **h, unsigned char *key, int value);
+/**
+  *
+  * This function adds an element into a map.
+  *
+  **/
+void hashmap_append(Hashmap *map, unsigned char *key, int value);
 
-/** Allocate a new hashmap in memory. */
-Hashmap **hashmap_alloc();
+/**
+  * 
+  * This function creates a map, returning a pointer
+  * to a newly initialized Hashmap struct.
+  * 
+  **/
+Hashmap *hashmap_alloc(int nb_register);
 
-/** Deallocate a hashmap in memory. */
-void hashmap_free(Hashmap **h);
+/**
+  * 
+  * This function frees a previously allocated map.
+  * The strings and register underlying the map will 
+  * also be deallocated.
+  * 
+  **/
+void hashmap_free(Hashmap *map);
+
+/**
+  * 
+  * This function prints for the standard output
+  * the whole map.
+  * 
+  **/
+void hashmap_print(Hashmap *map);

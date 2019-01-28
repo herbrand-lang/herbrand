@@ -25,8 +25,10 @@ int main(int argc, char *argv[]) {
 		file = fopen(argv[1], "r");
 		if(file != NULL) {
 			parser_stream(program, file);
-			program_listing(program);
+			printf("\nPARSED RULES:\n");
 			program_print(program);
+			printf("\nHASHMAP RULES:\n");
+			hashmap_print(program->indices);
 		} else {
 			printf("(existence-error file \"%s\")\n", argv[1]);
 		}
