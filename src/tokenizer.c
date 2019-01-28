@@ -142,9 +142,15 @@ Tokenizer *tokenizer_read_stream(FILE *stream) {
 			tokenizer_add_char_token(tokenizer, token, character);
 			tokenizer->column++;
 			tokenizer_read_atom(tokenizer, token, stream);
+		// Read graphic atom
+		} else if(strchr("+-*/.^&,;:<>=?~$@!", character) != NULL) {
+			tokenizer->tokens[token]->category = TOKEN_ATOM;
+			tokenizer_add_char_token(tokenizer, token, character);
+			tokenizer->column++;
+			tokenizer_read_graphic_atom(tokenizer, token, stream);
 		// Read number
 		} else if(character >= 48 && character <= 57) {
-			tokenizer->tokens[token]->category = TOKEN_NUMBER;
+			tokenizer->tokens[token]->category = TOKEN_NUMERAL;
 			tokenizer_add_char_token(tokenizer, token, character);
 			tokenizer->column++;
 			tokenizer_read_number(tokenizer, token, stream);
@@ -174,12 +180,9 @@ Tokenizer *tokenizer_read_stream(FILE *stream) {
 			continue;
 		// Read unexpected input
 		} else {
-			printf(
-				"(parser-error (line %d) (column %d) (found '%c')\n\t(message \"unexpected input\"))\n",
-				tokenizer->line,
-				tokenizer->column,
-				character);
-			return tokenizer;
+			tokenizer->tokens[token]->category = TOKEN_ERROR;
+			tokenizer_add_char_token(tokenizer, token, character);
+			tokenizer->column++;
 		}
 		// Resize text of the token
 		tokenizer->tokens[token]->text = realloc(tokenizer->tokens[token]->text, sizeof(char)*(tokenizer->tokens[token]->length+1));
@@ -247,10 +250,24 @@ void tokenizer_read_variable(Tokenizer *tokenizer, int token, FILE *stream) {
   **/
 void tokenizer_read_number(Tokenizer *tokenizer, int token, FILE *stream) {
 	char character;
+	int dot = 0;
 	while(fscanf(stream, "%c", &character) != EOF) {
 		if(character >= 48 && character <= 57) {
+			if(dot) dot++;
 			tokenizer_add_char_token(tokenizer, token, character);
 			tokenizer->column++;
+		} else if(character == '.' && !dot) {
+			dot = 1;
+			fscanf(stream, "%c", &character);
+			if(character >= 48 && character <= 57) {
+				tokenizer->tokens[token]->category = TOKEN_DECIMAL;
+				tokenizer_add_char_token(tokenizer, token, '.');
+				tokenizer_add_char_token(tokenizer, token, character);
+				tokenizer->column += 2;
+			} else {
+				fseek(stream, -2, SEEK_CUR);
+				return;
+			}		
 		} else {
 			fseek(stream, -1, SEEK_CUR);
 			return;
@@ -269,6 +286,25 @@ void tokenizer_read_atom(Tokenizer *tokenizer, int token, FILE *stream) {
 	char character;
 	while(fscanf(stream, "%c", &character) != EOF) {
 		if(character >= 65 && character <= 90 || character >= 97 && character <= 122 || character >= 48 && character <= 57 || character == '_' || character == '-') {
+			tokenizer_add_char_token(tokenizer, token, character);
+			tokenizer->column++;
+		} else {
+			fseek(stream, -1, SEEK_CUR);
+			return;
+		}
+	}
+}
+
+/**
+  * 
+  * This function reads a lexical component of the category atom. A graphical
+  % atom is a non-empty sequence of characters + - * / . ^ & , ; < > = ? ~ $ @ !.
+  *
+  **/
+void tokenizer_read_graphic_atom(Tokenizer *tokenizer, int token, FILE *stream) {
+	char character;
+	while(fscanf(stream, "%c", &character) != EOF) {
+		if(strchr("+-*/.^&,;:<>=?~$@!", character) != NULL) {
 			tokenizer_add_char_token(tokenizer, token, character);
 			tokenizer->column++;
 		} else {

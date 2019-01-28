@@ -82,6 +82,8 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
 			determinist = 0;
 		} else if(strcmp(token->text, "#dynamic") == 0) {
 			dynamic = 1;
+		} else if(strcmp(token->text, "#static") == 0) {
+			dynamic = 0;
 		}
 		start++;
 		state->next = start;
@@ -118,7 +120,7 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
 	start++;
 	state->next = start;
 	token = tokenizer->tokens[start];
-	if(token->category != TOKEN_NUMBER) {
+	if(token->category != TOKEN_NUMERAL) {
 		strcpy(state->error, "arity (a non-negative numeral) expected in predicate declaration");
 		state->success = 0;
 		return state;
@@ -283,11 +285,17 @@ Parser *parser_expression(Tokenizer *tokenizer, int start) {
 			term->term.string = malloc(sizeof(char)*(token->length+1));
 			strcpy(term->term.string, token->text);
 			break;
-		case TOKEN_NUMBER:
+		case TOKEN_NUMERAL:
 			term = malloc(sizeof(Term));
 			state->value = term;
 			term->type = TYPE_NUMERAL;
 			term->term.numeral = atoi(token->text);
+			break;
+		case TOKEN_DECIMAL:
+			term = malloc(sizeof(Term));
+			state->value = term;
+			term->type = TYPE_DECIMAL;
+			term->term.decimal = atof(token->text);
 			break;
 		case TOKEN_LPAR:
 			term = term_list_empty();
@@ -320,6 +328,7 @@ Parser *parser_expression(Tokenizer *tokenizer, int start) {
 			state->next++;
 			state->value = term;
 			break;
+		case TOKEN_ERROR:
 		default:
 			state->success = 0;
 			strcpy(state->error, "unexpected token");

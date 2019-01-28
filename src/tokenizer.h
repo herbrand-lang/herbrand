@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 
@@ -17,7 +18,7 @@
 #define N_TOKENS 100
 #define N_CHARS_TOKEN 16
 
-typedef enum {TOKEN_WHITESPACE, TOKEN_LPAR, TOKEN_RPAR, TOKEN_BAR, TOKEN_ATOM, TOKEN_NUMBER, TOKEN_STRING, TOKEN_VARIABLE, TOKEN_TAG, TOKEN_ERROR} Category;
+typedef enum {TOKEN_WHITESPACE, TOKEN_LPAR, TOKEN_RPAR, TOKEN_BAR, TOKEN_ATOM, TOKEN_NUMERAL, TOKEN_DECIMAL, TOKEN_STRING, TOKEN_VARIABLE, TOKEN_TAG, TOKEN_ERROR} Category;
 
 typedef struct Token {
     char *text;
@@ -129,6 +130,14 @@ void tokenizer_read_number(Tokenizer *tokenizer, int token, FILE *stream);
   *
   **/
 void tokenizer_read_atom(Tokenizer *tokenizer, int token, FILE *stream);
+
+/**
+  * 
+  * This function reads a lexical component of the category atom. A graphical
+  % atom is a non-empty sequence of characters + - * / . ^ & , ; : < > = ? ~ $ @ !.
+  *
+  **/
+void tokenizer_read_graphic_atom(Tokenizer *tokenizer, int token, FILE *stream);
 
 /**
   * 

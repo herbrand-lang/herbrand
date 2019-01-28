@@ -47,12 +47,12 @@ int program_realloc(Program *program) {
   * 
   **/
 void program_free(Program *program) {
-    int i;
-    for(i = 0; i < program->nb_rules; i++)
-        rule_free(program->rules[i]);
-    hashmap_free(program->indices);
-    free(program->rules);
-    free(program);
+	int i;
+	for(i = 0; i < program->nb_rules; i++)
+		rule_free(program->rules[i]);
+	hashmap_free(program->indices);
+	free(program->rules);
+	free(program);
 }
 
 /**
@@ -73,9 +73,9 @@ int program_is_full(Program *program) {
   * 
   **/
 int program_add_rule(Program *program, Rule *rule) {
-    if(program_is_full(program))
+	if(program_is_full(program))
 		if(program_realloc(program) == 0)
-            return 0;
+			return 0;
 	hashmap_append(program->indices, rule->name, program->nb_rules);
 	program->rules[program->nb_rules] = rule;
 	program->nb_rules++;
@@ -94,11 +94,8 @@ void program_listing(Program *program) {
 	for(i = 0; i < program->nb_rules; i++) {
 		printf("%s/%d :: ", program->rules[i]->name, program->rules[i]->arity);
 		term_print(program->rules[i]->type);
-        if(program->rules[i]->dynamic) printf(" #dynamic");
-        if(program->rules[i]->determinist)
-            printf(" #det");
-        else
-            printf(" #nondet");
+		printf(program->rules[i]->dynamic ? " #dynamic" : " #static");
+		printf(program->rules[i]->determinist ? " #det" : " #nondet");
 		printf("\n");
 	}
 }
@@ -112,6 +109,6 @@ void program_listing(Program *program) {
 void program_print(Program *program) {
 	int i;
 	for(i = 0; i < program->nb_rules; i++) {
-        rule_print(program->rules[i]);
+		rule_print(program->rules[i]);
 	}
 }
