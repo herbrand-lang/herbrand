@@ -297,6 +297,13 @@ Parser *parser_expression(Tokenizer *tokenizer, int start) {
 			term->type = TYPE_DECIMAL;
 			term->term.decimal = atof(token->text);
 			break;
+		case TOKEN_STRING:
+			term = malloc(sizeof(Term));
+			state->value = term;
+			term->type = TYPE_STRING;
+			term->term.string = malloc(sizeof(char)*(token->length+1));
+			strcpy(term->term.string, token->text);
+			break;
 		case TOKEN_LPAR:
 			term = term_list_empty();
 			list = term;

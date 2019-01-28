@@ -122,13 +122,13 @@ Tokenizer *tokenizer_read_stream(FILE *stream) {
 		// Read string
 		if(character == '"') {
 			tokenizer->tokens[token]->category = TOKEN_STRING;
-			tokenizer_add_char_token(tokenizer, token, character);
 			tokenizer->column++;
 			tokenizer_read_string(tokenizer, token, stream);
 		// Read tag
 		} else if(character == '#') {
 			tokenizer->tokens[token]->category = TOKEN_TAG;
 			tokenizer_add_char_token(tokenizer, token, character);
+			tokenizer->column++;
 			tokenizer_read_tag(tokenizer, token, stream);
 		// Read variable
 		} else if(character >= 65 && character <= 90 || character == '_') {
@@ -220,6 +220,7 @@ void tokenizer_read_string(Tokenizer *tokenizer, int token, FILE *stream) {
 		}
 		tokenizer_add_char_token(tokenizer, token, character);
 	}
+	tokenizer->tokens[token]->category = TOKEN_ERROR;
 }
 
 /**
