@@ -20,11 +20,20 @@
   *
   **/
 unsigned long hashmap_hash(Hashmap *map, unsigned char *key) {
-    unsigned long hash = 5381;
-    int c;
-    while(c = *key++)
-        hash = ((hash << 5) + hash) + c;
-    return hash % map->nb_registers;
+	int i, j;
+	unsigned int byte, crc, mask;
+	i = 0;
+	crc = 0xFFFFFFFF;
+	while(key[i] != '\0') {
+		byte = key[i];
+		crc = crc^byte;
+		for(j = 7; j >= 0; j--) {
+			mask = -(crc & 1);
+			crc = (crc >> 1)^(0xEDB88320 & mask);
+		}
+		i++;
+	}
+	return ~crc % map->nb_registers;
 }
 
 /**

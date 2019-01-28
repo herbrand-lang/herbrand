@@ -20,7 +20,7 @@
 
 typedef struct Program {
 	Rule **rules;
-	Hashmap **indices;
+	Hashmap *indices;
 	int nb_rules;
 	int max_rules;
 } Program;

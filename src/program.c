@@ -20,7 +20,7 @@
 Program *program_alloc() {
 	Program *program = malloc(sizeof(Program));
 	program->rules = malloc(sizeof(Rule*)*N_RULES);
-	program->indices = hashmap_alloc();
+	program->indices = hashmap_alloc(N_RULES);
 	program->nb_rules = 0;
 	program->max_rules = N_RULES;
 	return program;
