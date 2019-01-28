@@ -110,25 +110,8 @@ void program_listing(Program *program) {
   * 
   **/
 void program_print(Program *program) {
-	int i, j, k;
+	int i;
 	for(i = 0; i < program->nb_rules; i++) {
-        if(program->rules[i]->dynamic) printf("#dynamic ");
-        if(program->rules[i]->determinist)
-            printf("#det ");
-        else
-            printf("#nondet ");
-        printf("\n");
-		printf("(predicate %s %d ", program->rules[i]->name, program->rules[i]->arity);
-		term_print(program->rules[i]->type);
-		printf("\n");
-		for(j = 0; j < program->rules[i]->nb_clauses; j++) {
-			printf("\t(");
-			term_print(program->rules[i]->clauses[j]->head);
-			term_print(program->rules[i]->clauses[j]->body);
-			printf(")");
-			if(j == program->rules[i]->nb_clauses-1)
-				printf(")");
-			printf("\n");
-		}
+        rule_print(program->rules[i]);
 	}
 }

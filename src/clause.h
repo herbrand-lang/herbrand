@@ -40,3 +40,11 @@ Clause *clause_alloc();
   * 
   **/
 void clause_free(Clause *clause);
+
+/**
+  * 
+  * This function prints for the standard output
+  * the whole clause.
+  * 
+  **/
+void clause_print(Clause *clause);

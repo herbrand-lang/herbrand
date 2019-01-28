@@ -100,3 +100,27 @@ int rule_add_clause(Rule *rule, Clause *clause) {
 	rule->nb_clauses++;
 	return 1;
 }
+
+/**
+  * 
+  * This function prints for the standard output
+  * the whole rule.
+  * 
+  **/
+void rule_print(Rule *rule) {
+	int i;
+	if(rule->dynamic) printf("#dynamic ");
+	if(rule->determinist)
+		printf("#det ");
+	else
+		printf("#nondet ");
+	printf("\n");
+	printf("(predicate %s %d ", rule->name, rule->arity);
+	term_print(rule->type);
+	printf("\n");
+	for(i = 0; i < rule->nb_clauses; i++) {
+		printf("\t");
+		clause_print(rule->clauses[i]);
+		printf("\n");
+	}	
+}

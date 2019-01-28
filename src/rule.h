@@ -84,3 +84,11 @@ int rule_set_name(Rule *rule, char *name);
   * 
   **/
 int rule_add_clause(Rule *rule, Clause *clause);
+
+/**
+  * 
+  * This function prints for the standard output
+  * the whole rule.
+  * 
+  **/
+void rule_print(Rule *rule);

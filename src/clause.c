@@ -31,9 +31,35 @@ Clause *clause_alloc() {
   * 
   **/
 void clause_free(Clause *clause) {
-    if(clause->head != NULL)
-        term_free(clause->head);
-    if(clause->body != NULL)
-        term_free(clause->body);
-    free(clause);
+	if(clause->head != NULL)
+		term_free(clause->head);
+	if(clause->body != NULL)
+		term_free(clause->body);
+	free(clause);
+}
+
+/**
+  * 
+  * This function prints for the standard output
+  * the whole clause.
+  * 
+  **/
+void clause_print(Clause *clause) {
+	int i = 0;
+	Term *term;
+	printf("(");
+	term = clause->head;
+	while(term->term.list->head != NULL) {
+		if(i != 0) printf(" ");
+		term_print(term->term.list->head);
+		term = term->term.list->tail;
+		i++;
+	}
+	term = clause->body;
+	while(term->term.list->head != NULL) {
+		printf(" ");
+		term_print(term->term.list->head);
+		term = term->term.list->tail;
+	}
+	printf(")");
 }
