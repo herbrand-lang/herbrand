@@ -198,12 +198,12 @@ Tokenizer *tokenizer_read_stream(FILE *stream) {
 		}
 		// Resize text of the token
 		tokenizer->tokens[token]->text = realloc(tokenizer->tokens[token]->text, sizeof(char)*(tokenizer->tokens[token]->length+1));
+		token++;
+		tokenizer->nb_tokens++;
 		// Reallocate tokens if needs
 		if(tokenizer_is_full(tokenizer))
 			if(!tokenizer_realloc(tokenizer))
 				return NULL;
-		token++;
-		tokenizer->nb_tokens++;
 		tokenizer_init_token(tokenizer, token);
 	}
 	return tokenizer;
