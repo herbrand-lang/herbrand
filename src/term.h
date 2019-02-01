@@ -3,7 +3,7 @@
  * FILENAME: term.h
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 27.01.2019
+ * UPDATED: 01.02.2019
  * 
  *H*/
 
@@ -50,6 +50,27 @@ void term_free(Term *term);
   * 
   **/
 Term *term_list_empty();
+
+/**
+  * 
+  * This function checks whether a list is empty.
+  * 
+  **/
+int term_list_is_null(Term *term);
+
+/**
+  * 
+  * This function returns the head of a list.
+  * 
+  **/
+Term *term_list_get_head(Term *term);
+
+/**
+  * 
+  * This function returns the tail of a list.
+  * 
+  **/
+Term *term_list_get_tail(Term *term);
 
 /**
   * 

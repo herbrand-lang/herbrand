@@ -3,7 +3,7 @@
  * FILENAME: term.c
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 27.01.2019
+ * UPDATED: 01.02.2019
  * 
  *H*/
 
@@ -47,6 +47,33 @@ Term *term_list_empty() {
     list->term.list->head = NULL;
     list->term.list->tail = NULL;
     return list;
+}
+
+/**
+  * 
+  * This function checks whether a list is empty.
+  * 
+  **/
+int term_list_is_null(Term *term) {
+	return term->type == TYPE_LIST && term->term.list->head == NULL;
+}
+
+/**
+  * 
+  * This function returns the head of a list.
+  * 
+  **/
+Term *term_list_get_head(Term *term) {
+	return term->term.list->head;
+}
+
+/**
+  * 
+  * This function returns the tail of a list.
+  * 
+  **/
+Term *term_list_get_tail(Term *term) {
+	return term->term.list->tail;
 }
 
 /**
