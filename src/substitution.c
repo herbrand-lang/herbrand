@@ -13,13 +13,71 @@
 
 /**
   * 
+  * Identity substitution whitout any variable.
+  * 
+  **/
+Substitution LOGIC_SUBSTITUTION_ID = {NULL, NULL, NULL, 0, 0};
+
+/**
+  * 
   * This function creates a substitution, returning a pointer
   * to a newly initialized Substitution struct.
   * 
   **/
 Substitution *substitution_alloc(int nb_vars) {
 	Substitution *subs = malloc(sizeof(Substitution));
-	subs->domain = malloc(sizeof(Term)*nb_vars);
-	subs->range = malloc(sizeof(Term)*nb_vars);
+	subs->domain = malloc(sizeof(char*)*nb_vars);
+	subs->range = malloc(sizeof(Term*)*nb_vars);
+	subs->indices = hashmap_alloc(nb_vars);
+	subs->nb_vars = 0;
+	subs->max_vars = nb_vars;
 	return subs;
+}
+
+/**
+  * 
+  * This function frees a previously allocated substitution.
+  * The terms, strings and hashmap underlying the substitution
+  * will also be deallocated.
+  * 
+  **/
+void substitution_free(Substitution *subs) {
+	int i;
+	for(i = 0; i < subs->nb_vars; i++) {
+		free(subs->domain[i]);
+		term_free(subs->range[i]);
+	}
+	hashmap_free(subs->indices);
+	free(subs);
+}
+
+/**
+  * 
+  * This function adds a new link into a substitution.
+  * Returns 0 if the request fails, or 1 if it succeeds.
+  * 
+  **/
+int substitution_add_link(Substitution *subs, Term *var, Term *value) {
+	if(subs->nb_vars == subs->max_vars)
+		return 0;
+	subs->domain[subs->nb_vars] = malloc(sizeof(char)*(strlen(var->term.string)+1));
+	subs->range[subs->nb_vars] = value;
+	strcpy(subs->domain[subs->nb_vars], var->term.string);
+	hashmap_append(subs->indices, var->term.string, subs->nb_vars);
+	subs->nb_vars++;
+	return 1;
+}
+
+/**
+  * 
+  * This function gets the term linked with a variable
+  * from a substitution. If variable is not contained 
+  * in the substitution, returns NULL.
+  * 
+  **/
+Term *substitution_get_link(Substitution *subs, Term *var) {
+	int index = hashmap_lookup(subs->indices, var->term.string);
+	if(index != -1)
+		return subs->range[index];
+	return NULL;
 }
