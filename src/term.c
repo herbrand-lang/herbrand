@@ -3,7 +3,7 @@
  * FILENAME: term.c
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 01.02.2019
+ * UPDATED: 27.03.2019
  * 
  *H*/
 
@@ -41,12 +41,12 @@ void term_free(Term *term) {
   * 
   **/
 Term *term_list_empty() {
-    Term *list = malloc(sizeof(Term));
-    list->type = TYPE_LIST;
-    list->term.list = malloc(sizeof(List));
-    list->term.list->head = NULL;
-    list->term.list->tail = NULL;
-    return list;
+		Term *list = malloc(sizeof(Term));
+		list->type = TYPE_LIST;
+		list->term.list = malloc(sizeof(List));
+		list->term.list->head = NULL;
+		list->term.list->tail = NULL;
+		return list;
 }
 
 /**
@@ -83,11 +83,11 @@ Term *term_list_get_tail(Term *term) {
   * 
   **/
 Term *term_list_add_element(Term *list, Term *term) {
-    while(list->term.list->head != NULL)
-        list = list->term.list->tail;
-    list->term.list->head = term;
-    list->term.list->tail = term_list_empty();
-    return list->term.list->tail;
+		while(list->term.list->head != NULL)
+				list = list->term.list->tail;
+		list->term.list->head = term;
+		list->term.list->tail = term_list_empty();
+		return list->term.list->tail;
 }
 
 /**
@@ -97,13 +97,13 @@ Term *term_list_add_element(Term *list, Term *term) {
   * 
   **/
 Term *term_list_set_tail(Term *list, Term *term) {
-    Term *prev;
-    while(list->term.list->head != NULL) {
-        prev = list;
-        list = list->term.list->tail;
-    }
-    term_free(prev->term.list->tail);
-    prev->term.list->tail = term;
+		Term *prev;
+		while(list->term.list->head != NULL) {
+				prev = list;
+				list = list->term.list->tail;
+		}
+		term_free(prev->term.list->tail);
+		prev->term.list->tail = term;
 }
 
 /**

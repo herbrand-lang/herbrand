@@ -3,7 +3,7 @@
  * FILENAME: program.c
  * DESCRIPTION: Data structures and functions for storing and manipuling substitutions
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 28.01.2019
+ * UPDATED: 27.03.2019
  * 
  *H*/
 
@@ -80,4 +80,43 @@ Term *substitution_get_link(Substitution *subs, Term *var) {
 	if(index != -1)
 		return subs->range[index];
 	return NULL;
+}
+
+/**
+  *
+  * This function composes two substitutions. This
+  * function modifies the original first substitution.
+  * 
+  **/
+void substitution_compose(Substitution *u, Substitution *v) {
+	int i;
+	for(i = 0; i < u->nb_vars; i++) 
+		u->range[i] = term_apply_substitution(u->range[i], v);
+}
+
+/**
+  *
+  * This function applies a substitution to a term.
+  * 
+  **/
+Term *term_apply_substitution(Term *term, Substitution *subs) {
+	Term *term2;
+	if(term->type == TYPE_VARIABLE) {
+		term2 = substitution_get_link(subs, term);
+		if(term2 == NULL)
+			return term;
+		else
+			return term2;
+	} else if(term->type == TYPE_LIST) {
+		if(term_list_is_null(term))
+			return term;
+		term2 = term_list_empty();
+		while(term->type == TYPE_LIST && !term_list_is_null(term)) {
+			term_list_add_element(term2, term_apply_substitution(term_list_get_head(term), subs));
+			term = term_list_get_tail(term);
+		}
+		term_list_set_tail(term2, term_apply_substitution(term, subs));
+	} else {
+		return term;
+	}
 }

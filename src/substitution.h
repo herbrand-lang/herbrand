@@ -3,7 +3,7 @@
  * FILENAME: program.c
  * DESCRIPTION: Data structures and functions for storing and manipuling substitutions
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 01.02.2019
+ * UPDATED: 27.03.2019
  * 
  *H*/
 
@@ -69,3 +69,18 @@ int substitution_add_link(Substitution *subs, Term *var, Term *value);
   * 
   **/
 Term *substitution_get_link(Substitution *subs, Term *var);
+
+/**
+	*
+	* This function composes two substitutions. This
+	* function modifies the original first substitution.
+	* 
+	**/
+void substitution_compose(Substitution *u, Substitution *v);
+
+/**
+  *
+  * This function applies a substitution to a term.
+  * 
+  **/
+Term *term_apply_substitution(Term *term, Substitution *subs);
