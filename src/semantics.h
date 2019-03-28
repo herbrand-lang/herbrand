@@ -10,8 +10,36 @@
 #include <string.h>
 #include "term.h"
 #include "substitution.h"
+#include "program.h"
 
 
+#ifndef LOGIC_SEMANTICS_H
+#define LOGIC_SEMANTICS_H
+
+typedef struct Goal {
+  Term *first;
+  struct Goal *next;
+} Goal;
+
+typedef struct State {
+  Goal *goal;
+  int nb_terms;
+  Substitution *substitution;
+	struct State *parent;
+  struct State *next;
+} State;
+
+typedef struct Derivation {
+	State *points;
+  int nb_states;
+  int nb_inferences;
+} Derivation;
+
+#endif
+
+
+
+// UNIFICATION
 
 /**
   * 
@@ -60,3 +88,107 @@ Substitution *semantics_unify_atoms(Term *atom1, Term *atom2);
   * 
   **/
 Substitution *semantics_unify_strings(Term *str1, Term *str2);
+
+
+
+// RESOLUTION
+
+/**
+  * 
+  * This function creates a derivaiton returning a pointer
+  * to a newly initialized Derivation struct.
+  * 
+  **/
+Derivation *derivation_alloc();
+
+/**
+  * 
+  * This function frees a previously allocated derivation.
+  * The states and terms underlying the derivation will
+  * also be deallocated.
+  * 
+  **/
+void derivation_free(Derivation *D);
+
+/**
+  * 
+  * This function pushes a new state at the beginning
+  * of a derivation.
+  * 
+  **/
+void derivation_push_state(Derivation *D, State *state);
+
+/**
+  * 
+  * This function pops a new state from the beginning
+  * of a derivation.
+  * 
+  **/
+State *derivation_pop_state(Derivation *D);
+
+/**
+  * 
+  * This function creates an state returning a pointer
+  * to a newly initialized State struct.
+  * 
+  **/
+State *state_alloc();
+
+/**
+  * 
+  * This function creates an state from a new goal,
+  * returning a pointer to a newly initialized State
+  * struct.
+  * 
+  **/
+State *state_init_goal(Term *goal);
+
+/**
+  * 
+  * This function selects the most left term
+	* of the goal in a state.
+  * 
+  **/
+void state_select_term(State *state, Term *term);
+
+/**
+  * 
+  * This function frees a previously allocated state.
+  * The terms and substitution underlying the state will
+  * also be deallocated.
+  * 
+  **/
+void state_free(State *state);
+
+/**
+  * 
+  * This function creates a goal returning a pointer
+  * to a newly initialized Goal struct.
+  * 
+  **/
+Goal *goal_alloc();
+
+/**
+  * 
+  * This function frees a previously allocated goal.
+  * The terms underlying the goal will also be deallocated.
+  * 
+  **/
+void goal_free(Goal *goal);
+
+/**
+  * 
+	* This function creates a derivation from a new goal,
+	* returning a pointer to a newly initialized Derivation
+  * struct.
+	*
+  **/
+Derivation *semantics_query(Term *goal);
+
+/**
+  * 
+	* This function finds and returns the next computed
+	* answer of a derivation.
+	*
+  **/
+Substitution *semantics_answer(Program *program, Derivation *D);
