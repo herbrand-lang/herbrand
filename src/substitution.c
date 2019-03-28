@@ -156,6 +156,10 @@ Term *term_apply_substitution(Term *term, Substitution *subs) {
   **/
 void substitution_print(Substitution *subs) {
 	int i;
+	if(subs == NULL) {
+		printf("false");
+		return;
+	}
 	printf("{");
 	for(i = 0; i < subs->nb_vars; i++) {
 		if(i > 0) printf(", ");

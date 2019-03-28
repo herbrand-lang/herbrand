@@ -3,7 +3,7 @@
  * FILENAME: semantics.h
  * DESCRIPTION: Declarative semantics for the language
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 01.02.2019
+ * UPDATED: 28.03.2019
  * 
  *H*/
 
@@ -16,14 +16,8 @@
 #ifndef LOGIC_SEMANTICS_H
 #define LOGIC_SEMANTICS_H
 
-typedef struct Goal {
-  Term *first;
-  struct Goal *next;
-} Goal;
-
 typedef struct State {
-  Goal *goal;
-  int nb_terms;
+  Term *goal;
   Substitution *substitution;
 	struct State *parent;
   struct State *next;
@@ -146,10 +140,18 @@ State *state_init_goal(Term *goal);
 /**
   * 
   * This function selects the most left term
-	* of the goal in a state.
+  * of the goal in a state.
   * 
   **/
-void state_select_term(State *state, Term *term);
+Term *term_select_most_left(Term *term);
+
+/**
+  * 
+  * This function replaces the most left term
+  * of the goal in a state.
+  * 
+  **/
+Term *term_replace_most_left(Term *term, Term *head);
 
 /**
   * 
@@ -161,20 +163,13 @@ void state_select_term(State *state, Term *term);
 void state_free(State *state);
 
 /**
-  * 
-  * This function creates a goal returning a pointer
-  * to a newly initialized Goal struct.
-  * 
-  **/
-Goal *goal_alloc();
-
-/**
-  * 
-  * This function frees a previously allocated goal.
-  * The terms underlying the goal will also be deallocated.
+  *
+  * This function creates an state from a inference,
+  * returning a pointer to a newly initialized State
+  * struct.
   * 
   **/
-void goal_free(Goal *goal);
+State *state_inference(State *point, Term *body, Substitution *subs);
 
 /**
   * 

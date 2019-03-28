@@ -3,7 +3,7 @@
  * FILENAME: semantics.c
  * DESCRIPTION: Declarative semantics for the language
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 27.03.2019
+ * UPDATED: 28.03.2019
  * 
  *H*/
 
@@ -64,6 +64,8 @@ Substitution *semantics_unify_lists(Term *term1, Term *term2, int occurs_check) 
 	Substitution *mgu, *subs2, *subs = substitution_alloc(0);
 	if(term_list_is_null(term1) && term_list_is_null(term2))
 		return subs;
+	else if(term_list_is_null(term1) || term_list_is_null(term2))
+		return NULL;
 	while(term1->type == TYPE_LIST && term2->type == TYPE_LIST
 	&& !term_list_is_null(term1) && !term_list_is_null(term2)) {
 		mgu = semantics_unify_terms(
@@ -208,7 +210,6 @@ State *state_alloc() {
 	state->next = NULL;
 	state->parent = NULL;
 	state->substitution = NULL;
-	state->nb_terms = 0;
 	return state;
 }
 
@@ -221,23 +222,49 @@ State *state_alloc() {
   **/
 State *state_init_goal(Term *goal) {
 	State *state = state_alloc();
-	state->goal = goal_alloc();
-	state->goal->first = goal;
-	state->substitution = substitution_alloc_from_term(goal);
-	state->nb_terms = 1;
+	state->goal = goal;
+	//state->substitution = substitution_alloc_from_term(goal);
+	state->substitution = substitution_alloc(0);
 	return state;
 }
 
 /**
   * 
   * This function selects the most left term
-	* of the goal in a state.
+  * of the goal in a state.
   * 
   **/
-void state_select_term(State *state, Term *term) {
-	if(state->goal == NULL)
+Term *term_select_most_left(Term *term) {
+	if(term == NULL || term_list_is_null(term))
 		return NULL;
-	return state->goal->first;
+	while(term->type == TYPE_LIST && term->term.list->head->type == TYPE_LIST)
+		term = term->term.list->head;
+	return term;
+}
+
+/**
+  * 
+  * This function replaces the most left term
+  * of the goal in a state.
+  * 
+  **/
+Term *term_replace_most_left(Term *term, Term *head) {
+	if(term == NULL || term_list_is_null(term))
+		return head;
+	if(term->type == TYPE_LIST) {
+		if(term->term.list->head->type == TYPE_LIST) {
+			return term_list_create(
+				term_replace_most_left(term->term.list->head, head),
+				term->term.list->tail);
+		} else {
+			if(head == NULL) {
+				return term->term.list->tail;
+			} else {
+				return term_list_create(head, term->term.list->tail);
+			}
+		}
+	}
+	return NULL;
 }
 
 /**
@@ -256,38 +283,26 @@ void state_free(State *state) {
 }
 
 /**
-  * 
-  * This function creates a goal returning a pointer
-  * to a newly initialized Goal struct.
-  * 
-  **/
-Goal *goal_alloc() {
-	Goal *goal = malloc(sizeof(Goal));
-	goal->first = NULL;
-	goal->next = NULL;
-	return goal;
-}
-
-/**
-  * 
-  * This function frees a previously allocated goal.
-  * The terms underlying the goal will also be deallocated.
-  * 
-  **/
-void goal_free(Goal *goal) {
-	if(goal->first != NULL)
-		term_free(goal->first);
-	if(goal->next != NULL)
-		goal_free(goal->next);
-	free(goal);
-}
-
-/**
-  * 
-	* This function creates a derivation from a new goal,
-	* returning a pointer to a newly initialized Derivation
+  *
+  * This function creates an state from a inference,
+  * returning a pointer to a newly initialized State
   * struct.
-	*
+  * 
+  **/
+State *state_inference(State *point, Term *body, Substitution *subs) {
+	State *state = state_alloc();
+	state->goal = term_apply_substitution(term_replace_most_left(state->goal, body), subs);
+	state->substitution = substitution_compose(point->substitution, subs);
+	state->parent = point;
+	return state;
+}
+
+/**
+  * 
+  * This function creates a derivation from a new goal,
+  * returning a pointer to a newly initialized Derivation
+  * struct.
+  *
   **/
 Derivation *semantics_query(Term *goal) {
 	Derivation *D = derivation_alloc();
@@ -298,10 +313,42 @@ Derivation *semantics_query(Term *goal) {
 
 /**
   * 
-	* This function finds and returns the next computed
-	* answer of a derivation.
-	*
+  * This function finds and returns the next computed
+  * answer of a derivation.
+  *
   **/
 Substitution *semantics_answer(Program *program, Derivation *D) {
-
+	int i;
+	State *point, *state;
+	Rule *rule;
+	Clause *clause;
+	Term *term, *body;
+	Substitution *mgu;
+	while(1) {
+		point = derivation_pop_state(D);
+		// If no more points, there are no more answers
+		if(point == NULL)
+			return NULL;
+		term = term_select_most_left(point->goal);
+		// If no more terms, this choice point is an answer
+		if(term == NULL)
+			return point->substitution;
+		// Else, do a resolution step
+		// If not callable, error
+		//if(!term_is_callable(term))
+			// error
+		rule = program_get_rule(program, term->term.list->head->term.string);
+		// If rule does not exist, fail
+		if(rule == NULL)
+			continue;
+		// For each clause in the rule, check unification
+		for(i = rule->nb_clauses-1; i >= 0; i--) {
+			clause = clause_rename_variables(rule->clauses[i]);
+			mgu = semantics_unify_terms(clause->head, term->term.list->tail, 0);
+			if(mgu != NULL) {
+				state = state_inference(point, clause->body, mgu);
+				derivation_push_state(D, state);
+			}
+		}
+	}
 }

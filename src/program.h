@@ -73,6 +73,15 @@ int program_add_rule(Program *program, Rule *rule);
 
 /**
   * 
+  * This function returns the rule of the program
+	* by its identifier. If the rule does not exist
+	* in the program, returns NULL.
+  * 
+  **/
+Rule *program_get_rule(Program *program, char *rule_name);
+
+/**
+  * 
   * This function prints for the standard output
   * the list of predicates stored in a program, with
   * the format "name/arity :: type".

@@ -35,19 +35,52 @@ int main(int argc, char *argv[]) {
 		}
 		program_free(program);
 	} else {
-		interactive_mode();
+		interactive_query();
 	}
 	return 0;
 }
 
 /**
   * 
-  * This function starts the interactive mode.
+  * This function starts the interactive
+  * query mode.
   * 
   */
-void interactive_mode() {
+void interactive_query() {
+	Program *program;
+	FILE *file;
+	Derivation *D;
+	Substitution *answer;
+	Term *term = NULL;
+	program = program_alloc();
+	file = fopen("../sample/append.lo", "r");
+	if(file != NULL)
+		parser_stream(program, file);
+	while(1) {
+		while(term == NULL) {
+			printf("logic> ");
+			term = parser_term(stdin);
+		}
+		D = semantics_query(term);
+		do {
+			answer = semantics_answer(program, D);
+			substitution_print(answer);
+			printf(" ");
+		} while(answer != NULL && getchar() == ';');
+		if(answer == NULL)
+			printf("\n");
+		term = NULL;
+	}
+}
+
+/**
+  * 
+  * This function starts the interactive
+  * unification mode.
+  * 
+  **/
+void interactive_unification() {
 	Term *term1 = NULL, *term2 = NULL;
-	char c;
 	Substitution *mgu;
 	while(1) {
 		while(term1 == NULL) {

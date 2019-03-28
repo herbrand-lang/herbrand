@@ -23,7 +23,16 @@ int main(int argc, char *argv[]);
 
 /**
   * 
-  * This function starts the interactive mode.
+  * This function starts the interactive
+  * query mode.
   * 
   **/
-void interactive_mode();
+void interactive_query();
+
+/**
+  * 
+  * This function starts the interactive
+  * unification mode.
+  * 
+  **/
+void interactive_unification();

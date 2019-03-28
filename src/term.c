@@ -3,7 +3,7 @@
  * FILENAME: term.c
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 27.03.2019
+ * UPDATED: 28.03.2019
  * 
  *H*/
 
@@ -32,6 +32,64 @@ void term_free(Term *term) {
 			break;
 	}
 	free(term);
+}
+
+/**
+  * 
+  * This function renames the variables of a term.
+  * 
+  **/
+Term *term_rename_variables(Term *term, int *id, Hashmap *vars) {
+	int index, mod, length = 2;
+	Term *var;
+	if(term == NULL)
+		return NULL;
+	else if(term->type == TYPE_VARIABLE) {
+		index = hashmap_lookup(vars, term->term.string);
+		var = malloc(sizeof(Term));
+		var->type = TYPE_VARIABLE;
+		if(index != -1) {
+			mod = index;
+			while(mod != 0) {
+				mod /= 10;
+				length++;
+			}
+			var->term.string = malloc(sizeof(char)*length);
+			sprintf(var->term.string, "$%d", index);
+			return var;
+		} else {
+			(*id)++;
+			mod = *id;
+			while(mod != 0) {
+				mod /= 10;
+				length++;
+			}
+			var->term.string = malloc(sizeof(char)*length);
+			hashmap_append(vars, term->term.string, *id);
+			sprintf(var->term.string, "$%d", *id);
+		}
+		return var;
+	} else if(term->type == TYPE_LIST && !term_list_is_null(term)) {
+		return term_list_create(
+			term_rename_variables(term->term.list->head, id, vars),
+			term_rename_variables(term->term.list->tail, id, vars));
+	} else
+		return term;
+}
+
+/**
+  * 
+  * This function creates a list, returning a
+  * pointer to a newly initialized Term struct.
+  * 
+  **/
+Term *term_list_create(Term *head, Term *tail) {
+		Term *list = malloc(sizeof(Term));
+		list->type = TYPE_LIST;
+		list->term.list = malloc(sizeof(List));
+		list->term.list->head = head;
+		list->term.list->tail = tail;
+		return list;
 }
 
 /**

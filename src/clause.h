@@ -3,13 +3,14 @@
  * FILENAME: clause.h
  * DESCRIPTION: Data structures and functions for storing and manipuling clauses
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 27.01.2019
+ * UPDATED: 28.03.2019
  * 
  *H*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "term.h"
+#include "hashmap.h"
 
 
 
@@ -40,6 +41,13 @@ Clause *clause_alloc();
   * 
   **/
 void clause_free(Clause *clause);
+
+/**
+  * 
+  * This function renames the variables of a clause.
+  * 
+  **/
+Clause *clause_rename_variables(Clause *clause);
 
 /**
   * 

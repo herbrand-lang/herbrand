@@ -26,9 +26,9 @@ typedef struct Rule {
 	char *name;
 	int arity;
 	int nb_clauses;
-    int max_clauses;
-    int dynamic;
-    int determinist;
+  int max_clauses;
+  int dynamic;
+  int determinist;
 } Rule;
 
 #endif

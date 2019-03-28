@@ -3,13 +3,14 @@
  * FILENAME: term.h
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 27.03.2019
+ * UPDATED: 28.03.2019
  * 
  *H*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "hashmap.h"
 
 
 
@@ -43,6 +44,21 @@ typedef struct List {
   * 
   **/
 void term_free(Term *term);
+
+/**
+  * 
+  * This function renames the variables of a term.
+  * 
+  **/
+Term *term_rename_variables(Term *term, int *id, Hashmap *vars);
+
+/**
+  * 
+  * This function creates a list, returning a
+  * pointer to a newly initialized Term struct.
+  * 
+  **/
+Term *term_list_create(Term *head, Term *tail);
 
 /**
   * 
