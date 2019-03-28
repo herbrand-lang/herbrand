@@ -3,7 +3,7 @@
  * FILENAME: program.h
  * DESCRIPTION: Data structures and functions for storing and manipuling programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 27.01.2019
+ * UPDATED: 29.03.2019
  * 
  *H*/
 
@@ -23,6 +23,7 @@ typedef struct Program {
 	Hashmap *indices;
 	int nb_rules;
 	int max_rules;
+  int renames;
 } Program;
 
 #endif

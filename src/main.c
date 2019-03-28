@@ -51,6 +51,7 @@ void interactive_query() {
 	FILE *file;
 	Derivation *D;
 	Substitution *answer;
+	char c, d;
 	Term *term = NULL;
 	program = program_alloc();
 	file = fopen("../sample/append.lo", "r");
@@ -66,7 +67,9 @@ void interactive_query() {
 			answer = semantics_answer(program, D);
 			substitution_print(answer);
 			printf(" ");
-		} while(answer != NULL && getchar() == ';');
+			c = getchar();
+			while((d = getchar()) != '\n' && d != EOF);
+		} while(answer != NULL && c == ';');
 		if(answer == NULL)
 			printf("\n");
 		term = NULL;

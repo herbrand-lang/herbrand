@@ -3,7 +3,7 @@
  * FILENAME: semantics.c
  * DESCRIPTION: Declarative semantics for the language
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 28.03.2019
+ * UPDATED: 29.03.2019
  * 
  *H*/
 
@@ -74,7 +74,7 @@ Substitution *semantics_unify_lists(Term *term1, Term *term2, int occurs_check) 
 			occurs_check);
 		if(mgu == NULL)
 			return NULL;
-		subs2 = substitution_compose(subs, mgu);
+		subs2 = substitution_compose(subs, mgu, 1);
 		term1 = term_apply_substitution(term_list_get_tail(term1), mgu);
 		term2 = term_apply_substitution(term_list_get_tail(term2), mgu);
 		substitution_free(subs);
@@ -84,7 +84,7 @@ Substitution *semantics_unify_lists(Term *term1, Term *term2, int occurs_check) 
 	mgu = semantics_unify_terms(term1, term2, occurs_check);
 	if(mgu == NULL)
 		return NULL;
-	subs2 = substitution_compose(subs, mgu);
+	subs2 = substitution_compose(subs, mgu, 1);
 	substitution_free(subs);
 	substitution_free(mgu);
 	return subs2;
@@ -223,8 +223,8 @@ State *state_alloc() {
 State *state_init_goal(Term *goal) {
 	State *state = state_alloc();
 	state->goal = goal;
-	//state->substitution = substitution_alloc_from_term(goal);
-	state->substitution = substitution_alloc(0);
+	state->substitution = substitution_alloc_from_term(goal);
+	//state->substitution = substitution_alloc(0);
 	return state;
 }
 
@@ -292,7 +292,7 @@ void state_free(State *state) {
 State *state_inference(State *point, Term *body, Substitution *subs) {
 	State *state = state_alloc();
 	state->goal = term_apply_substitution(term_replace_most_left(state->goal, body), subs);
-	state->substitution = substitution_compose(point->substitution, subs);
+	state->substitution = substitution_compose(point->substitution, subs, 0);
 	state->parent = point;
 	return state;
 }
@@ -343,8 +343,8 @@ Substitution *semantics_answer(Program *program, Derivation *D) {
 			continue;
 		// For each clause in the rule, check unification
 		for(i = rule->nb_clauses-1; i >= 0; i--) {
-			clause = clause_rename_variables(rule->clauses[i]);
-			mgu = semantics_unify_terms(clause->head, term->term.list->tail, 0);
+			clause = clause_rename_variables(rule->clauses[i], &(program->renames));
+			mgu = semantics_unify_terms(term->term.list->tail, clause->head, 0);
 			if(mgu != NULL) {
 				state = state_inference(point, clause->body, mgu);
 				derivation_push_state(D, state);

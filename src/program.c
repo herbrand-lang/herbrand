@@ -3,7 +3,7 @@
  * FILENAME: program.c
  * DESCRIPTION: Data structures and functions for storing and manipuling programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 27.01.2019
+ * UPDATED: 29.03.2019
  * 
  *H*/
 
@@ -23,6 +23,7 @@ Program *program_alloc() {
 	program->indices = hashmap_alloc(N_RULES);
 	program->nb_rules = 0;
 	program->max_rules = N_RULES;
+	program->renames = 0;
 	return program;
 }
 

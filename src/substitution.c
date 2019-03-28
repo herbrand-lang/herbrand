@@ -3,7 +3,7 @@
  * FILENAME: program.c
  * DESCRIPTION: Data structures and functions for storing and manipuling substitutions
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 27.03.2019
+ * UPDATED: 29.03.2019
  * 
  *H*/
 
@@ -110,13 +110,14 @@ Term *substitution_get_link(Substitution *subs, Term *var) {
   * function modifies the original first substitution.
   * 
   **/
-Substitution *substitution_compose(Substitution *u, Substitution *v) {
+Substitution *substitution_compose(Substitution *u, Substitution *v, int join) {
 	int i;
-	Substitution *subs = substitution_alloc(u->nb_vars+v->nb_vars);
+	Substitution *subs = substitution_alloc(join ? u->nb_vars+v->nb_vars : u->nb_vars);
 	for(i = 0; i < u->nb_vars; i++)
 		substitution_add_link(subs, u->domain[i], term_apply_substitution(u->range[i], v));
-	for(i = 0; i < v->nb_vars; i++)
-		substitution_add_link(subs, v->domain[i], v->range[i]);
+	if(join)
+		for(i = 0; i < v->nb_vars; i++)
+			substitution_add_link(subs, v->domain[i], v->range[i]);
 	return subs;
 }
 
@@ -136,14 +137,9 @@ Term *term_apply_substitution(Term *term, Substitution *subs) {
 	} else if(term->type == TYPE_LIST) {
 		if(term_list_is_null(term))
 			return term;
-		term2 = term_list_empty();
-		tail = term2;
-		while(term->type == TYPE_LIST && !term_list_is_null(term)) {
-			tail = term_list_add_element(tail, term_apply_substitution(term_list_get_head(term), subs));
-			term = term_list_get_tail(term);
-		}
-		term_list_set_tail(term2, term_apply_substitution(term, subs));
-		return term2;
+		return term_list_create(
+			term_apply_substitution(term->term.list->head, subs),
+			term_apply_substitution(term->term.list->tail, subs));
 	} else {
 		return term;
 	}

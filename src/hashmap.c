@@ -58,7 +58,8 @@ void hashmap_append(Hashmap *map, unsigned char *key, int value) {
 	int hash = hashmap_hash(map, key);
 	HashmapRegister *p = map->map[hash], *q = malloc(sizeof(HashmapRegister)), *r;
 	q->next = NULL;
-	q->key = key;
+	q->key = malloc(sizeof(char)*(strlen(key)+1));
+	strcpy(q->key, key);
 	q->value = value;
 	if(p == NULL) {
 		map->map[hash] = q;

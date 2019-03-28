@@ -3,7 +3,7 @@
  * FILENAME: clause.h
  * DESCRIPTION: Data structures and functions for storing and manipuling clauses
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 28.03.2019
+ * UPDATED: 29.03.2019
  * 
  *H*/
 
@@ -47,7 +47,7 @@ void clause_free(Clause *clause);
   * This function renames the variables of a clause.
   * 
   **/
-Clause *clause_rename_variables(Clause *clause);
+Clause *clause_rename_variables(Clause *clause, int *id);
 
 /**
   * 
