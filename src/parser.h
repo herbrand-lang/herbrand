@@ -41,6 +41,13 @@ void parser_free(Parser *state);
 
 /**
   * 
+  * This function parses a term from a stream.
+  * 
+  **/
+Term *parser_term(FILE *stream);
+
+/**
+  * 
   * This function parses an stream and loads a program.
   * 
   **/

@@ -23,6 +23,35 @@ void parser_free(Parser *state) {
 
 /**
   * 
+  * This function parses a term from a stream.
+  * 
+  **/
+Term *parser_term(FILE *stream) {
+	Term *term;
+	Tokenizer *tokenizer;
+	Parser *state;
+	tokenizer = tokenizer_read_stream(stream);
+	printf("%d tokens\n", tokenizer->nb_tokens);
+	state = parser_expression(tokenizer, 0);
+	if(!state->success) {
+		printf(
+			"(parser-error (line %d) (column %d) (found \"%s\")\n\t(message \"%s\"))\n",
+			tokenizer->tokens[state->next]->line,
+			tokenizer->tokens[state->next]->column,
+			state->next < tokenizer->nb_tokens ? tokenizer->tokens[state->next]->text : "",
+			state->error);
+		term = NULL;
+	} else {
+		term = state->value;
+	}
+	parser_free(state);
+	tokenizer_free(tokenizer);
+	return term;
+}
+
+
+/**
+  * 
   * This function parses an stream and loads a program.
   * 
   **/

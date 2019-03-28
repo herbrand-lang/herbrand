@@ -46,6 +46,14 @@ Substitution *substitution_alloc(int nb_vars);
 
 /**
   * 
+  * This function creates a substitution from a term,
+	* returning a pointer to a newly initialized Substitution struct.
+  * 
+  **/
+Substitution *substitution_alloc_from_term(Term *term);
+
+/**
+  * 
   * This function frees a previously allocated substitution.
   * The terms, strings and hashmap underlying the substitution
   * will also be deallocated.
@@ -59,7 +67,7 @@ void substitution_free(Substitution *subs);
   * Returns 0 if the request fails, or 1 if it succeeds.
   * 
   **/
-int substitution_add_link(Substitution *subs, Term *var, Term *value);
+int substitution_add_link(Substitution *subs, char *var, Term *value);
 
 /**
   * 
@@ -76,7 +84,7 @@ Term *substitution_get_link(Substitution *subs, Term *var);
 	* function modifies the original first substitution.
 	* 
 	**/
-void substitution_compose(Substitution *u, Substitution *v);
+Substitution *substitution_compose(Substitution *u, Substitution *v);
 
 /**
   *
@@ -84,3 +92,10 @@ void substitution_compose(Substitution *u, Substitution *v);
   * 
   **/
 Term *term_apply_substitution(Term *term, Substitution *subs);
+
+/**
+  * 
+  * This function prints for the standard output a substitution.
+  * 
+  **/
+void substitution_print(Substitution *subs);

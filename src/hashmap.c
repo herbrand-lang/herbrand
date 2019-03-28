@@ -3,7 +3,7 @@
  * FILENAME: hashmap.c
  * DESCRIPTION: 
  * AUTHORS: José Antonio Riaza Valverde
- * DATE: 26.01.2019
+ * DATE: 27.03.2019
  * 
  *H*/
 
@@ -84,6 +84,8 @@ void hashmap_append(Hashmap *map, unsigned char *key, int value) {
   **/
 Hashmap *hashmap_alloc(int nb_registers) {
 	int i;
+	if(nb_registers == 0)
+		nb_registers++;
 	Hashmap *map = malloc(sizeof(Hashmap));
 	if(map != NULL) {
 		map->nb_registers = nb_registers;

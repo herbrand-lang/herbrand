@@ -36,6 +36,28 @@ Substitution *substitution_alloc(int nb_vars) {
 
 /**
   * 
+  * This function creates a substitution from a term,
+	* returning a pointer to a newly initialized Substitution struct.
+  * 
+  **/
+Substitution *substitution_alloc_from_term(Term *term) {
+	int i, nb_vars = 0;
+	Term **vars = term_get_variables(term, &nb_vars);
+	Substitution *subs = malloc(sizeof(Substitution));
+	subs->domain = malloc(sizeof(char*)*nb_vars);
+	subs->range = malloc(sizeof(Term*)*nb_vars);
+	subs->indices = hashmap_alloc(nb_vars);
+	subs->nb_vars = 0;
+	subs->max_vars = nb_vars;
+	for(i = 0; i < nb_vars; i++) {
+		if(substitution_get_link(subs, vars[i]) == NULL)
+			substitution_add_link(subs, vars[i]->term.string, vars[i]);
+	}
+	return subs;
+}
+
+/**
+  * 
   * This function frees a previously allocated substitution.
   * The terms, strings and hashmap underlying the substitution
   * will also be deallocated.
@@ -45,7 +67,7 @@ void substitution_free(Substitution *subs) {
 	int i;
 	for(i = 0; i < subs->nb_vars; i++) {
 		free(subs->domain[i]);
-		term_free(subs->range[i]);
+		//term_free(subs->range[i]);
 	}
 	hashmap_free(subs->indices);
 	free(subs);
@@ -57,13 +79,13 @@ void substitution_free(Substitution *subs) {
   * Returns 0 if the request fails, or 1 if it succeeds.
   * 
   **/
-int substitution_add_link(Substitution *subs, Term *var, Term *value) {
+int substitution_add_link(Substitution *subs, char *var, Term *value) {
 	if(subs->nb_vars == subs->max_vars)
 		return 0;
-	subs->domain[subs->nb_vars] = malloc(sizeof(char)*(strlen(var->term.string)+1));
+	subs->domain[subs->nb_vars] = malloc(sizeof(char)*(strlen(var)+1));
 	subs->range[subs->nb_vars] = value;
-	strcpy(subs->domain[subs->nb_vars], var->term.string);
-	hashmap_append(subs->indices, var->term.string, subs->nb_vars);
+	strcpy(subs->domain[subs->nb_vars], var);
+	hashmap_append(subs->indices, var, subs->nb_vars);
 	subs->nb_vars++;
 	return 1;
 }
@@ -88,10 +110,14 @@ Term *substitution_get_link(Substitution *subs, Term *var) {
   * function modifies the original first substitution.
   * 
   **/
-void substitution_compose(Substitution *u, Substitution *v) {
+Substitution *substitution_compose(Substitution *u, Substitution *v) {
 	int i;
-	for(i = 0; i < u->nb_vars; i++) 
-		u->range[i] = term_apply_substitution(u->range[i], v);
+	Substitution *subs = substitution_alloc(u->nb_vars+v->nb_vars);
+	for(i = 0; i < u->nb_vars; i++)
+		substitution_add_link(subs, u->domain[i], term_apply_substitution(u->range[i], v));
+	for(i = 0; i < v->nb_vars; i++)
+		substitution_add_link(subs, v->domain[i], v->range[i]);
+	return subs;
 }
 
 /**
@@ -100,7 +126,7 @@ void substitution_compose(Substitution *u, Substitution *v) {
   * 
   **/
 Term *term_apply_substitution(Term *term, Substitution *subs) {
-	Term *term2;
+	Term *term2, *tail;
 	if(term->type == TYPE_VARIABLE) {
 		term2 = substitution_get_link(subs, term);
 		if(term2 == NULL)
@@ -111,12 +137,30 @@ Term *term_apply_substitution(Term *term, Substitution *subs) {
 		if(term_list_is_null(term))
 			return term;
 		term2 = term_list_empty();
+		tail = term2;
 		while(term->type == TYPE_LIST && !term_list_is_null(term)) {
-			term_list_add_element(term2, term_apply_substitution(term_list_get_head(term), subs));
+			tail = term_list_add_element(tail, term_apply_substitution(term_list_get_head(term), subs));
 			term = term_list_get_tail(term);
 		}
 		term_list_set_tail(term2, term_apply_substitution(term, subs));
+		return term2;
 	} else {
 		return term;
 	}
+}
+
+/**
+  * 
+  * This function prints for the standard output a substitution.
+  * 
+  **/
+void substitution_print(Substitution *subs) {
+	int i;
+	printf("{");
+	for(i = 0; i < subs->nb_vars; i++) {
+		if(i > 0) printf(", ");
+		printf("%s/", subs->domain[i]);
+		term_print(subs->range[i]);
+	}
+	printf("}");
 }

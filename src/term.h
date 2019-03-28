@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 
@@ -87,6 +88,14 @@ Term *term_list_add_element(Term *list, Term *term);
   * 
   **/
 Term *term_list_set_tail(Term *list, Term *term);
+
+/**
+  * 
+  * This function returns the list of variables
+	* contained in the term.
+  * 
+  **/
+Term **term_get_variables(Term *term, int *nb_vars);
 
 /**
   * 

@@ -108,6 +108,36 @@ Term *term_list_set_tail(Term *list, Term *term) {
 
 /**
   * 
+  * This function returns the list of variables
+	* contained in the term.
+  * 
+  **/
+Term **term_get_variables(Term *term, int *nb_vars) {
+	Term **vars_head, **vars_tail, **vars;
+	int nb_vars_head, nb_vars_tail;
+	if(term->type == TYPE_VARIABLE) {
+		nb_vars++;
+		vars = malloc(sizeof(Term*));
+		vars[0] = term;
+		return vars;
+	} else if(term->type == TYPE_LIST && !term_list_is_null(term)) {
+		nb_vars_head = 0;
+		nb_vars_tail = 0;
+		vars_head = term_get_variables(term_list_get_head(term), &nb_vars_head);
+		vars_tail = term_get_variables(term_list_get_head(term), &nb_vars_tail);
+		vars = malloc(sizeof(Term*)*(nb_vars_head+nb_vars_tail));
+		memcpy(vars, vars_head, sizeof(Term*)*nb_vars_head);
+		memcpy(vars+sizeof(Term*)*nb_vars_head, vars_tail, sizeof(Term*)*nb_vars_tail);
+		free(vars_head);
+		free(vars_tail);
+		return vars;
+	} else {
+		return NULL;
+	}
+}
+
+/**
+  * 
   * This function prints for the standard output a term.
   * 
   **/
