@@ -30,15 +30,16 @@ Term *parser_term(FILE *stream) {
 	Term *term;
 	Tokenizer *tokenizer;
 	Parser *state;
+	int token;
 	tokenizer = tokenizer_read_stream(stream);
-	printf("%d tokens\n", tokenizer->nb_tokens);
 	state = parser_expression(tokenizer, 0);
 	if(!state->success) {
+		token = state->next < tokenizer->nb_tokens ? state->next : tokenizer->nb_tokens-1;
 		printf(
 			"(parser-error (line %d) (column %d) (found \"%s\")\n\t(message \"%s\"))\n",
-			tokenizer->tokens[state->next]->line,
-			tokenizer->tokens[state->next]->column,
-			state->next < tokenizer->nb_tokens ? tokenizer->tokens[state->next]->text : "",
+			tokenizer->tokens[token]->line,
+			tokenizer->tokens[token]->column,
+			state->next < tokenizer->nb_tokens ? tokenizer->tokens[token]->text : "",
 			state->error);
 		term = NULL;
 	} else {
@@ -70,14 +71,16 @@ void parser_stream(Program *program, FILE *stream) {
 void parser_program(Program *program, Tokenizer *tokenizer) {
 	int start = 0;
 	Parser *state;
+	int token;
 	while(start < tokenizer->nb_tokens) {
 		state = parser_predicate(tokenizer, start);
 		if(!state->success) {
+			token = state->next < tokenizer->nb_tokens ? state->next : tokenizer->nb_tokens-1;
 			printf(
 				"(parser-error (line %d) (column %d) (found \"%s\")\n\t(message \"%s\"))\n",
-				tokenizer->tokens[state->next]->line,
-				tokenizer->tokens[state->next]->column,
-				state->next < tokenizer->nb_tokens ? tokenizer->tokens[state->next]->text : "",
+				tokenizer->tokens[token]->line,
+				tokenizer->tokens[token]->column,
+				state->next < tokenizer->nb_tokens ? tokenizer->tokens[token]->text : "",
 				state->error);
 			rule_free(state->value);
 			parser_free(state);

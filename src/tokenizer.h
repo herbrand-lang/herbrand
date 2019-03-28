@@ -80,7 +80,7 @@ int tokenizer_is_full(Tokenizer *tokenizer);
   * token in a tokenizer.
   * 
   **/
-void *tokenizer_init_token(Tokenizer *tokenizer, int token);
+int tokenizer_init_token(Tokenizer *tokenizer);
 
 /**
   * 
@@ -96,54 +96,3 @@ int tokenizer_add_char_token(Tokenizer *tokenizer, int token, char character);
   * 
   **/
 Tokenizer *tokenizer_read_stream(FILE *stream);
-
-/**
-  * 
-  * This function reads a lexical component of the category string. A string
-  * is any sequence between double quotes ('"').
-  *
-  **/
-void tokenizer_read_string(Tokenizer *tokenizer, int token, FILE *stream);
-
-/**
-  * 
-  * This function reads a lexical component of the category variable. A variable
-  * is a non-empty sequence of letters (a-zA-Z) and symbols (-_) starting by
-  * a uppercase letter (a-z).
-  *
-  **/
-void tokenizer_read_variable(Tokenizer *tokenizer, int token, FILE *stream);
-
-/**
-  * 
-  * This function reads a lexical component of the category number. A number
-  * is a non-empty sequence of numbers (0-9).
-  *
-  **/
-void tokenizer_read_number(Tokenizer *tokenizer, int token, FILE *stream);
-
-/**
-  * 
-  * This function reads a lexical component of the category atom. An atom is
-  * a non-empty sequence of letters (a-zA-Z) and symbols (-_) starting by
-  * a lowercase letter (a-z).
-  *
-  **/
-void tokenizer_read_atom(Tokenizer *tokenizer, int token, FILE *stream);
-
-/**
-  * 
-  * This function reads a lexical component of the category atom. A graphical
-  % atom is a non-empty sequence of characters + - * / . ^ & : < > = ? ~ $ @ !.
-  *
-  **/
-void tokenizer_read_graphic_atom(Tokenizer *tokenizer, int token, FILE *stream);
-
-/**
-  * 
-  * This function reads a lexical component of the category tag. A tag is
-  * the character '#' followed by a non-empty sequence of lowercase letters
-  * (a-z).
-  *
-  **/
-void tokenizer_read_tag(Tokenizer *tokenizer, int token, FILE *stream);

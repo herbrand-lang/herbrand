@@ -47,12 +47,19 @@ int main(int argc, char *argv[]) {
   */
 void interactive_mode() {
 	Term *term1 = NULL, *term2 = NULL;
+	char c;
 	Substitution *mgu;
 	while(1) {
-		while(term1 == NULL)
+		while(term1 == NULL) {
+			printf("unify> ");
 			term1 = parser_term(stdin);
-		while(term2 == NULL)
+		}
+		while(term2 == NULL) {
+			printf("unify(");
+			term_print(term1);
+			printf(")> ");
 			term2 = parser_term(stdin);
+		}
 		mgu = semantics_unify_terms(term1, term2, 0);
 		if(mgu != NULL) {
 			substitution_print(mgu);

@@ -3,7 +3,7 @@
  * FILENAME: rule.c
  * DESCRIPTION: Data structures and functions for storing and manipuling rules
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 27.01.2019
+ * UPDATED: 28.03.2019
  * 
  *H*/
 
@@ -110,7 +110,7 @@ int rule_add_clause(Rule *rule, Clause *clause) {
 void rule_print(Rule *rule) {
 	int i;
 	printf(rule->dynamic ? "#dynamic " : "#static ");
-    printf(rule->determinist ? "#det " : "#nondet ");
+	printf(rule->determinist ? "#det " : "#nondet ");
 	printf("\n");
 	printf("(predicate %s %d ", rule->name, rule->arity);
 	term_print(rule->type);
@@ -118,6 +118,8 @@ void rule_print(Rule *rule) {
 	for(i = 0; i < rule->nb_clauses; i++) {
 		printf("\t");
 		clause_print(rule->clauses[i]);
+		if(i+1 == rule->nb_clauses)
+			printf(")");
 		printf("\n");
-	}	
+	}
 }
