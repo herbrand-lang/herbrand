@@ -173,6 +173,14 @@ State *state_inference(State *point, Term *body, Substitution *subs);
 
 /**
   * 
+  * This function prints for the standard output
+  * the whole state.
+  * 
+  **/
+void state_print(State *state);
+
+/**
+  * 
 	* This function creates a derivation from a new goal,
 	* returning a pointer to a newly initialized Derivation
   * struct.

@@ -224,7 +224,6 @@ State *state_init_goal(Term *goal) {
 	State *state = state_alloc();
 	state->goal = goal;
 	state->substitution = substitution_alloc_from_term(goal);
-	//state->substitution = substitution_alloc(0);
 	return state;
 }
 
@@ -237,7 +236,7 @@ State *state_init_goal(Term *goal) {
 Term *term_select_most_left(Term *term) {
 	if(term == NULL || term_list_is_null(term))
 		return NULL;
-	while(term->type == TYPE_LIST && term->term.list->head->type == TYPE_LIST)
+	while(term->type == TYPE_LIST && term->term.list->head->type == TYPE_LIST && !term_list_is_null(term->term.list->head))
 		term = term->term.list->head;
 	return term;
 }
@@ -249,22 +248,23 @@ Term *term_select_most_left(Term *term) {
   * 
   **/
 Term *term_replace_most_left(Term *term, Term *head) {
-	if(term == NULL || term_list_is_null(term))
-		return head;
-	if(term->type == TYPE_LIST) {
-		if(term->term.list->head->type == TYPE_LIST) {
+	if(term->type == TYPE_LIST && term->term.list->head->type == TYPE_LIST && !term_list_is_null(term->term.list->head)) {
+		if(term->term.list->head->type == TYPE_LIST
+		&& term->term.list->head->term.list->head->type == TYPE_LIST
+		&& !term_list_is_null(term->term.list->head->term.list->tail)) {
 			return term_list_create(
 				term_replace_most_left(term->term.list->head, head),
 				term->term.list->tail);
 		} else {
-			if(head == NULL) {
+			if(head == NULL || term_list_is_null(head)) {
 				return term->term.list->tail;
 			} else {
 				return term_list_create(head, term->term.list->tail);
 			}
 		}
+	} else {
+		return head;
 	}
-	return NULL;
 }
 
 /**
@@ -291,10 +291,24 @@ void state_free(State *state) {
   **/
 State *state_inference(State *point, Term *body, Substitution *subs) {
 	State *state = state_alloc();
-	state->goal = term_apply_substitution(term_replace_most_left(state->goal, body), subs);
+	state->goal = term_apply_substitution(term_replace_most_left(point->goal, body), subs);
 	state->substitution = substitution_compose(point->substitution, subs, 0);
 	state->parent = point;
 	return state;
+}
+
+/**
+  * 
+  * This function prints for the standard output
+  * the whole state.
+  * 
+  **/
+void state_print(State *state) {
+	printf("<");
+	term_print(state->goal);
+	printf(", ");
+	substitution_print(state->substitution);
+	printf(">");
 }
 
 /**
