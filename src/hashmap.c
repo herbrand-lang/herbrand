@@ -3,7 +3,7 @@
  * FILENAME: hashmap.c
  * DESCRIPTION: 
  * AUTHORS: José Antonio Riaza Valverde
- * DATE: 27.03.2019
+ * DATE: 30.03.2019
  * 
  *H*/
 
@@ -110,11 +110,14 @@ void hashmap_free(Hashmap *map) {
 	for(i = 0; i < map->nb_registers; i++) {
 		p = map->map[i];
 		while(p != NULL) {
+			if(p->key != NULL)
+				free(p->key);
 			q = p->next;
 			free(p);
 			p = q;
 		}
 	}
+	free(map->map);
 	free(map);
 }
 

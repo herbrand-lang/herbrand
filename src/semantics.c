@@ -60,30 +60,51 @@ Substitution *semantics_unify_terms(Term *term1, Term *term2, int occurs_check) 
   * 
   **/
 Substitution *semantics_unify_lists(Term *term1, Term *term2, int occurs_check) {
-	Term *list1, *list2;
-	Substitution *mgu, *subs2, *subs = substitution_alloc(0);
+	int i = 0;
+	Term *list1, *list2, *term_ap1 = NULL, *term_ap2 = NULL;
+	Substitution *mgu, *subs2, *subs;
 	if(term_list_is_null(term1) && term_list_is_null(term2))
-		return subs;
+		return substitution_alloc(0);
 	else if(term_list_is_null(term1) || term_list_is_null(term2))
 		return NULL;
+	subs = substitution_alloc(0);
 	while(term1->type == TYPE_LIST && term2->type == TYPE_LIST
 	&& !term_list_is_null(term1) && !term_list_is_null(term2)) {
 		mgu = semantics_unify_terms(
 			term_list_get_head(term1),
 			term_list_get_head(term2),
 			occurs_check);
-		if(mgu == NULL)
+		if(mgu == NULL) {
+			if(i > 0) {
+				term_free(term1);
+				term_free(term2);
+			}
+			substitution_free(subs);
 			return NULL;
+		}
 		subs2 = substitution_compose(subs, mgu, 1);
-		term1 = term_apply_substitution(term_list_get_tail(term1), mgu);
-		term2 = term_apply_substitution(term_list_get_tail(term2), mgu);
+		term_ap1 = term_apply_substitution(term_list_get_tail(term1), mgu);
+		term_ap2 = term_apply_substitution(term_list_get_tail(term2), mgu);
+		if(i > 0) {
+			term_free(term1);
+			term_free(term2);
+		}
+		term1 = term_ap1;
+		term2 = term_ap2;
 		substitution_free(subs);
 		substitution_free(mgu);
 		subs = subs2;
+		i++;
 	}
 	mgu = semantics_unify_terms(term1, term2, occurs_check);
-	if(mgu == NULL)
+	if(mgu == NULL) {
+		substitution_free(subs);
 		return NULL;
+	}
+	if(i > 0) {
+		term_free(term1);
+		term_free(term2);
+	}
 	subs2 = substitution_compose(subs, mgu, 1);
 	substitution_free(subs);
 	substitution_free(mgu);
@@ -151,7 +172,9 @@ Substitution *semantics_unify_strings(Term *str1, Term *str2) {
 Derivation *derivation_alloc() {
 	Derivation *D = malloc(sizeof(Derivation));
 	D->points = NULL;
+	D->visited = NULL;
 	D->nb_states = 0;
+	D->nb_visited_states = 0;
 	D->nb_inferences = 0;
 	return D;
 };
@@ -164,10 +187,17 @@ Derivation *derivation_alloc() {
   * 
   **/
 void derivation_free(Derivation *D) {
-	State *point = D->points;
+	State *next, *point = D->points;
 	while(point != NULL) {
-		point = D->points->next;
-		state_free(D->points);
+		next = point->next;
+		state_free(point);
+		point = next;
+	}
+	point = D->visited;
+	while(point != NULL) {
+		next = point->next;
+		state_free(point);
+		point = next;
 	}
 	free(D);
 }
@@ -182,6 +212,18 @@ void derivation_push_state(Derivation *D, State *state) {
 	state->next = D->points;
 	D->points = state;
 	D->nb_states++;
+}
+
+/**
+  * 
+  * This function pushes an old state at the beginning
+  * of visited states.
+  * 
+  **/
+void derivation_push_visited_state(Derivation *D, State *state) {
+	state->next = D->visited;
+	D->visited = state;
+	D->nb_visited_states++;
 }
 
 /**
@@ -224,6 +266,7 @@ State *state_init_goal(Term *goal) {
 	State *state = state_alloc();
 	state->goal = goal;
 	state->substitution = substitution_alloc_from_term(goal);
+	term_increase_references(goal);
 	return state;
 }
 
@@ -277,8 +320,6 @@ Term *term_replace_most_left(Term *term, Term *head) {
 void state_free(State *state) {
 	term_free(state->goal);
 	substitution_free(state->substitution);
-	if(state->parent != NULL)
-		state_free(state->parent);
 	free(state);
 }
 
@@ -343,6 +384,7 @@ Substitution *semantics_answer(Program *program, Derivation *D) {
 		// If no more points, there are no more answers
 		if(point == NULL)
 			return NULL;
+		derivation_push_visited_state(D, point);
 		term = term_select_most_left(point->goal);
 		// If no more terms, this choice point is an answer
 		if(term == NULL)
@@ -362,7 +404,9 @@ Substitution *semantics_answer(Program *program, Derivation *D) {
 			if(mgu != NULL) {
 				state = state_inference(point, clause->body, mgu);
 				derivation_push_state(D, state);
+				substitution_free(mgu);
 			}
+			clause_free(clause);
 		}
 	}
 }

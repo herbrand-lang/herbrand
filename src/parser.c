@@ -3,7 +3,7 @@
  * FILENAME: parse.c
  * DESCRIPTION: Parse programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 28.01.2019
+ * UPDATED: 30.03.2019
  * 
  *H*/
 
@@ -304,33 +304,33 @@ Parser *parser_expression(Tokenizer *tokenizer, int start) {
 	Token *token = tokenizer->tokens[start];
 	switch(token->category) {
 		case TOKEN_ATOM:
-			term = malloc(sizeof(Term));
+			term = term_alloc();
 			state->value = term;
 			term->type = TYPE_ATOM;
 			term->term.string = malloc(sizeof(char)*(token->length+1));
 			strcpy(term->term.string, token->text);
 			break;
 		case TOKEN_VARIABLE:
-			term = malloc(sizeof(Term));
+			term = term_alloc();
 			state->value = term;
 			term->type = TYPE_VARIABLE;
 			term->term.string = malloc(sizeof(char)*(token->length+1));
 			strcpy(term->term.string, token->text);
 			break;
 		case TOKEN_NUMERAL:
-			term = malloc(sizeof(Term));
+			term = term_alloc();
 			state->value = term;
 			term->type = TYPE_NUMERAL;
 			term->term.numeral = atoi(token->text);
 			break;
 		case TOKEN_DECIMAL:
-			term = malloc(sizeof(Term));
+			term = term_alloc();
 			state->value = term;
 			term->type = TYPE_DECIMAL;
 			term->term.decimal = atof(token->text);
 			break;
 		case TOKEN_STRING:
-			term = malloc(sizeof(Term));
+			term = term_alloc();
 			state->value = term;
 			term->type = TYPE_STRING;
 			term->term.string = malloc(sizeof(char)*(token->length+1));

@@ -3,7 +3,7 @@
  * FILENAME: term.h
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 28.03.2019
+ * UPDATED: 30.03.2019
  * 
  *H*/
 
@@ -27,6 +27,7 @@ typedef struct Term {
 		struct List *list;
 	} term;
 	Type type;
+  int references;
 } Term;
 
 typedef struct List {
@@ -40,10 +41,26 @@ typedef struct List {
 
 /**
   * 
+  * This function creates a term returning a pointer
+  * to a newly initialized Term struct.
+  * 
+  **/
+Term *term_alloc();
+
+/**
+  * 
   * This function frees a previously allocated term.
   * 
   **/
 void term_free(Term *term);
+
+/**
+  * 
+  * This function increases in one the number
+	* of references to a term.
+  * 
+  **/
+void term_increase_references(Term *term);
 
 /**
   * 

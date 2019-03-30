@@ -3,7 +3,7 @@
  * FILENAME: main.c
  * DESCRIPTION: Main file
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 27.03.2019
+ * UPDATED: 30.03.2019
  * COMPILING: gcc -I/usr/include -L *.h *.c -o logic -g
  * 
  *H*/
@@ -62,6 +62,10 @@ void interactive_query() {
 			printf("logic> ");
 			term = parser_term(stdin);
 		}
+		if(term->type == TYPE_ATOM && strcmp(term->term.string, "exit") == 0) {
+			term_free(term);
+			break;
+		}
 		D = semantics_query(term);
 		do {
 			answer = semantics_answer(program, D);
@@ -72,8 +76,11 @@ void interactive_query() {
 		} while(answer != NULL && c == ';');
 		if(answer == NULL)
 			printf("\n");
+		term_free(term);
+		derivation_free(D);
 		term = NULL;
 	}
+	program_free(program);
 }
 
 /**

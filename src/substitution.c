@@ -3,7 +3,7 @@
  * FILENAME: program.c
  * DESCRIPTION: Data structures and functions for storing and manipuling substitutions
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 29.03.2019
+ * UPDATED: 30.03.2019
  * 
  *H*/
 
@@ -53,6 +53,7 @@ Substitution *substitution_alloc_from_term(Term *term) {
 		if(substitution_get_link(subs, vars[i]) == NULL)
 			substitution_add_link(subs, vars[i]->term.string, vars[i]);
 	}
+	free(vars);
 	return subs;
 }
 
@@ -67,8 +68,10 @@ void substitution_free(Substitution *subs) {
 	int i;
 	for(i = 0; i < subs->nb_vars; i++) {
 		free(subs->domain[i]);
-		//term_free(subs->range[i]);
+		term_free(subs->range[i]);
 	}
+	free(subs->domain);
+	free(subs->range);
 	hashmap_free(subs->indices);
 	free(subs);
 }
@@ -87,6 +90,7 @@ int substitution_add_link(Substitution *subs, char *var, Term *value) {
 	strcpy(subs->domain[subs->nb_vars], var);
 	hashmap_append(subs->indices, var, subs->nb_vars);
 	subs->nb_vars++;
+	term_increase_references(value);
 	return 1;
 }
 
@@ -130,17 +134,23 @@ Term *term_apply_substitution(Term *term, Substitution *subs) {
 	Term *term2, *tail;
 	if(term->type == TYPE_VARIABLE) {
 		term2 = substitution_get_link(subs, term);
-		if(term2 == NULL)
+		if(term2 == NULL) {
+			term_increase_references(term);
 			return term;
-		else
+		} else {
+			term_increase_references(term2);
 			return term2;
+		}
 	} else if(term->type == TYPE_LIST) {
-		if(term_list_is_null(term))
+		if(term_list_is_null(term)) {
+			term_increase_references(term);
 			return term;
+		}
 		return term_list_create(
 			term_apply_substitution(term->term.list->head, subs),
 			term_apply_substitution(term->term.list->tail, subs));
 	} else {
+		term_increase_references(term);
 		return term;
 	}
 }

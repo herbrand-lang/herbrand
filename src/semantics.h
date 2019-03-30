@@ -3,7 +3,7 @@
  * FILENAME: semantics.h
  * DESCRIPTION: Declarative semantics for the language
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 28.03.2019
+ * UPDATED: 30.03.2019
  * 
  *H*/
 
@@ -25,7 +25,9 @@ typedef struct State {
 
 typedef struct Derivation {
 	State *points;
+  State *visited;
   int nb_states;
+  int nb_visited_states;
   int nb_inferences;
 } Derivation;
 
@@ -111,6 +113,14 @@ void derivation_free(Derivation *D);
   * 
   **/
 void derivation_push_state(Derivation *D, State *state);
+
+/**
+  * 
+  * This function pushes an old state at the beginning
+  * of visited states.
+  * 
+  **/
+void derivation_push_visited_state(Derivation *D, State *state);
 
 /**
   * 

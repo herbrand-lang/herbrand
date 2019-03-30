@@ -3,7 +3,7 @@
  * FILENAME: term.c
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 28.03.2019
+ * UPDATED: 30.03.2019
  * 
  *H*/
 
@@ -13,10 +13,26 @@
 
 /**
   * 
+  * This function creates a term returning a pointer
+  * to a newly initialized Term struct.
+  * 
+  **/
+Term *term_alloc() {
+	Term *term = malloc(sizeof(Term));
+	term->references = 0;
+	return term;
+}
+
+/**
+  * 
   * This function frees a previously allocated term.
   * 
   **/
 void term_free(Term *term) {
+	if(term->references > 0) {
+		term->references--;
+		return;
+	}
 	switch(term->type) {
 		case TYPE_ATOM:
 		case TYPE_STRING:
@@ -36,6 +52,16 @@ void term_free(Term *term) {
 
 /**
   * 
+  * This function increases in one the number
+  * of references to a term.
+  * 
+  **/
+void term_increase_references(Term *term) {
+	term->references++;
+}
+
+/**
+  * 
   * This function renames the variables of a term.
   * 
   **/
@@ -46,7 +72,7 @@ Term *term_rename_variables(Term *term, int *id, Hashmap *vars) {
 		return NULL;
 	else if(term->type == TYPE_VARIABLE) {
 		index = hashmap_lookup(vars, term->term.string);
-		var = malloc(sizeof(Term));
+		var = term_alloc();
 		var->type = TYPE_VARIABLE;
 		if(index != -1) {
 			mod = index;
@@ -56,7 +82,6 @@ Term *term_rename_variables(Term *term, int *id, Hashmap *vars) {
 			}
 			var->term.string = malloc(sizeof(char)*length);
 			sprintf(var->term.string, "$%d", index);
-			return var;
 		} else {
 			(*id)++;
 			mod = *id;
@@ -73,8 +98,10 @@ Term *term_rename_variables(Term *term, int *id, Hashmap *vars) {
 		return term_list_create(
 			term_rename_variables(term->term.list->head, id, vars),
 			term_rename_variables(term->term.list->tail, id, vars));
-	} else
+	} else {
+		term_increase_references(term);
 		return term;
+	}
 }
 
 /**
@@ -84,7 +111,7 @@ Term *term_rename_variables(Term *term, int *id, Hashmap *vars) {
   * 
   **/
 Term *term_list_create(Term *head, Term *tail) {
-		Term *list = malloc(sizeof(Term));
+		Term *list = term_alloc();
 		list->type = TYPE_LIST;
 		list->term.list = malloc(sizeof(List));
 		list->term.list->head = head;
@@ -99,7 +126,7 @@ Term *term_list_create(Term *head, Term *tail) {
   * 
   **/
 Term *term_list_empty() {
-		Term *list = malloc(sizeof(Term));
+		Term *list = term_alloc();
 		list->type = TYPE_LIST;
 		list->term.list = malloc(sizeof(List));
 		list->term.list->head = NULL;
@@ -141,11 +168,11 @@ Term *term_list_get_tail(Term *term) {
   * 
   **/
 Term *term_list_add_element(Term *list, Term *term) {
-		while(list->term.list->head != NULL)
-				list = list->term.list->tail;
-		list->term.list->head = term;
-		list->term.list->tail = term_list_empty();
-		return list->term.list->tail;
+	while(list->term.list->head != NULL)
+			list = list->term.list->tail;
+	list->term.list->head = term;
+	list->term.list->tail = term_list_empty();
+	return list->term.list->tail;
 }
 
 /**
@@ -167,7 +194,7 @@ Term *term_list_set_tail(Term *list, Term *term) {
 /**
   * 
   * This function returns the list of variables
-	* contained in the term.
+  * contained in the term.
   * 
   **/
 Term **term_get_variables(Term *term, int *nb_vars) {
