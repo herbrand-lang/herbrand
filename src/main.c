@@ -4,7 +4,7 @@
  * DESCRIPTION: Main file
  * AUTHORS: José Antonio Riaza Valverde
  * UPDATED: 30.03.2019
- * COMPILING: gcc -I/usr/include -L *.h *.c -o logic -g
+ * COMPILING: gcc -I/usr/include -L *.h *.c -o herbrand -g
  * 
  *H*/
 
@@ -55,14 +55,14 @@ void interactive_query() {
 	char c, d;
 	Term *term = NULL;
 	program = program_alloc();
-	file = fopen("../sample/append.lo", "r");
+	file = fopen("../modules/list.hb", "r");
 	if(file != NULL) {
 		parser_stream(program, file);
 		fclose(file);
 	}
 	while(1) {
 		while(term == NULL) {
-			printf("logic> ");
+			printf("herbrand> ");
 			term = parser_term(stdin);
 		}
 		if(term->type == TYPE_ATOM && strcmp(term->term.string, "exit") == 0) {

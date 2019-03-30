@@ -108,6 +108,13 @@ Term *term_list_get_tail(Term *term);
 
 /**
   * 
+  * This function returns the nth-elemnt of a list.
+  * 
+  **/
+Term *term_list_get_nth(Term *term, int index);
+
+/**
+  * 
   * This function adds an element to a list, returning
   * the pointer to the last element inserted in the struct.
   * 
@@ -136,3 +143,19 @@ Term **term_get_variables(Term *term, int *nb_vars);
   * 
   **/
 void term_print(Term *term);
+
+/**
+  * 
+  * This function selects the most left term
+  * of the goal in a state.
+  * 
+  **/
+Term *term_select_most_left(Term *term);
+
+/**
+  * 
+  * This function replaces the most left term
+  * of the goal in a state.
+  * 
+  **/
+Term *term_replace_most_left(Term *term, Term *head);

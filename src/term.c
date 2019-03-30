@@ -163,6 +163,19 @@ Term *term_list_get_tail(Term *term) {
 
 /**
   * 
+  * This function returns the nth-elemnt of a list.
+  * 
+  **/
+Term *term_list_get_nth(Term *term, int index) {
+	while(index > 0 && term->type == TYPE_LIST) {
+		term = term->term.list->tail;
+		index--;
+	}
+	return index ? NULL : term->term.list->head;
+}
+
+/**
+  * 
   * This function adds an element to a list, returning
   * the pointer to the last element inserted in the struct.
   * 
@@ -264,5 +277,48 @@ void term_print(Term *term) {
 			}
 			printf(")");
 			break;
+	}
+}
+
+/**
+  * 
+  * This function selects the most left term
+  * of the goal in a state.
+  * 
+  **/
+Term *term_select_most_left(Term *term) {
+	if(term == NULL || term_list_is_null(term))
+		return NULL;
+	while(term->type == TYPE_LIST && term->term.list->head->type == TYPE_LIST && !term_list_is_null(term->term.list->head))
+		term = term->term.list->head;
+	return term;
+}
+
+/**
+  * 
+  * This function replaces the most left term
+  * of the goal in a state.
+  * 
+  **/
+Term *term_replace_most_left(Term *term, Term *head) {
+	if(term->type == TYPE_LIST && term->term.list->head->type == TYPE_LIST && !term_list_is_null(term->term.list->head)) {
+		term_increase_references(term->term.list->tail);
+		if(term->term.list->head->type == TYPE_LIST
+		&& term->term.list->head->term.list->head->type == TYPE_LIST
+		&& !term_list_is_null(term->term.list->head->term.list->tail)) {
+			return term_list_create(
+				term_replace_most_left(term->term.list->head, head),
+				term->term.list->tail);
+		} else {
+			if(head == NULL || term_list_is_null(head)) {
+				return term->term.list->tail;
+			} else {
+				term_increase_references(head);
+				return term_list_create(head, term->term.list->tail);
+			}
+		}
+	} else {
+		term_increase_references(head);
+		return head;
 	}
 }
