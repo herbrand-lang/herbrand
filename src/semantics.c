@@ -292,6 +292,7 @@ Term *term_select_most_left(Term *term) {
   **/
 Term *term_replace_most_left(Term *term, Term *head) {
 	if(term->type == TYPE_LIST && term->term.list->head->type == TYPE_LIST && !term_list_is_null(term->term.list->head)) {
+		term_increase_references(term->term.list->tail);
 		if(term->term.list->head->type == TYPE_LIST
 		&& term->term.list->head->term.list->head->type == TYPE_LIST
 		&& !term_list_is_null(term->term.list->head->term.list->tail)) {
@@ -302,10 +303,12 @@ Term *term_replace_most_left(Term *term, Term *head) {
 			if(head == NULL || term_list_is_null(head)) {
 				return term->term.list->tail;
 			} else {
+				term_increase_references(head);
 				return term_list_create(head, term->term.list->tail);
 			}
 		}
 	} else {
+		term_increase_references(head);
 		return head;
 	}
 }
@@ -331,8 +334,11 @@ void state_free(State *state) {
   * 
   **/
 State *state_inference(State *point, Term *body, Substitution *subs) {
+	Term *left;
 	State *state = state_alloc();
-	state->goal = term_apply_substitution(term_replace_most_left(point->goal, body), subs);
+	left = term_replace_most_left(point->goal, body);
+	state->goal = term_apply_substitution(left, subs);
+	term_free(left);
 	state->substitution = substitution_compose(point->substitution, subs, 0);
 	state->parent = point;
 	return state;

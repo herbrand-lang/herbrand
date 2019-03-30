@@ -26,6 +26,7 @@ int main(int argc, char *argv[]) {
 		if(file != NULL) {
 			program = program_alloc();
 			parser_stream(program, file);
+			fclose(file);
 			printf("\nPARSED RULES:\n");
 			program_print(program);
 			printf("\nHASHMAP RULES:\n");
@@ -55,8 +56,10 @@ void interactive_query() {
 	Term *term = NULL;
 	program = program_alloc();
 	file = fopen("../sample/append.lo", "r");
-	if(file != NULL)
+	if(file != NULL) {
 		parser_stream(program, file);
+		fclose(file);
+	}
 	while(1) {
 		while(term == NULL) {
 			printf("logic> ");

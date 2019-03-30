@@ -116,9 +116,13 @@ Term *substitution_get_link(Substitution *subs, Term *var) {
   **/
 Substitution *substitution_compose(Substitution *u, Substitution *v, int join) {
 	int i;
+	Term *apply;
 	Substitution *subs = substitution_alloc(join ? u->nb_vars+v->nb_vars : u->nb_vars);
-	for(i = 0; i < u->nb_vars; i++)
-		substitution_add_link(subs, u->domain[i], term_apply_substitution(u->range[i], v));
+	for(i = 0; i < u->nb_vars; i++) {
+		apply = term_apply_substitution(u->range[i], v);
+		substitution_add_link(subs, u->domain[i], apply);
+		term_free(apply);
+	}
 	if(join)
 		for(i = 0; i < v->nb_vars; i++)
 			substitution_add_link(subs, v->domain[i], v->range[i]);
