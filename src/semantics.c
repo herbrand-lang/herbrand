@@ -97,13 +97,13 @@ Substitution *semantics_unify_lists(Term *term1, Term *term2, int occurs_check) 
 		i++;
 	}
 	mgu = semantics_unify_terms(term1, term2, occurs_check);
-	if(mgu == NULL) {
-		substitution_free(subs);
-		return NULL;
-	}
 	if(i > 0) {
 		term_free(term1);
 		term_free(term2);
+	}
+	if(mgu == NULL) {
+		substitution_free(subs);
+		return NULL;
 	}
 	subs2 = substitution_compose(subs, mgu, 1);
 	substitution_free(subs);
