@@ -193,24 +193,136 @@ void builtin_arithmetic_gt(Program *program, Derivation *D, State *point, Term *
 }
 void builtin_arithmetic_ge(Program *program, Derivation *D, State *point, Term *term) {
 }
+
+/**
+  * atom/1
+  * (atom @term)
+  * 
+  * Check if atom.
+  * (atom X) is true if and only if X is an atom.
+  * 
+  **/
 void builtin_atom(Program *program, Derivation *D, State *point, Term *term) {
+	Term *atom = term_list_get_nth(term, 1);
+	if(atom->type == TYPE_ATOM) 
+		derivation_push_state(D, state_success(point));
 }
+
+/**
+  * number/1
+  * (number @term)
+  * 
+  * Check if number.
+  * (number X) is true if and only if X is a number.
+  * 
+  **/
 void builtin_number(Program *program, Derivation *D, State *point, Term *term) {
+	Term *number = term_list_get_nth(term, 1);
+	if(number->type == TYPE_NUMERAL || number->type == TYPE_DECIMAL) 
+		derivation_push_state(D, state_success(point));
 }
+
+/**
+  * integer/1
+  * (integer @term)
+  * 
+  * Check if integer.
+  * (integer X) is true if and only if X is an integer.
+  * 
+  **/
 void builtin_integer(Program *program, Derivation *D, State *point, Term *term) {
+	Term *integer = term_list_get_nth(term, 1);
+	if(integer->type == TYPE_NUMERAL)
+		derivation_push_state(D, state_success(point));
 }
+
+/**
+  * float/1
+  * (float @term)
+  * 
+  * Check if float.
+  * (float X) is true if and only if X is a float.
+  * 
+  **/
 void builtin_float(Program *program, Derivation *D, State *point, Term *term) {
+	Term *decimal = term_list_get_nth(term, 1);
+	if(decimal->type == TYPE_DECIMAL)
+		derivation_push_state(D, state_success(point));
 }
+
+/**
+  * string/1
+  * (string @term)
+  * 
+  * Check if string.
+  * (string X) is true if and only if X is a string.
+  * 
+  **/
 void builtin_string(Program *program, Derivation *D, State *point, Term *term) {
+	Term *string = term_list_get_nth(term, 1);
+	if(string->type == TYPE_STRING)
+		derivation_push_state(D, state_success(point));
 }
+
+/**
+  * ground/1
+  * (ground @term)
+  * 
+  * Check if ground term.
+  * (ground Term) is true if and only if Term holds no free variables.
+  * 
+  **/
 void builtin_ground(Program *program, Derivation *D, State *point, Term *term) {
+	int nb_vars = 0;
+	Term *ground = term_list_get_nth(term, 1);
+	Term **vars = term_get_variables(ground, &nb_vars);
+	free(vars);
+	if(nb_vars == 0)
+		derivation_push_state(D, state_success(point));
 }
+
+/**
+  * list/1
+  * (list @term)
+  * 
+  * Check if list.
+  * (list X) is true if and only if X is a list.
+  * 
+  **/
 void builtin_list(Program *program, Derivation *D, State *point, Term *term) {
+	Term *list = term_list_get_nth(term, 1);
+	if(list->type == TYPE_LIST)
+		derivation_push_state(D, state_success(point));
 }
+
+/**
+  * var/1
+  * (var @term)
+  * 
+  * Check if variable.
+  * (var X) is true if and only if X is a variable.
+  * 
+  **/
 void builtin_var(Program *program, Derivation *D, State *point, Term *term) {
+	Term *var = term_list_get_nth(term, 1);
+	if(var->type == TYPE_VARIABLE)
+		derivation_push_state(D, state_success(point));
 }
+
+/**
+  * nonvar/1
+  * (nonvar @term)
+  * 
+  * Check if not variable.
+  * (nonvar X) is true if and only if X is not a variable.
+  * 
+  **/
 void builtin_nonvar(Program *program, Derivation *D, State *point, Term *term) {
+	Term *nonvar = term_list_get_nth(term, 1);
+	if(nonvar->type != TYPE_VARIABLE)
+		derivation_push_state(D, state_success(point));
 }
+
 void builtin_atom_length(Program *program, Derivation *D, State *point, Term *term) {
 }
 void builtin_atom_concat(Program *program, Derivation *D, State *point, Term *term) {
