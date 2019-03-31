@@ -140,8 +140,27 @@ void builtin_unification(Program *program, Derivation *D, State *point, Term *te
 	}
 }
 
+/**
+  * (/=)/2
+  * (/= ?term ?term)
+  * 
+  * Not unification.
+  * (/= X Y) is true if and only if X and Y are not unifiable. True if the unification fails.
+  * 
+  **/
 void builtin_not_unifcation(Program *program, Derivation *D, State *point, Term *term) {
+	Substitution *mgu;
+	Term *left, *right;
+	left = term_list_get_nth(term, 1);
+	right = term_list_get_nth(term, 2);
+	mgu = semantics_unify_terms(left, right, 0);
+	if(mgu == NULL) 
+		derivation_push_state(D, state_success(point));
+	else
+		substitution_free(mgu);
 }
+
+
 void builtin_asserta(Program *program, Derivation *D, State *point, Term *term) {
 }
 void builtin_assertz(Program *program, Derivation *D, State *point, Term *term) {

@@ -94,12 +94,21 @@ void state_free(State *state);
 
 /**
   *
-  * This function creates an state from a inference,
+  * This function creates an state from an inference,
   * returning a pointer to a newly initialized State
   * struct.
   * 
   **/
 State *state_inference(State *point, Term *body, Substitution *subs);
+
+/**
+  *
+  * This function creates an state from an success step,
+  * returning a pointer to a newly initialized State
+  * struct.
+  * 
+  **/
+State *state_success(State *point);
 
 /**
   * 

@@ -133,7 +133,7 @@ State *state_init_goal(Term *goal) {
 
 /**
   *
-  * This function creates an state from a inference,
+  * This function creates an state from an inference,
   * returning a pointer to a newly initialized State
   * struct.
   * 
@@ -146,6 +146,24 @@ State *state_inference(State *point, Term *body, Substitution *subs) {
   	if(left != NULL)
 		term_free(left);
 	state->substitution = substitution_compose(point->substitution, subs, 0);
+	state->parent = point;
+	return state;
+}
+
+/**
+  *
+  * This function creates an state from an success step,
+  * returning a pointer to a newly initialized State
+  * struct.
+  * 
+  **/
+State *state_success(State *point) {
+	Term *list = term_list_empty();
+	State *state = state_alloc();
+	state->goal = term_replace_most_left(point->goal, list);
+  	term_free(list);
+	substitution_increase_references(point->substitution);
+	state->substitution = point->substitution;
 	state->parent = point;
 	return state;
 }

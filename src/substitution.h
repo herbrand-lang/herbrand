@@ -23,6 +23,7 @@ typedef struct Substitution {
 	Hashmap *indices;
   int max_vars;
 	int nb_vars;
+  int references;
 } Substitution;
 
 #endif
@@ -60,6 +61,14 @@ Substitution *substitution_alloc_from_term(Term *term);
   * 
   **/
 void substitution_free(Substitution *subs);
+
+/**
+  * 
+  * This function increases in one the number
+  * of references to a substitution.
+  * 
+  **/
+void substitution_increase_references(Substitution *subs);
 
 /**
   * 

@@ -31,6 +31,7 @@ Substitution *substitution_alloc(int nb_vars) {
 	subs->indices = hashmap_alloc(nb_vars);
 	subs->nb_vars = 0;
 	subs->max_vars = nb_vars;
+	subs->references = 0;
 	return subs;
 }
 
@@ -49,6 +50,7 @@ Substitution *substitution_alloc_from_term(Term *term) {
 	subs->indices = hashmap_alloc(nb_vars);
 	subs->nb_vars = 0;
 	subs->max_vars = nb_vars;
+	subs->references = 0;
 	for(i = 0; i < nb_vars; i++) {
 		if(substitution_get_link(subs, vars[i]) == NULL)
 			substitution_add_link(subs, vars[i]->term.string, vars[i]);
@@ -66,14 +68,28 @@ Substitution *substitution_alloc_from_term(Term *term) {
   **/
 void substitution_free(Substitution *subs) {
 	int i;
-	for(i = 0; i < subs->nb_vars; i++) {
-		free(subs->domain[i]);
-		term_free(subs->range[i]);
+	if(subs->references == 0) {
+		for(i = 0; i < subs->nb_vars; i++) {
+			free(subs->domain[i]);
+			term_free(subs->range[i]);
+		}
+		free(subs->domain);
+		free(subs->range);
+		hashmap_free(subs->indices);
+		free(subs);
+	} else {
+		subs->references--;
 	}
-	free(subs->domain);
-	free(subs->range);
-	hashmap_free(subs->indices);
-	free(subs);
+}
+
+/**
+  * 
+  * This function increases in one the number
+  * of references to a substitution.
+  * 
+  **/
+void substitution_increase_references(Substitution *subs) {
+	subs->references++;
 }
 
 /**
