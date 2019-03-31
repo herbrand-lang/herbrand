@@ -3,7 +3,7 @@
  * FILENAME: hashmap.h
  * DESCRIPTION: 
  * AUTHORS: José Antonio Riaza Valverde
- * DATE: 26.01.2019
+ * DATE: 31.03.2019
  * 
  *H*/
 
@@ -30,6 +30,14 @@ typedef struct Hashmap {
 #endif
 
 
+
+/**
+  *
+  * This function calculates the hash for lookup an element
+  * into a map of certain size.
+  *
+  **/
+unsigned long hashmap_function(int size, unsigned char *key);
 
 /**
   *

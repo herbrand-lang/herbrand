@@ -3,7 +3,7 @@
  * FILENAME: derivation.c
  * DESCRIPTION: Data structures and functions for derivations
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 30.03.2019
+ * UPDATED: 31.03.2019
  * 
  *H*/
 
@@ -143,8 +143,8 @@ State *state_inference(State *point, Term *body, Substitution *subs) {
 	State *state = state_alloc();
 	left = term_replace_most_left(point->goal, body);
 	state->goal = term_apply_substitution(left, subs);
-    if(left != NULL)
-	    term_free(left);
+  	if(left != NULL)
+		term_free(left);
 	state->substitution = substitution_compose(point->substitution, subs, 0);
 	state->parent = point;
 	return state;

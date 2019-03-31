@@ -3,7 +3,7 @@
  * FILENAME: hashmap.c
  * DESCRIPTION: 
  * AUTHORS: José Antonio Riaza Valverde
- * DATE: 30.03.2019
+ * DATE: 31.03.2019
  * 
  *H*/
 
@@ -16,10 +16,10 @@
 /**
   *
   * This function calculates the hash for lookup an element
-  * into a map.
+  * into a map of certain size.
   *
   **/
-unsigned long hashmap_hash(Hashmap *map, unsigned char *key) {
+unsigned long hashmap_function(int size, unsigned char *key) {
 	int i, j;
 	unsigned int byte, crc, mask;
 	i = 0;
@@ -33,7 +33,17 @@ unsigned long hashmap_hash(Hashmap *map, unsigned char *key) {
 		}
 		i++;
 	}
-	return ~crc % map->nb_registers;
+	return ~crc % size;
+}
+
+/**
+  *
+  * This function calculates the hash for lookup an element
+  * into a map.
+  *
+  **/
+unsigned long hashmap_hash(Hashmap *map, unsigned char *key) {
+	return hashmap_function(map->nb_registers, key);
 }
 
 /**

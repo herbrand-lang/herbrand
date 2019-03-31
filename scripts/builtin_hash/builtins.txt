@@ -1,0 +1,50 @@
+consult
+and
+or
+ite
+not
+once
+repeat
+true
+false
+catch
+throw
+= unification
+/= not_unifcation
+asserta
+assertz
+retract
+retractall
+== term_eq
+/== term_ne
+< term_lt
+<= term_le
+> term_gt
+>= term_ge
+:== arithmetic_eq
+:/== arithmetic_ne
+:< arithmetic_lt
+:<= arithmetic_le
+:> arithmetic_gt
+:>= arithmetic_ge
+atom
+number
+integer
+float
+string
+ground
+list
+var
+nonvar
+atom_length
+atom_concat
+atom_chars
+string_length
+string_concat
+string_chars
+findall
+is
+succ
+halt
+current_herbrand_flag
+set_herbrand_flag
