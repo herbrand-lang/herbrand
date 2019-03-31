@@ -3,7 +3,7 @@
  * FILENAME: rule.h
  * DESCRIPTION: Data structures and functions for storing and manipuling rules
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 27.01.2019
+ * UPDATED: 31.01.2019
  * 
  *H*/
 
@@ -26,9 +26,9 @@ typedef struct Rule {
 	char *name;
 	int arity;
 	int nb_clauses;
-  int max_clauses;
-  int dynamic;
-  int determinist;
+	int max_clauses;
+	int dynamic;
+	int determinist;
 } Rule;
 
 #endif

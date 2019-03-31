@@ -9,6 +9,7 @@
 
 #include <string.h>
 #include "tokenizer.h"
+#include "module.h"
 #include "program.h"
 #include "rule.h"
 #include "clause.h"

@@ -71,7 +71,9 @@ void parser_stream(Program *program, FILE *stream) {
 void parser_program(Program *program, Tokenizer *tokenizer) {
 	int start = 0;
 	Parser *state;
+	Module *module;
 	int token;
+	module = program_get_module(program, "user");
 	while(start < tokenizer->nb_tokens) {
 		state = parser_predicate(tokenizer, start);
 		if(!state->success) {
@@ -86,7 +88,7 @@ void parser_program(Program *program, Tokenizer *tokenizer) {
 			parser_free(state);
 			break;
 		}
-		program_add_rule(program, state->value);
+		module_add_predicate(module, state->value);
 		start = state->next;
 		parser_free(state);
 	}

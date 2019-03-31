@@ -57,7 +57,7 @@ void term_free(Term *term);
 /**
   * 
   * This function increases in one the number
-	* of references to a term.
+  * of references to a term.
   * 
   **/
 void term_increase_references(Term *term);
@@ -132,7 +132,7 @@ Term *term_list_set_tail(Term *list, Term *term);
 /**
   * 
   * This function returns the list of variables
-	* contained in the term.
+  * contained in the term.
   * 
   **/
 Term **term_get_variables(Term *term, int *nb_vars);

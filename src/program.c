@@ -3,7 +3,7 @@
  * FILENAME: program.c
  * DESCRIPTION: Data structures and functions for storing and manipuling programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 29.03.2019
+ * UPDATED: 31.03.2019
  * 
  *H*/
 
@@ -18,83 +18,87 @@
   * 
   **/
 Program *program_alloc() {
+  Module *module;
 	Program *program = malloc(sizeof(Program));
-	program->rules = malloc(sizeof(Rule*)*N_RULES);
-	program->indices = hashmap_alloc(N_RULES);
-	program->nb_rules = 0;
-	program->max_rules = N_RULES;
+	program->modules = malloc(sizeof(Module*)*N_MODULES);
+	program->indices = hashmap_alloc(N_MODULES);
+	program->nb_modules = 0;
+	program->max_modules = N_MODULES;
 	program->renames = 0;
+  // Add user-defined module
+  module = module_alloc();
+  module_set_name(module, "user");
+  program_add_module(program, module);
 	return program;
 }
 
 /**
   * 
   * This function increases the memory reserved for
-  * rules in a program. Returns 0 if the request fails,
+  * modules in a program. Returns 0 if the request fails,
   * or 1 if it succeeds.
   * 
   **/
 int program_realloc(Program *program) {
-	program->max_rules += N_RULES;
-	program->rules = realloc(program->rules, sizeof(Rule*)*program->max_rules);
-	return program->rules != NULL;
+	program->max_modules += N_MODULES;
+	program->modules = realloc(program->modules, sizeof(Module*)*program->max_modules);
+	return program->modules != NULL;
 }
 
 /**
   * 
   * This function frees a previously allocated program.
-  * The rules, clauses and terms underlying the program
-  * will also be deallocated.
+  * The modules, predicates, clauses and terms underlying
+  * the program will also be deallocated.
   * 
   **/
 void program_free(Program *program) {
 	int i;
-	for(i = 0; i < program->nb_rules; i++)
-		rule_free(program->rules[i]);
+	for(i = 0; i < program->nb_modules; i++)
+		module_free(program->modules[i]);
 	hashmap_free(program->indices);
-	free(program->rules);
+	free(program->modules);
 	free(program);
 }
 
 /**
-  *
   * This function checks if a program cannot store new
-  * rules.
+  * modules.
   * 
   **/
 int program_is_full(Program *program) {
-	return program->nb_rules == program->max_rules;
+	return program->nb_modules == program->max_modules;
 }
 
 /**
   * 
-  * This function adds a new rule to a program. If the
+  * This function adds a new module to a program. If the
   * memory of the program is full, the function resizes
   * it. Returns 0 if the request fails, or 1 if it succeeds.
   * 
   **/
-int program_add_rule(Program *program, Rule *rule) {
+int program_add_module(Program *program, Module *module) {
 	if(program_is_full(program))
 		if(program_realloc(program) == 0)
 			return 0;
-	hashmap_append(program->indices, rule->name, program->nb_rules);
-	program->rules[program->nb_rules] = rule;
-	program->nb_rules++;
+	hashmap_append(program->indices, module->name, program->nb_modules);
+	program->modules[program->nb_modules] = module;
+	program->nb_modules++;
 	return 1;
 }
 
 /**
   * 
-  * This function returns the rule of the program
-  * by its identifier. If the rule does not exist
+  * This function returns the module of the program
+  * by its identifier. If the module does not exist
   * in the program, returns NULL.
   * 
   **/
-Rule *program_get_rule(Program *program, char *rule_name) {
-	int index = hashmap_lookup(program->indices, rule_name);
+Module *program_get_module(Program *program, char *module_name) {
+	int index = hashmap_lookup(program->indices, module_name);
 	if(index == -1)
 		return NULL;
-	return program->rules[index];
+	return program->modules[index];
 }
 
 /**
@@ -106,12 +110,9 @@ Rule *program_get_rule(Program *program, char *rule_name) {
   **/
 void program_listing(Program *program) {
 	int i;
-	for(i = 0; i < program->nb_rules; i++) {
-		printf("%s/%d :: ", program->rules[i]->name, program->rules[i]->arity);
-		term_print(program->rules[i]->type);
-		printf(program->rules[i]->dynamic ? " #dynamic" : " #static");
-		printf(program->rules[i]->determinist ? " #det" : " #nondet");
-		printf("\n");
+	for(i = 0; i < program->nb_modules; i++) {
+		printf("(module %s)\n", program->modules[i]->name);
+		module_listing(program->modules[i]);
 	}
 }
 
@@ -123,7 +124,7 @@ void program_listing(Program *program) {
   **/
 void program_print(Program *program) {
 	int i;
-	for(i = 0; i < program->nb_rules; i++) {
-		rule_print(program->rules[i]);
+	for(i = 0; i < program->nb_modules; i++) {
+		module_print(program->modules[i]);
 	}
 }

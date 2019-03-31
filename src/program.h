@@ -3,15 +3,15 @@
  * FILENAME: program.h
  * DESCRIPTION: Data structures and functions for storing and manipuling programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 29.03.2019
+ * UPDATED: 31.03.2019
  * 
  *H*/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "rule.h"
+#include "module.h"
 #include "hashmap.h"
-#define N_RULES 32
+#define N_MODULES 8
 
 
 
@@ -19,10 +19,10 @@
 #define LOGIC_PROGRAM_H
 
 typedef struct Program {
-	Rule **rules;
+	Module **modules;
 	Hashmap *indices;
-	int nb_rules;
-	int max_rules;
+	int nb_modules;
+	int max_modules;
   int renames;
 } Program;
 
@@ -41,7 +41,7 @@ Program *program_alloc();
 /**
   * 
   * This function increases the memory reserved for
-  * rules in a program. Returns 0 if the request fails,
+  * modules in a program. Returns 0 if the request fails,
   * or 1 if it succeeds.
   * 
   **/
@@ -50,36 +50,36 @@ int program_realloc(Program *program);
 /**
   * 
   * This function frees a previously allocated program.
-  * The rules, clauses and terms underlying the program
-  * will also be deallocated.
+  * The modules, predicates, clauses and terms underlying
+  * the program will also be deallocated.
   * 
   **/
 void program_free(Program *program);
 
 /**
   * This function checks if a program cannot store new
-  * rules.
+  * modules.
   * 
   **/
 int program_is_full(Program *program);
 
 /**
   * 
-  * This function adds a new rule to a program. If the
+  * This function adds a new module to a program. If the
   * memory of the program is full, the function resizes
   * it. Returns 0 if the request fails, or 1 if it succeeds.
   * 
   **/
-int program_add_rule(Program *program, Rule *rule);
+int program_add_module(Program *program, Module *module);
 
 /**
   * 
-  * This function returns the rule of the program
-	* by its identifier. If the rule does not exist
-	* in the program, returns NULL.
+  * This function returns the module of the program
+  * by its identifier. If the module does not exist
+  * in the program, returns NULL.
   * 
   **/
-Rule *program_get_rule(Program *program, char *rule_name);
+Module *program_get_module(Program *program, char *module_name);
 
 /**
   * 

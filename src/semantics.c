@@ -33,11 +33,13 @@ Derivation *semantics_query(Term *goal) {
   **/
 Substitution *semantics_answer(Program *program, Derivation *D) {
 	int i;
+	Module *module;
 	State *point, *state;
 	Rule *rule;
 	Clause *clause;
 	Term *term, *body;
 	Substitution *mgu;
+	module = program_get_module(program, "user");
 	while(1) {
 		point = derivation_pop_state(D);
 		// If no more points, there are no more answers
@@ -56,7 +58,7 @@ Substitution *semantics_answer(Program *program, Derivation *D) {
 		if(builtin_check_predicate(term_list_get_head(term))) {
 			builtin_run_predicate(program, D, point, term);
 		} else {
-			rule = program_get_rule(program, term->term.list->head->term.string);
+			rule = module_get_predicate(module, term->term.list->head->term.string);
 			// If rule does not exist, fail
 			if(rule == NULL)
 				continue;

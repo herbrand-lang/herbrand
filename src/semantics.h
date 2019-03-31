@@ -10,6 +10,7 @@
 #include "term.h"
 #include "substitution.h"
 #include "program.h"
+#include "module.h"
 #include "derivation.h"
 #include "unification.h"
 #include "builtin.h"
