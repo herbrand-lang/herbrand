@@ -3,7 +3,7 @@
  * FILENAME: rule.h
  * DESCRIPTION: Data structures and functions for storing and manipuling rules
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 31.01.2019
+ * UPDATED: 31.03.2019
  * 
  *H*/
 
@@ -29,6 +29,7 @@ typedef struct Rule {
 	int max_clauses;
 	int dynamic;
 	int determinist;
+	int local;
 } Rule;
 
 #endif
@@ -41,7 +42,7 @@ typedef struct Rule {
   * to a newly initialized Rule struct.
   * 
   **/
-Rule *rule_alloc(int dynamic, int determinist);
+Rule *rule_alloc(int dynamic, int determinist, int local);
 
 /**
   * 

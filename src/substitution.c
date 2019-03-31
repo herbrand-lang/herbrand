@@ -150,9 +150,11 @@ Term *term_apply_substitution(Term *term, Substitution *subs) {
 			term_increase_references(term);
 			return term;
 		}
-		return term_list_create(
+		term2 = term_list_create(
 			term_apply_substitution(term->term.list->head, subs),
 			term_apply_substitution(term->term.list->tail, subs));
+		term2->parent = term->parent;
+		return term2;
 	} else {
 		term_increase_references(term);
 		return term;

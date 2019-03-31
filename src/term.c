@@ -3,7 +3,7 @@
  * FILENAME: term.c
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 30.03.2019
+ * UPDATED: 31.03.2019
  * 
  *H*/
 
@@ -20,6 +20,7 @@
 Term *term_alloc() {
 	Term *term = malloc(sizeof(Term));
 	term->references = 0;
+	term->parent = NULL;
 	return term;
 }
 
@@ -95,9 +96,11 @@ Term *term_rename_variables(Term *term, int *id, Hashmap *vars) {
 		}
 		return var;
 	} else if(term->type == TYPE_LIST && !term_list_is_null(term)) {
-		return term_list_create(
+		var = term_list_create(
 			term_rename_variables(term->term.list->head, id, vars),
 			term_rename_variables(term->term.list->tail, id, vars));
+		var->parent = term->parent;
+		return var;
 	} else {
 		term_increase_references(term);
 		return term;

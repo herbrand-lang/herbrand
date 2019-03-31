@@ -3,7 +3,7 @@
  * FILENAME: rule.c
  * DESCRIPTION: Data structures and functions for storing and manipuling rules
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 28.03.2019
+ * UPDATED: 31.03.2019
  * 
  *H*/
 
@@ -17,7 +17,7 @@
   * to a newly initialized Rule struct.
   * 
   **/
-Rule *rule_alloc(int dynamic, int determinist) {
+Rule *rule_alloc(int dynamic, int determinist, int local) {
 	Rule *rule = malloc(sizeof(Rule));
 	rule->name = NULL;
 	rule->type = NULL;
@@ -26,6 +26,7 @@ Rule *rule_alloc(int dynamic, int determinist) {
 	rule->clauses = malloc(sizeof(Clause*)*rule->max_clauses);
 	rule->dynamic = dynamic;
 	rule->determinist = determinist;
+	rule->local = local;
 	return rule;
 }
 
@@ -111,6 +112,7 @@ void rule_print(Rule *rule) {
 	int i;
 	printf(rule->dynamic ? "#dynamic " : "#static ");
 	printf(rule->determinist ? "#det " : "#nondet ");
+	printf(rule->local ? "#local " : "");
 	printf("\n");
 	printf("(predicate %s %d ", rule->name, rule->arity);
 	term_print(rule->type);

@@ -18,17 +18,17 @@
   * 
   **/
 Program *program_alloc() {
-  Module *module;
+	Module *module;
 	Program *program = malloc(sizeof(Program));
 	program->modules = malloc(sizeof(Module*)*N_MODULES);
 	program->indices = hashmap_alloc(N_MODULES);
 	program->nb_modules = 0;
 	program->max_modules = N_MODULES;
 	program->renames = 0;
-  // Add user-defined module
-  module = module_alloc();
-  module_set_name(module, "user");
-  program_add_module(program, module);
+	// Add user-defined module
+	module = module_alloc();
+	module_set_name(module, "user");
+	program_add_module(program, module);
 	return program;
 }
 
@@ -99,6 +99,21 @@ Module *program_get_module(Program *program, char *module_name) {
 	if(index == -1)
 		return NULL;
 	return program->modules[index];
+}
+
+/**
+  * 
+  * This function returns the predicate of the program
+  * by its identifier. If the predicate does not exist
+  * in the program, returns NULL.
+  * 
+  **/
+Rule *program_get_predicate(Program *program, char *predicate_name, char *from) {
+	int i;
+	Rule *rule = NULL;
+	for(i = 0; i < program->nb_modules && rule == NULL; i++)
+		rule = module_get_predicate(program->modules[i], predicate_name, from);
+	return rule;
 }
 
 /**

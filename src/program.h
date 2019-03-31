@@ -83,6 +83,15 @@ Module *program_get_module(Program *program, char *module_name);
 
 /**
   * 
+  * This function returns the predicate of the program
+  * by its identifier. If the predicate does not exist
+  * in the program, returns NULL.
+  * 
+  **/
+Rule *program_get_predicate(Program *program, char *predicate_name, char *from);
+
+/**
+  * 
   * This function prints for the standard output
   * the list of predicates stored in a program, with
   * the format "name/arity :: type".

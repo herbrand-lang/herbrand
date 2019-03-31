@@ -63,6 +63,13 @@ void parser_program(Program *program, Tokenizer *tokenizer);
 
 /**
   * 
+  * This function parses a module declaration.
+  * 
+  **/
+Parser *parser_module(Tokenizer *tokenizer, int start);
+
+/**
+  * 
   * This function parses a predicate declaration.
   * 
   **/
@@ -73,7 +80,7 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start);
   * This function parses a clause of a predicate declaration.
   * 
   **/
-Parser *parser_clause(Tokenizer *tokenizer, int start, int arity);
+Parser *parser_clause(Tokenizer *tokenizer, int start, char *rule_name, int arity);
 
 /**
   * 

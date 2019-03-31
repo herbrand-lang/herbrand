@@ -86,7 +86,7 @@ int module_add_predicate(Module *module, Rule *rule);
   * in the program, returns NULL.
   * 
   **/
-Rule *module_get_predicate(Module *module, char *predicate_name);
+Rule *module_get_predicate(Module *module, char *predicate_name, char *from);
 
 /**
   * 

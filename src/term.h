@@ -3,7 +3,7 @@
  * FILENAME: term.h
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 30.03.2019
+ * UPDATED: 31.03.2019
  * 
  *H*/
 
@@ -28,6 +28,7 @@ typedef struct Term {
 	} term;
 	Type type;
   int references;
+  char *parent;
 } Term;
 
 typedef struct List {

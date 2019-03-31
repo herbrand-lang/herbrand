@@ -10,7 +10,6 @@
 #include "term.h"
 #include "substitution.h"
 #include "program.h"
-#include "module.h"
 #include "derivation.h"
 #include "unification.h"
 #include "builtin.h"
@@ -28,8 +27,8 @@ Derivation *semantics_query(Term *goal);
 
 /**
   * 
-	* This function finds and returns the next computed
-	* answer of a derivation.
-	*
+  * This function finds and returns the next computed
+  * answer of a derivation.
+  *
   **/
 Substitution *semantics_answer(Program *program, Derivation *D);

@@ -69,29 +69,93 @@ void parser_stream(Program *program, FILE *stream) {
   * 
   **/
 void parser_program(Program *program, Tokenizer *tokenizer) {
-	int start = 0;
+	int start, n_token;
 	Parser *state;
 	Module *module;
-	int token;
-	module = program_get_module(program, "user");
+	Token *token;
+	// Parse module declaration
+	state = parser_module(tokenizer, 0);
+	if(state != NULL && state->success) {
+		module = state->value;
+		program_add_module(program, module);
+		start = state->next;
+		parser_free(state);
+		state = NULL;
+	} else {
+		module = program_get_module(program, "user");
+		start = 0;
+	}
+	// Parse predicates
 	while(start < tokenizer->nb_tokens) {
-		state = parser_predicate(tokenizer, start);
+		if(state == NULL)
+			state = parser_predicate(tokenizer, start);
 		if(!state->success) {
-			token = state->next < tokenizer->nb_tokens ? state->next : tokenizer->nb_tokens-1;
+			n_token = state->next < tokenizer->nb_tokens ? state->next : tokenizer->nb_tokens-1;
 			printf(
 				"(parser-error (line %d) (column %d) (found \"%s\")\n\t(message \"%s\"))\n",
-				tokenizer->tokens[token]->line,
-				tokenizer->tokens[token]->column,
-				state->next < tokenizer->nb_tokens ? tokenizer->tokens[token]->text : "",
+				tokenizer->tokens[n_token]->line,
+				tokenizer->tokens[n_token]->column,
+				state->next < tokenizer->nb_tokens ? tokenizer->tokens[n_token]->text : "",
 				state->error);
-			rule_free(state->value);
+			if(state->value != NULL)
+				rule_free(state->value);
 			parser_free(state);
 			break;
 		}
 		module_add_predicate(module, state->value);
 		start = state->next;
 		parser_free(state);
+		state = NULL;
 	}
+}
+
+/**
+  * 
+  * This function parses a module declaration.
+  * 
+  **/
+Parser *parser_module(Tokenizer *tokenizer, int start) {
+	Token *token;
+	Module *module;
+	Parser *state;
+	// Left parenthesis
+	token = tokenizer->tokens[start];
+	if(token->category != TOKEN_LPAR)
+		return NULL;
+	// Module atom
+	start++;
+	token = tokenizer->tokens[start];
+	if(token->category != TOKEN_ATOM || strcmp(token->text, "module") != 0)
+		return NULL;
+	state = malloc(sizeof(Parser));
+	state->success = 0;
+	state->start = start;
+	state->value = NULL;
+	// Name
+	start++;
+	token = tokenizer->tokens[start];
+	if(token->category != TOKEN_ATOM) {
+		strcpy(state->error, "name (an atom) expected in module declaration");
+		state->next = start;
+		return state;
+	}
+	module = module_alloc();
+	module_set_name(module, token->text);
+	// Right parenthesis
+	start++;
+	token = tokenizer->tokens[start];
+	if(token->category != TOKEN_RPAR) {
+		module_free(module);
+		strcpy(state->error, "right parenthesis ')' expected at the end of module declaration");
+		state->next = start;
+		return state;
+	}
+	start++;
+	start = start;
+	state->value = module;
+	state->success = 1;
+	state->next = start;
+	return state;
 }
 
 /**
@@ -100,7 +164,7 @@ void parser_program(Program *program, Tokenizer *tokenizer) {
   * 
   **/
 Parser *parser_predicate(Tokenizer *tokenizer, int start) {
-	int arity, dynamic = 0, determinist = 0;
+	int arity, dynamic = 0, determinist = 0, local = 0;
 	Rule *rule;
 	Token *token;
 	Parser *state = malloc(sizeof(Parser)), *state_expr;
@@ -110,20 +174,22 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
 	// Tags
 	token = tokenizer->tokens[start];
 	while(start < tokenizer->nb_tokens && token->category == TOKEN_TAG) {
-		if(strcmp(token->text, "#det") == 0) {
+		if(strcmp(token->text, "det") == 0) {
 			determinist = 1;
-		} else if(strcmp(token->text, "#nondet") == 0) {
+		} else if(strcmp(token->text, "nondet") == 0) {
 			determinist = 0;
-		} else if(strcmp(token->text, "#dynamic") == 0) {
+		} else if(strcmp(token->text, "dynamic") == 0) {
 			dynamic = 1;
-		} else if(strcmp(token->text, "#static") == 0) {
+		} else if(strcmp(token->text, "static") == 0) {
 			dynamic = 0;
+		} else if(strcmp(token->text, "local") == 0) {
+			local = 1;
 		}
 		start++;
 		state->next = start;
 		token = tokenizer->tokens[start];
 	}
-	rule = rule_alloc(dynamic, determinist);
+	rule = rule_alloc(dynamic, determinist, local);
 	state->value = rule;
 	// Left parenthesis
 	if(token->category != TOKEN_LPAR) {
@@ -182,7 +248,7 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
 	state->next = start;
 	token = tokenizer->tokens[start];
 	while(start < tokenizer->nb_tokens && token->category != TOKEN_RPAR) {
-		state_expr = parser_clause(tokenizer, start, arity);
+		state_expr = parser_clause(tokenizer, start, rule->name, arity);
 		if(!state_expr->success) {
 			parser_free(state);
 			state_expr->value = rule;
@@ -210,7 +276,7 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
   * This function parses a clause of a predicate declaration.
   * 
   **/
-Parser *parser_clause(Tokenizer *tokenizer, int start, int arity) {
+Parser *parser_clause(Tokenizer *tokenizer, int start, char *rule_name, int arity) {
 	int expected = arity;
 	Token *token;
 	Parser *state = malloc(sizeof(Parser)), *state_expr;
@@ -273,6 +339,7 @@ Parser *parser_clause(Tokenizer *tokenizer, int start, int arity) {
 		start = state_expr->next;
 		state->next = start;
 		token = tokenizer->tokens[start];
+		((Term*)state_expr->value)->parent = rule_name;
 		term_list_add_element(list, state_expr->value);
 		parser_free(state_expr);
 	}

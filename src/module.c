@@ -103,11 +103,18 @@ int module_add_predicate(Module *module, Rule *rule) {
   * in the module, returns NULL.
   * 
   **/
-Rule *module_get_predicate(Module *module, char *predicate_name) {
-	int index = hashmap_lookup(module->indices, predicate_name);
-	if(index == -1)
+Rule *module_get_predicate(Module *module, char *predicate_name, char *from) {
+	int index_from, index_pred = hashmap_lookup(module->indices, predicate_name);
+	if(index_pred == -1)
 		return NULL;
-	return module->predicates[index];
+    if(module->predicates[index_pred]->local) {
+        if(from == NULL)
+            return NULL;
+        index_from = hashmap_lookup(module->indices, from);
+        if(index_from == -1)
+            return NULL;
+    }
+	return module->predicates[index_pred];
 }
 
 /**
