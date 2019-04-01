@@ -55,11 +55,6 @@ void interactive_query() {
 	char c, d;
 	Term *term = NULL;
 	program = program_alloc();
-	file = fopen("../modules/list.hb", "r");
-	if(file != NULL) {
-		parser_stream(program, file);
-		fclose(file);
-	}
 	while(1) {
 		while(term == NULL) {
 			printf("herbrand> ");

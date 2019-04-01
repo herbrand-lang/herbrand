@@ -92,30 +92,139 @@ int builtin_run_predicate(Program *program, Derivation *D, State *point, Term *t
 	return 0;
 }
 
+/**
+  * 
+  * consult/1
+  * (consult +string)
+  * 
+  * Read a file as a Herbrand source file.
+  * (consult Path) is true when Path is a valid Herbrand source file.
+  * 
+  **/
 void builtin_consult(Program *program, Derivation *D, State *point, Term *term) {
+	Term *path;
+	FILE *file;
+	path = term_list_get_nth(term, 1);
+	file = fopen(path->term.string, "r");
+	if(file != NULL) {
+		parser_stream(program, file);
+		fclose(file);
+		derivation_push_state(D, state_success(point));
+	}
 }
+
+/**
+  * 
+  * and/2
+  * (and +callable_term +callable_term)
+  * 
+  * Conjunction.
+  * (and First Second) is true if and only if First is true and Second is true.
+  * 
+  **/
 void builtin_and(Program *program, Derivation *D, State *point, Term *term) {
+	State *state;
+	Term *tail;
+	tail = term_list_get_tail(term);
+	state = state_alloc();
+	state->goal = tail;
+	term_increase_references(tail);
+	state->substitution = point->substitution;
+	substitution_increase_references(point->substitution);
+	state->parent = point;
+	derivation_push_state(D, state);
 }
+
+/**
+  * 
+  * or/2
+  * (or +callable_term +callable_term)
+  * 
+  * Disjunction.
+  * (or Either Or) is true if and only if either Either or Or is true.
+  * 
+  **/
 void builtin_or(Program *program, Derivation *D, State *point, Term *term) {
+	State *state;
+	Term *left, *right;
+	left = term_list_get_nth(term, 1);
+	right = term_list_get_nth(term, 2);
+	// Right goal
+	state = state_alloc();
+	state->goal = right;
+	term_increase_references(right);
+	state->substitution = point->substitution;
+	substitution_increase_references(point->substitution);
+	state->parent = point;
+	derivation_push_state(D, state);
+	// Left goal
+	state = state_alloc();
+	state->goal = left;
+	term_increase_references(left);
+	state->substitution = point->substitution;
+	substitution_increase_references(point->substitution);
+	state->parent = point;
+	derivation_push_state(D, state);
 }
+
 void builtin_ite(Program *program, Derivation *D, State *point, Term *term) {
 }
 void builtin_not(Program *program, Derivation *D, State *point, Term *term) {
 }
 void builtin_once(Program *program, Derivation *D, State *point, Term *term) {
 }
+
+/**
+  * 
+  * repeat/0
+  * (repeat)
+  * 
+  * Provide infinite choice points.
+  * (repeat) is true. It provides infinite choice points, what makes it perfect
+  * for creating loops.
+  * 
+  **/
 void builtin_repeat(Program *program, Derivation *D, State *point, Term *term) {
+	State *state = state_alloc();
+	state->goal = point->goal;
+	term_increase_references(point->goal);
+	state->substitution = point->substitution;
+	substitution_increase_references(point->substitution);
+	state->parent = point;
+	derivation_push_state(D, state);
+	derivation_push_state(D, state_success(point));
 }
+
+/**
+  * 
+  * true/0
+  * (true)
+  * 
+  * Alwais succeed.
+  * 
+  **/
 void builtin_true(Program *program, Derivation *D, State *point, Term *term) {
+	derivation_push_state(D, state_success(point));
 }
+
+/**
+  * 
+  * false/0
+  * (false)
+  * 
+  * Alwais fail.
+  * 
+  **/
 void builtin_false(Program *program, Derivation *D, State *point, Term *term) {
 }
+
 void builtin_catch(Program *program, Derivation *D, State *point, Term *term) {
 }
 void builtin_throw(Program *program, Derivation *D, State *point, Term *term) {
 }
 
 /**
+  * 
   * (=)/2
   * (= ?term ?term)
   * 
@@ -141,6 +250,7 @@ void builtin_unification(Program *program, Derivation *D, State *point, Term *te
 }
 
 /**
+  * 
   * (/=)/2
   * (/= ?term ?term)
   * 
@@ -195,6 +305,7 @@ void builtin_arithmetic_ge(Program *program, Derivation *D, State *point, Term *
 }
 
 /**
+  * 
   * atom/1
   * (atom @term)
   * 
@@ -209,6 +320,7 @@ void builtin_atom(Program *program, Derivation *D, State *point, Term *term) {
 }
 
 /**
+  * 
   * number/1
   * (number @term)
   * 
@@ -223,6 +335,7 @@ void builtin_number(Program *program, Derivation *D, State *point, Term *term) {
 }
 
 /**
+  * 
   * integer/1
   * (integer @term)
   * 
@@ -237,6 +350,7 @@ void builtin_integer(Program *program, Derivation *D, State *point, Term *term) 
 }
 
 /**
+  * 
   * float/1
   * (float @term)
   * 
@@ -251,6 +365,7 @@ void builtin_float(Program *program, Derivation *D, State *point, Term *term) {
 }
 
 /**
+  * 
   * string/1
   * (string @term)
   * 
@@ -265,6 +380,7 @@ void builtin_string(Program *program, Derivation *D, State *point, Term *term) {
 }
 
 /**
+  * 
   * ground/1
   * (ground @term)
   * 
@@ -282,6 +398,7 @@ void builtin_ground(Program *program, Derivation *D, State *point, Term *term) {
 }
 
 /**
+  * 
   * list/1
   * (list @term)
   * 
@@ -296,6 +413,7 @@ void builtin_list(Program *program, Derivation *D, State *point, Term *term) {
 }
 
 /**
+  * 
   * var/1
   * (var @term)
   * 
@@ -310,6 +428,7 @@ void builtin_var(Program *program, Derivation *D, State *point, Term *term) {
 }
 
 /**
+  * 
   * nonvar/1
   * (nonvar @term)
   * 

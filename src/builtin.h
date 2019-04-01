@@ -13,6 +13,7 @@
 #include "unification.h"
 #include "hashmap.h"
 #include "program.h"
+#include "parser.h"
 
 
 
