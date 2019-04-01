@@ -14,35 +14,35 @@
 char *builtin_keys[BUILTIN_HASH_SIZE] = {
 	NULL, ":<", NULL, NULL, NULL, NULL, "var", NULL, NULL, NULL, "<", "integer", 
 	NULL, NULL, NULL, NULL, "string_length", "<=", NULL, NULL, "string_chars", NULL, 
-	NULL, NULL, "list", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, ">", NULL, NULL, NULL, "current_herbrand_flag", NULL, NULL, 
-	":>", NULL, NULL, "false", "nonvar", NULL, NULL, NULL, "set_herbrand_flag", "retractall", 
-	"throw", ":>=", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, "==", 
-	NULL, NULL, "succ", "number", "atom_concat", NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, "/==", NULL, NULL, NULL, "catch", "atom_chars", NULL, 
-	NULL, "ground", "halt", NULL, NULL, "asserta", "and", NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, "not", NULL, NULL, NULL, NULL, NULL, "atom", NULL, NULL, NULL, 
-	NULL, "assertz", NULL, NULL, "/=", "findall", NULL, NULL, "or", NULL, NULL, NULL, 
-	NULL, NULL, "true", NULL, NULL, NULL, NULL, NULL, ">=", NULL, "float", NULL, 
-	"is", "ite", NULL, NULL, NULL, "=", NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, "atom_length", NULL, NULL, "string", NULL, ":/==", NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ":<=", NULL, 
-	NULL, NULL, NULL, NULL, "repeat", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, "once", NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, NULL, "retract", NULL, NULL, NULL, NULL, NULL, NULL, 
-	"consult", "string_concat", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, NULL, "list", NULL, NULL, NULL, NULL, "import", NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, ">", NULL, NULL, NULL, "current_herbrand_flag", NULL, 
+	NULL, ":>", NULL, NULL, "false", "nonvar", NULL, NULL, NULL, "set_herbrand_flag", 
+	"retractall", "throw", ":>=", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, ":==", NULL, NULL, NULL, NULL};
+	NULL, NULL, "==", NULL, NULL, "succ", "number", "atom_concat", NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, "/==", NULL, NULL, NULL, "catch", "atom_chars", 
+	NULL, NULL, "ground", "halt", NULL, NULL, "asserta", "and", NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, "not", NULL, NULL, NULL, NULL, NULL, "atom", NULL, NULL, 
+	NULL, NULL, "assertz", NULL, NULL, "/=", "findall", NULL, NULL, "or", NULL, NULL, 
+	NULL, NULL, NULL, "true", NULL, NULL, NULL, NULL, NULL, ">=", NULL, "float", 
+	NULL, "is", "ite", NULL, NULL, NULL, "=", NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, "atom_length", NULL, NULL, "string", NULL, ":/==", NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ":<=", 
+	NULL, NULL, NULL, NULL, NULL, "repeat", NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, "once", NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, NULL, "retract", NULL, NULL, NULL, NULL, NULL, 
+	NULL, "consult", "string_concat", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, NULL, ":==", NULL, NULL, NULL, NULL};
 
 void (*builtin_handlers[BUILTIN_HASH_SIZE])() = {
 	NULL, builtin_arithmetic_lt, NULL, NULL, NULL, NULL, builtin_var, NULL, NULL, 
 	NULL, builtin_term_lt, builtin_integer, NULL, NULL, NULL, NULL, builtin_string_length, 
 	builtin_term_le, NULL, NULL, builtin_string_chars, NULL, NULL, NULL, builtin_list, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	builtin_term_gt, NULL, NULL, NULL, builtin_current_herbrand_flag, NULL, NULL, 
-	builtin_arithmetic_gt, NULL, NULL, builtin_false, builtin_nonvar, NULL, NULL, 
-	NULL, builtin_set_herbrand_flag, builtin_retractall, builtin_throw, builtin_arithmetic_ge, 
+	NULL, NULL, NULL, NULL, builtin_import, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, builtin_term_gt, NULL, NULL, NULL, builtin_current_herbrand_flag, NULL, 
+	NULL, builtin_arithmetic_gt, NULL, NULL, builtin_false, builtin_nonvar, NULL, 
+	NULL, NULL, builtin_set_herbrand_flag, builtin_retractall, builtin_throw, builtin_arithmetic_ge, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin_term_eq, 
 	NULL, NULL, builtin_succ, builtin_number, builtin_atom_concat, NULL, NULL, NULL, 
@@ -106,6 +106,31 @@ void builtin_consult(Program *program, Derivation *D, State *point, Term *term) 
 	FILE *file;
 	path = term_list_get_nth(term, 1);
 	file = fopen(path->term.string, "r");
+	if(file != NULL) {
+		parser_stream(program, file);
+		fclose(file);
+		derivation_push_state(D, state_success(point));
+	}
+}
+
+/**
+  * 
+  * import/1
+  * (import +atom_or_string)
+  * 
+  * Load a Herbrand module.
+  * (import Module) is true when Module is a valid Herbrand module.
+  * 
+  **/
+void builtin_import(Program *program, Derivation *D, State *point, Term *term) {
+	Term *path;
+	FILE *file;
+	char *module;
+	path = term_list_get_nth(term, 1);
+	module = malloc(sizeof(char)*(34+strlen(path->term.string)));
+	sprintf(module, "/usr/local/herbrand/modules/%s.hb", path->term.string);
+	file = fopen(module, "r");
+	free(module);
 	if(file != NULL) {
 		parser_stream(program, file);
 		fclose(file);

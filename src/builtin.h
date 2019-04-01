@@ -44,6 +44,7 @@ int builtin_check_predicate(Term *term);
 int builtin_run_predicate(Program *program, Derivation *D, State *point, Term *term);
 
 void builtin_consult(Program *program, Derivation *D, State *point, Term *term);
+void builtin_import(Program *program, Derivation *D, State *point, Term *term);
 void builtin_and(Program *program, Derivation *D, State *point, Term *term);
 void builtin_or(Program *program, Derivation *D, State *point, Term *term);
 void builtin_ite(Program *program, Derivation *D, State *point, Term *term);
