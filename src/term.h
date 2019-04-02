@@ -175,3 +175,10 @@ Term *term_select_most_left(Term *term);
   * 
   **/
 Term *term_replace_most_left(Term *term, Term *head);
+
+/**
+  * 
+  * This function finds a term.
+  * 
+  **/
+int term_search_term(Term *term, Term *needle);

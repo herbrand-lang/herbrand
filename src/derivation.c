@@ -162,7 +162,7 @@ State *state_success(State *point, Term *term) {
 	State *state = state_alloc();
 	state->goal = term_replace_most_left(point->goal, goal);
 	if(term == NULL)
-  	term_free(goal);
+  		term_free(goal);
 	substitution_increase_references(point->substitution);
 	state->substitution = point->substitution;
 	state->parent = point;

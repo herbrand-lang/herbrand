@@ -350,3 +350,19 @@ Term *term_replace_most_left(Term *term, Term *head) {
 		return head;
 	}
 }
+
+/**
+  * 
+  * This function finds a term.
+  * 
+  **/
+int term_search_term(Term *term, Term *needle) {
+	if(term == needle)
+		return 1;
+	while(term->type == TYPE_LIST && !term_list_is_null(term)) {
+		if(term_search_term(term->term.list->head, needle))
+			return 1;
+		term = term->term.list->tail;
+	}
+	return term == needle;
+}

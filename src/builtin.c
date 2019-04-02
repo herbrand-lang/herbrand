@@ -66,7 +66,6 @@ void (*builtin_handlers[BUILTIN_HASH_SIZE])() = {
 
 
 
-
 /**
   * 
   * This functions cheks if an atom is a built-in
@@ -175,6 +174,17 @@ void builtin_or(Program *program, Derivation *D, State *point, Term *term) {
 	derivation_push_state(D, state_success(point, left));
 }
 
+/**
+  * 
+  * ite/3
+  * (ite :callable_term :callable_term :callable_term)
+  * 
+  * If-Then-Else.
+  * (ite If Then Else) is true if and only if If is true and Then is true
+  * for the first solution of If, or if If is false and Else is true for
+  * the first value with which If fails.
+  * 
+  **/
 void builtin_ite(Program *program, Derivation *D, State *point, Term *term) {
 	Term *list, *cut, *list_cut, *cond, *then, *els;
 	cond = term_list_get_nth(term, 1);
@@ -199,14 +209,102 @@ void builtin_ite(Program *program, Derivation *D, State *point, Term *term) {
 	term_free(list);
 }
 
+/**
+  * 
+  * !/0
+  * (!)
+  * 
+  * Cut.
+  * (!) is true. All choice points between the cut and the parent goal are
+  * removed. The effect is commit to use of both the current clause and
+  * the substitutions found at the point of the cut.
+  * 
+  **/
 void builtin_cut(Program *program, Derivation *D, State *point, Term *term) {
-	
+	int i;
+	Term *left, *cut;
+	State *parent_cut, *last_cut, *state, *next_state;
+	parent_cut = point;
+	cut = term_list_get_nth(term, 0);
+	while(parent_cut->parent != NULL && term_search_term(parent_cut->parent->goal, cut)) {
+		last_cut = parent_cut;
+		parent_cut = parent_cut->parent;
+		if(parent_cut->goal != NULL && !term_list_is_null(parent_cut->goal)) {
+			left = term_select_most_left(parent_cut->goal);
+			if(left != NULL
+			&& strcmp(term_list_get_head(left)->term.string, "call") == 0
+			&& term_search_term(left, cut)) {
+				parent_cut = last_cut;
+				break;
+			}
+		}
+	}
+	state = D->points;
+	while(state != NULL && state != parent_cut) {
+		D->nb_states--;
+		next_state = state->next;
+		state_free(state);
+		state = next_state;
+	}
+	D->points = state;
+	derivation_push_state(D, state_success(point, NULL));
 }
 
+/**
+  * 
+  * not/1
+  * (not @callable_term)
+  * 
+  * Not provable.
+  * (not Term) is true if and only if (call Term) is false.
+  * 
+  **/
 void builtin_not(Program *program, Derivation *D, State *point, Term *term) {
-	
+	Term *list, *cut, *call, *fail, *list_cut, *list_fail, *goal, *list_goal;
+	goal = term_list_get_nth(term, 1);
+	// Cut term
+	cut = term_alloc();
+	cut->type = TYPE_ATOM;
+	term_set_string(cut, "!");
+	// Cut call
+	list_cut = term_list_empty();
+	term_list_add_element(list_cut, cut);
+	// False term
+	fail = term_alloc();
+	fail->type = TYPE_ATOM;
+	term_set_string(fail, "false");
+	// False call
+	list_fail = term_list_empty();
+	term_list_add_element(list_fail, fail);
+	// Call term
+	call = term_alloc();
+	call->type = TYPE_ATOM;
+	term_set_string(call, "call");
+	// Goal call
+	list_goal = term_list_empty();
+	term_list_add_element(list_goal, call);
+	term_list_add_element(list_goal, goal);
+	term_increase_references(goal);
+	// ((call Goal) (!) (false))
+	list = term_list_empty();
+	term_list_add_element(list, list_goal);
+	term_list_add_element(list, list_cut);
+	term_list_add_element(list, list_fail);
+	derivation_push_state(D, state_success(point, NULL));
+	derivation_push_state(D, state_success(point, list));
+	term_free(list);
 }
 
+/**
+  * 
+  * call/*
+  * (call +callable_term ...+term)
+  * 
+  * Invoke a callable term as a goal.
+  * (call Goal | Args) is true if and only if Goal represents a goal which is
+  * true after appending Args to its list of arguments. 
+  * 
+  **/
 void builtin_call(Program *program, Derivation *D, State *point, Term *term) {
 	Term *tail, *goal;
 	goal = term_list_clone(term_list_get_nth(term, 1));
@@ -218,6 +316,15 @@ void builtin_call(Program *program, Derivation *D, State *point, Term *term) {
 	term_free(goal);
 }
 
+/**
+  * 
+  * once/1
+  * (once @callable_term)
+  * 
+  * Evaluate a term just once.
+  * (once Term) is true. once makes sure that Term fails or succeeds just once.
+  * 
+  **/
 void builtin_once(Program *program, Derivation *D, State *point, Term *term) {
 	Term *list, *cut, *call, *list_cut, *goal, *list_goal;
 	goal = term_list_get_nth(term, 1);
@@ -272,6 +379,7 @@ void builtin_repeat(Program *program, Derivation *D, State *point, Term *term) {
   * (true)
   * 
   * Alwais succeed.
+  * (true) is always true.
   * 
   **/
 void builtin_true(Program *program, Derivation *D, State *point, Term *term) {
@@ -284,9 +392,12 @@ void builtin_true(Program *program, Derivation *D, State *point, Term *term) {
   * (false)
   * 
   * Alwais fail.
+  * (false) is always false.
   * 
   **/
 void builtin_false(Program *program, Derivation *D, State *point, Term *term) {
+	// do nothing
+	// fail
 }
 
 void builtin_catch(Program *program, Derivation *D, State *point, Term *term) {

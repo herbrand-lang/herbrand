@@ -46,8 +46,11 @@ Substitution *semantics_answer(Program *program, Derivation *D) {
 		derivation_push_visited_state(D, point);
 		term = term_select_most_left(point->goal);
 		// If no more terms, this choice point is an answer
-		if(term == NULL)
+		if(term == NULL || term_list_is_null(term)) {
+			if(term != NULL)
+				term_free(term);
 			return point->substitution;
+		}
 		// Else, do a resolution step
 		// If not callable, error
 		//if(!term_is_callable(term))
