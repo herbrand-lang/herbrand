@@ -3,7 +3,7 @@
  * FILENAME: builtin.c
  * DESCRIPTION: Functions for evaluating built-in predicates
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 02.04.2019
+ * UPDATED: 03.04.2019
  * 
  *H*/
 
@@ -50,9 +50,9 @@ void (*builtin_handlers[BUILTIN_HASH_SIZE])() = {
 	builtin_catch, builtin_atom_chars, NULL, NULL, builtin_ground, builtin_halt, 
 	NULL, NULL, builtin_asserta, builtin_and, NULL, NULL, NULL, NULL, NULL, NULL, 
 	NULL, builtin_not, NULL, NULL, NULL, NULL, NULL, builtin_atom, NULL, NULL, NULL, 
-	NULL, builtin_assertz, NULL, NULL, builtin_not_unifcation, builtin_findall, NULL, 
-	NULL, builtin_or, NULL, NULL, NULL, NULL, NULL, builtin_true, NULL, NULL, NULL, 
-	NULL, NULL, builtin_term_ge, NULL, builtin_float, NULL, builtin_is, builtin_ite, 
+	NULL, builtin_assertz, NULL, NULL, builtin_not_unification, builtin_findall, 
+	NULL, NULL, builtin_or, NULL, NULL, NULL, NULL, NULL, builtin_true, NULL, NULL, 
+	NULL, NULL, NULL, builtin_term_ge, NULL, builtin_float, NULL, builtin_is, builtin_ite, 
 	NULL, NULL, NULL, builtin_unification, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
 	NULL, NULL, builtin_atom_length, NULL, NULL, builtin_string, NULL, builtin_arithmetic_ne, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
@@ -63,6 +63,7 @@ void (*builtin_handlers[BUILTIN_HASH_SIZE])() = {
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin_arithmetic_eq, 
 	NULL, NULL, NULL, NULL};
+
 
 
 
@@ -447,7 +448,7 @@ void builtin_unification(Program *program, Derivation *D, State *point, Term *te
   * (/= X Y) is true if and only if X and Y are not unifiable. True if the unification fails.
   * 
   **/
-void builtin_not_unifcation(Program *program, Derivation *D, State *point, Term *term) {
+void builtin_not_unification(Program *program, Derivation *D, State *point, Term *term) {
 	Substitution *mgu;
 	Term *left, *right;
 	left = term_list_get_nth(term, 1);

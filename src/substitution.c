@@ -3,7 +3,7 @@
  * FILENAME: program.c
  * DESCRIPTION: Data structures and functions for storing and manipuling substitutions
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 30.03.2019
+ * UPDATED: 03.04.2019
  * 
  *H*/
 
@@ -52,7 +52,7 @@ Substitution *substitution_alloc_from_term(Term *term) {
 	subs->max_vars = nb_vars;
 	subs->references = 0;
 	for(i = 0; i < nb_vars; i++) {
-		if(substitution_get_link(subs, vars[i]) == NULL)
+		if(substitution_get_link(subs, vars[i]->term.string) == NULL)
 			substitution_add_link(subs, vars[i]->term.string, vars[i]);
 	}
 	free(vars);
@@ -117,8 +117,8 @@ int substitution_add_link(Substitution *subs, char *var, Term *value) {
   * in the substitution, returns NULL.
   * 
   **/
-Term *substitution_get_link(Substitution *subs, Term *var) {
-	int index = hashmap_lookup(subs->indices, var->term.string);
+Term *substitution_get_link(Substitution *subs, char *var) {
+	int index = hashmap_lookup(subs->indices, var);
 	if(index != -1)
 		return subs->range[index];
 	return NULL;
@@ -153,7 +153,7 @@ Substitution *substitution_compose(Substitution *u, Substitution *v, int join) {
 Term *term_apply_substitution(Term *term, Substitution *subs) {
 	Term *term2, *tail;
 	if(term->type == TYPE_VARIABLE) {
-		term2 = substitution_get_link(subs, term);
+		term2 = substitution_get_link(subs, term->term.string);
 		if(term2 == NULL) {
 			term_increase_references(term);
 			return term;
@@ -189,6 +189,9 @@ void substitution_print(Substitution *subs) {
 		return;
 	} else if(subs->nb_vars == 0) {
 		printf("true");
+		return;
+	} else if(subs->nb_vars == 1 && strcmp(subs->domain[0], "$error") == 0) {
+		term_print(subs->range[0]);
 		return;
 	}
 	printf("{");

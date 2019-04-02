@@ -3,7 +3,7 @@
  * FILENAME: derivation.c
  * DESCRIPTION: Data structures and functions for derivations
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 01.04.2019
+ * UPDATED: 03.04.2019
  * 
  *H*/
 
@@ -37,6 +37,7 @@ Derivation *derivation_alloc() {
 void derivation_free(Derivation *D) {
 	State *next, *point = D->points;
 	while(point != NULL) {
+		printf("\n");
 		next = point->next;
 		state_free(point);
 		point = next;
@@ -111,7 +112,8 @@ State *state_alloc() {
   * 
   **/
 void state_free(State *state) {
-	term_free(state->goal);
+	if(state->goal != NULL)
+		term_free(state->goal);
 	substitution_free(state->substitution);
 	free(state);
 }
@@ -165,6 +167,22 @@ State *state_success(State *point, Term *term) {
   		term_free(goal);
 	substitution_increase_references(point->substitution);
 	state->substitution = point->substitution;
+	state->parent = point;
+	return state;
+}
+
+/**
+  *
+  * This function creates an state from an error term,
+  * returning a pointer to a newly initialized State
+  * struct.
+  * 
+  **/
+State *state_error(State *point, Term *term) {
+	State *state = state_alloc();
+	state->goal = NULL;
+	state->substitution = substitution_alloc(1);
+	substitution_add_link(state->substitution, "$error", term);
 	state->parent = point;
 	return state;
 }

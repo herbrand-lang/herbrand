@@ -13,7 +13,7 @@ false
 catch
 throw
 = unification
-/= not_unifcation
+/= not_unification
 asserta
 assertz
 retract

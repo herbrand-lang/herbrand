@@ -3,7 +3,7 @@
  * FILENAME: derivation.h
  * DESCRIPTION: Data structures and functions for derivations
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 01.04.2019
+ * UPDATED: 03.04.2019
  * 
  *H*/
 
@@ -109,6 +109,15 @@ State *state_inference(State *point, Term *body, Substitution *subs);
   * 
   **/
 State *state_success(State *point, Term *term);
+
+/**
+  *
+  * This function creates an state from an error term,
+  * returning a pointer to a newly initialized State
+  * struct.
+  * 
+  **/
+State *state_error(State *point, Term *term);
 
 /**
   * 

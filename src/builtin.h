@@ -3,7 +3,7 @@
  * FILENAME: builtin.h
  * DESCRIPTION: Functions for evaluating built-in predicates
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 02.04.2019
+ * UPDATED: 03.04.2019
  * 
  *H*/
 
@@ -58,7 +58,7 @@ void builtin_false(Program *program, Derivation *D, State *point, Term *term);
 void builtin_catch(Program *program, Derivation *D, State *point, Term *term);
 void builtin_throw(Program *program, Derivation *D, State *point, Term *term);
 void builtin_unification(Program *program, Derivation *D, State *point, Term *term);
-void builtin_not_unifcation(Program *program, Derivation *D, State *point, Term *term);
+void builtin_not_unification(Program *program, Derivation *D, State *point, Term *term);
 void builtin_asserta(Program *program, Derivation *D, State *point, Term *term);
 void builtin_assertz(Program *program, Derivation *D, State *point, Term *term);
 void builtin_retract(Program *program, Derivation *D, State *point, Term *term);

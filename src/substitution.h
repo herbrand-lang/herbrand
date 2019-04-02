@@ -3,7 +3,7 @@
  * FILENAME: program.c
  * DESCRIPTION: Data structures and functions for storing and manipuling substitutions
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 29.03.2019
+ * UPDATED: 03.04.2019
  * 
  *H*/
 
@@ -85,7 +85,7 @@ int substitution_add_link(Substitution *subs, char *var, Term *value);
   * in the substitution, returns NULL.
   * 
   **/
-Term *substitution_get_link(Substitution *subs, Term *var);
+Term *substitution_get_link(Substitution *subs, char *var);
 
 /**
 	*

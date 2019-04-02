@@ -3,7 +3,7 @@
  * FILENAME: semantics.c
  * DESCRIPTION: Declarative semantics for the language
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 30.03.2019
+ * UPDATED: 03.04.2019
  * 
  *H*/
 
@@ -36,7 +36,7 @@ Substitution *semantics_answer(Program *program, Derivation *D) {
 	State *point, *state;
 	Rule *rule;
 	Clause *clause;
-	Term *term, *body;
+	Term *term, *body, *error;
 	Substitution *mgu;
 	while(1) {
 		point = derivation_pop_state(D);
@@ -45,18 +45,23 @@ Substitution *semantics_answer(Program *program, Derivation *D) {
 			return NULL;
 		derivation_push_visited_state(D, point);
 		term = term_select_most_left(point->goal);
+		// If there is an error, return it
 		// If no more terms, this choice point is an answer
-		if(term == NULL || term_list_is_null(term)) {
+		if(term == NULL || term_list_is_null(term)
+		|| substitution_get_link(point->substitution, "$error") != NULL) {
 			if(term != NULL)
 				term_free(term);
 			return point->substitution;
 		}
 		// Else, do a resolution step
-		// If not callable, error
-		//if(!term_is_callable(term))
-			// error
+
+		// If not callable term, error
+		if(!term_is_callable(term)) {
+			error = exception_type_error("callable_term", term, term->parent);
+			derivation_push_state(D, state_error(point, error));
+			term_free(error);
 		// If is a built-in predicate
-		if(builtin_check_predicate(term_list_get_head(term))) {
+		} else if(builtin_check_predicate(term_list_get_head(term))) {
 			builtin_run_predicate(program, D, point, term);
 		} else {
 			rule = program_get_predicate(program, term->term.list->head->term.string, term->parent);

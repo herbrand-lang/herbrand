@@ -3,7 +3,7 @@
  * FILENAME: term.h
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 02.04.2019
+ * UPDATED: 03.04.2019
  * 
  *H*/
 
@@ -69,6 +69,14 @@ void term_set_string(Term *term, char *str);
   * 
   **/
 void term_increase_references(Term *term);
+
+/**
+  * 
+  * This function increases in one the number
+  * of references to a term.
+  * 
+  **/
+int term_is_callable(Term *term);
 
 /**
   * 

@@ -3,7 +3,7 @@
  * FILENAME: semantics.h
  * DESCRIPTION: Declarative semantics for the language
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 30.03.2019
+ * UPDATED: 03.04.2019
  * 
  *H*/
 
@@ -13,6 +13,7 @@
 #include "derivation.h"
 #include "unification.h"
 #include "builtin.h"
+#include "exception.h"
 
 
 

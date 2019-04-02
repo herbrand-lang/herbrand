@@ -3,7 +3,7 @@
  * FILENAME: term.c
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 02.04.2019
+ * UPDATED: 03.04.2019
  * 
  *H*/
 
@@ -69,6 +69,24 @@ void term_set_string(Term *term, char *str) {
   **/
 void term_increase_references(Term *term) {
 	term->references++;
+}
+
+/**
+  * 
+  * This function increases in one the number
+  * of references to a term.
+  * 
+  **/
+int term_is_callable(Term *term) {
+	if(term->type != TYPE_LIST)
+		return 0;
+	else if(term_list_is_null(term))
+		return 1;
+	else if(term->term.list->head->type != TYPE_ATOM)
+		return 0;
+	while(term->type == TYPE_LIST && !term_list_is_null(term))
+		term = term->term.list->tail;
+	return term_list_is_null(term);
 }
 
 /**
