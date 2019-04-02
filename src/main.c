@@ -3,7 +3,7 @@
  * FILENAME: main.c
  * DESCRIPTION: Main file
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 30.03.2019
+ * UPDATED: 02.04.2019
  * COMPILING: gcc -I/usr/include -L *.h *.c -o herbrand -g
  * 
  *H*/
@@ -70,10 +70,10 @@ void interactive_query() {
 			substitution_print(answer);
 			printf(" ");
 			c = getchar();
-			while((d = getchar()) != '\n' && d != EOF);
+			if(c != '\n')
+				while((d = getchar()) != '\n' && d != EOF);
 		} while(answer != NULL && c == ';');
-		if(answer == NULL)
-			printf("\n");
+		printf("\n");
 		term_free(term);
 		derivation_free(D);
 		term = NULL;

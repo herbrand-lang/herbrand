@@ -3,7 +3,7 @@
  * FILENAME: tokenizer.c
  * DESCRIPTION: Split source code into lexical components
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 28.01.2019
+ * UPDATED: 02.04.2019
  * 
  *H*/
 
@@ -121,10 +121,10 @@ int tokenizer_add_char_token(Tokenizer *tokenizer, int token, char character) {
   **/
 Tokenizer *tokenizer_read_stream(FILE *stream) {
 	char character;
-	int token, token_number_dot = 0, token_graphic = 0, token_string_open = 0, token_start = 1, token_cat = -1;
+	int token, token_number_dot = 0, token_graphic = 0, token_string_open = 0, token_start = 1, token_cat = -1, nb_paren = 0;
 	Tokenizer *tokenizer = tokenizer_alloc();
 	while(fscanf(stream, "%c", &character) == 1 && !feof(stream) && stream != stdin ||
-	stream == stdin && (tokenizer->nb_tokens == 0 || tokenizer->nb_tokens > 0 && character != '\n' || !token_start && token_cat == TOKEN_STRING)) {
+	stream == stdin && (nb_paren > 0 || tokenizer->nb_tokens == 0 || tokenizer->nb_tokens > 0 && character != '\n' || !token_start && token_cat == TOKEN_STRING)) {
 		// Read string
 		if((token_start || token_cat == TOKEN_ATOM && token_graphic) && character == '"' || !token_start && token_cat == TOKEN_STRING) {
 			if(token_cat != TOKEN_STRING || token_start) {
@@ -223,6 +223,7 @@ Tokenizer *tokenizer_read_stream(FILE *stream) {
 			tokenizer->column++;
 			token_start = 1;
 			token_cat = TOKEN_LPAR;
+			nb_paren++;
 		// Read right parenthesis
 		} else if(character == ')') {
 			token = tokenizer_init_token(tokenizer);
@@ -231,6 +232,7 @@ Tokenizer *tokenizer_read_stream(FILE *stream) {
 			tokenizer->column++;
 			token_start = 1;
 			token_cat = TOKEN_RPAR;
+			nb_paren--;
 		// Read bar
 		} else if(character == '|') {
 			token = tokenizer_init_token(tokenizer);
