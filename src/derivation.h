@@ -3,7 +3,7 @@
  * FILENAME: derivation.h
  * DESCRIPTION: Data structures and functions for derivations
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 30.03.2019
+ * UPDATED: 01.04.2019
  * 
  *H*/
 
@@ -108,7 +108,7 @@ State *state_inference(State *point, Term *body, Substitution *subs);
   * struct.
   * 
   **/
-State *state_success(State *point);
+State *state_success(State *point, Term *term);
 
 /**
   * 

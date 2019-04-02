@@ -3,7 +3,7 @@
  * FILENAME: builtin.c
  * DESCRIPTION: Functions for evaluating built-in predicates
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 31.03.2019
+ * UPDATED: 02.04.2019
  * 
  *H*/
 
@@ -17,7 +17,7 @@ char *builtin_keys[BUILTIN_HASH_SIZE] = {
 	NULL, NULL, "list", NULL, NULL, NULL, NULL, "import", NULL, NULL, NULL, NULL, 
 	NULL, NULL, NULL, NULL, ">", NULL, NULL, NULL, "current_herbrand_flag", NULL, 
 	NULL, ":>", NULL, NULL, "false", "nonvar", NULL, NULL, NULL, "set_herbrand_flag", 
-	"retractall", "throw", ":>=", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	"retractall", "throw", ":>=", NULL, NULL, NULL, NULL, NULL, "call", NULL, NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
 	NULL, NULL, "==", NULL, NULL, "succ", "number", "atom_concat", NULL, NULL, NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, "/==", NULL, NULL, NULL, "catch", "atom_chars", 
@@ -29,7 +29,7 @@ char *builtin_keys[BUILTIN_HASH_SIZE] = {
 	NULL, NULL, NULL, "atom_length", NULL, NULL, "string", NULL, ":/==", NULL, NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ":<=", 
 	NULL, NULL, NULL, NULL, NULL, "repeat", NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, "once", NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, "once", NULL, NULL, "!", NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, "retract", NULL, NULL, NULL, NULL, NULL, 
 	NULL, "consult", "string_concat", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
@@ -43,8 +43,8 @@ void (*builtin_handlers[BUILTIN_HASH_SIZE])() = {
 	NULL, builtin_term_gt, NULL, NULL, NULL, builtin_current_herbrand_flag, NULL, 
 	NULL, builtin_arithmetic_gt, NULL, NULL, builtin_false, builtin_nonvar, NULL, 
 	NULL, NULL, builtin_set_herbrand_flag, builtin_retractall, builtin_throw, builtin_arithmetic_ge, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin_term_eq, 
+	NULL, NULL, NULL, NULL, NULL, builtin_call, NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin_term_eq, 
 	NULL, NULL, builtin_succ, builtin_number, builtin_atom_concat, NULL, NULL, NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin_term_ne, NULL, NULL, NULL, 
 	builtin_catch, builtin_atom_chars, NULL, NULL, builtin_ground, builtin_halt, 
@@ -58,11 +58,12 @@ void (*builtin_handlers[BUILTIN_HASH_SIZE])() = {
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
 	NULL, builtin_arithmetic_le, NULL, NULL, NULL, NULL, NULL, builtin_repeat, NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, builtin_once, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	builtin_retract, NULL, NULL, NULL, NULL, NULL, NULL, builtin_consult, builtin_string_concat, 
+	NULL, builtin_once, NULL, NULL, builtin_cut, NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, builtin_retract, NULL, NULL, NULL, NULL, NULL, NULL, builtin_consult, builtin_string_concat, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin_arithmetic_eq, 
 	NULL, NULL, NULL, NULL};
+
 
 
 
@@ -109,7 +110,7 @@ void builtin_consult(Program *program, Derivation *D, State *point, Term *term) 
 	if(file != NULL) {
 		parser_stream(program, file);
 		fclose(file);
-		derivation_push_state(D, state_success(point));
+		derivation_push_state(D, state_success(point, NULL));
 	}
 }
 
@@ -134,7 +135,7 @@ void builtin_import(Program *program, Derivation *D, State *point, Term *term) {
 	if(file != NULL) {
 		parser_stream(program, file);
 		fclose(file);
-		derivation_push_state(D, state_success(point));
+		derivation_push_state(D, state_success(point, NULL));
 	}
 }
 
@@ -148,16 +149,9 @@ void builtin_import(Program *program, Derivation *D, State *point, Term *term) {
   * 
   **/
 void builtin_and(Program *program, Derivation *D, State *point, Term *term) {
-	State *state;
 	Term *tail;
 	tail = term_list_get_tail(term);
-	state = state_alloc();
-	state->goal = tail;
-	term_increase_references(tail);
-	state->substitution = point->substitution;
-	substitution_increase_references(point->substitution);
-	state->parent = point;
-	derivation_push_state(D, state);
+	derivation_push_state(D, state_success(point, tail));
 }
 
 /**
@@ -170,33 +164,85 @@ void builtin_and(Program *program, Derivation *D, State *point, Term *term) {
   * 
   **/
 void builtin_or(Program *program, Derivation *D, State *point, Term *term) {
-	State *state;
 	Term *left, *right;
 	left = term_list_get_nth(term, 1);
 	right = term_list_get_nth(term, 2);
 	// Right goal
-	state = state_alloc();
-	state->goal = right;
 	term_increase_references(right);
-	state->substitution = point->substitution;
-	substitution_increase_references(point->substitution);
-	state->parent = point;
-	derivation_push_state(D, state);
+	derivation_push_state(D, state_success(point, right));
 	// Left goal
-	state = state_alloc();
-	state->goal = left;
 	term_increase_references(left);
-	state->substitution = point->substitution;
-	substitution_increase_references(point->substitution);
-	state->parent = point;
-	derivation_push_state(D, state);
+	derivation_push_state(D, state_success(point, left));
 }
 
 void builtin_ite(Program *program, Derivation *D, State *point, Term *term) {
+	Term *list, *cut, *list_cut, *cond, *then, *els;
+	cond = term_list_get_nth(term, 1);
+	then = term_list_get_nth(term, 2);
+	els = term_list_get_nth(term, 3);
+	// Cut term
+	cut = term_alloc();
+	cut->type = TYPE_ATOM;
+	term_set_string(cut, "!");
+	// Cut call
+	list_cut = term_list_empty();
+	term_list_add_element(list_cut, cut);
+	// (If (!) Then)
+	list = term_list_empty();
+	term_list_add_element(list, cond);
+	term_list_add_element(list, list_cut);
+	term_list_add_element(list, then);
+	term_increase_references(cond);
+	term_increase_references(then);
+	derivation_push_state(D, state_success(point, els));
+	derivation_push_state(D, state_success(point, list));
+	term_free(list);
 }
+
+void builtin_cut(Program *program, Derivation *D, State *point, Term *term) {
+	
+}
+
 void builtin_not(Program *program, Derivation *D, State *point, Term *term) {
+	
 }
+
+void builtin_call(Program *program, Derivation *D, State *point, Term *term) {
+	Term *tail, *goal;
+	goal = term_list_clone(term_list_get_nth(term, 1));
+	tail = term_list_get_tail(term);
+	tail = term_list_get_tail(tail);
+	term_list_set_tail(goal, tail);
+	term_increase_references(tail);
+	derivation_push_state(D, state_success(point, goal));
+	term_free(goal);
+}
+
 void builtin_once(Program *program, Derivation *D, State *point, Term *term) {
+	Term *list, *cut, *call, *list_cut, *goal, *list_goal;
+	goal = term_list_get_nth(term, 1);
+	// Cut term
+	cut = term_alloc();
+	cut->type = TYPE_ATOM;
+	term_set_string(cut, "!");
+	// Call term
+	call = term_alloc();
+	call->type = TYPE_ATOM;
+	term_set_string(call, "call");
+	// Cut call
+	list_cut = term_list_empty();
+	term_list_add_element(list_cut, cut);
+	// Goal call
+	list_goal = term_list_empty();
+	term_list_add_element(list_goal, call);
+	term_list_add_element(list_goal, goal);
+	term_increase_references(goal);
+	// ((call Goal) (!))
+	list = term_list_empty();
+	term_list_add_element(list, list_goal);
+	term_list_add_element(list, list_cut);
+	derivation_push_state(D, state_success(point, list));
+	term_free(list);
 }
 
 /**
@@ -217,7 +263,7 @@ void builtin_repeat(Program *program, Derivation *D, State *point, Term *term) {
 	substitution_increase_references(point->substitution);
 	state->parent = point;
 	derivation_push_state(D, state);
-	derivation_push_state(D, state_success(point));
+	derivation_push_state(D, state_success(point, NULL));
 }
 
 /**
@@ -229,7 +275,7 @@ void builtin_repeat(Program *program, Derivation *D, State *point, Term *term) {
   * 
   **/
 void builtin_true(Program *program, Derivation *D, State *point, Term *term) {
-	derivation_push_state(D, state_success(point));
+	derivation_push_state(D, state_success(point, NULL));
 }
 
 /**
@@ -290,7 +336,7 @@ void builtin_not_unifcation(Program *program, Derivation *D, State *point, Term 
 	right = term_list_get_nth(term, 2);
 	mgu = semantics_unify_terms(left, right, 0);
 	if(mgu == NULL) 
-		derivation_push_state(D, state_success(point));
+		derivation_push_state(D, state_success(point, NULL));
 	else
 		substitution_free(mgu);
 }
@@ -341,7 +387,7 @@ void builtin_arithmetic_ge(Program *program, Derivation *D, State *point, Term *
 void builtin_atom(Program *program, Derivation *D, State *point, Term *term) {
 	Term *atom = term_list_get_nth(term, 1);
 	if(atom->type == TYPE_ATOM) 
-		derivation_push_state(D, state_success(point));
+		derivation_push_state(D, state_success(point, NULL));
 }
 
 /**
@@ -356,7 +402,7 @@ void builtin_atom(Program *program, Derivation *D, State *point, Term *term) {
 void builtin_number(Program *program, Derivation *D, State *point, Term *term) {
 	Term *number = term_list_get_nth(term, 1);
 	if(number->type == TYPE_NUMERAL || number->type == TYPE_DECIMAL) 
-		derivation_push_state(D, state_success(point));
+		derivation_push_state(D, state_success(point, NULL));
 }
 
 /**
@@ -371,7 +417,7 @@ void builtin_number(Program *program, Derivation *D, State *point, Term *term) {
 void builtin_integer(Program *program, Derivation *D, State *point, Term *term) {
 	Term *integer = term_list_get_nth(term, 1);
 	if(integer->type == TYPE_NUMERAL)
-		derivation_push_state(D, state_success(point));
+		derivation_push_state(D, state_success(point, NULL));
 }
 
 /**
@@ -386,7 +432,7 @@ void builtin_integer(Program *program, Derivation *D, State *point, Term *term) 
 void builtin_float(Program *program, Derivation *D, State *point, Term *term) {
 	Term *decimal = term_list_get_nth(term, 1);
 	if(decimal->type == TYPE_DECIMAL)
-		derivation_push_state(D, state_success(point));
+		derivation_push_state(D, state_success(point, NULL));
 }
 
 /**
@@ -401,7 +447,7 @@ void builtin_float(Program *program, Derivation *D, State *point, Term *term) {
 void builtin_string(Program *program, Derivation *D, State *point, Term *term) {
 	Term *string = term_list_get_nth(term, 1);
 	if(string->type == TYPE_STRING)
-		derivation_push_state(D, state_success(point));
+		derivation_push_state(D, state_success(point, NULL));
 }
 
 /**
@@ -419,7 +465,7 @@ void builtin_ground(Program *program, Derivation *D, State *point, Term *term) {
 	Term **vars = term_get_variables(ground, &nb_vars);
 	free(vars);
 	if(nb_vars == 0)
-		derivation_push_state(D, state_success(point));
+		derivation_push_state(D, state_success(point, NULL));
 }
 
 /**
@@ -434,7 +480,7 @@ void builtin_ground(Program *program, Derivation *D, State *point, Term *term) {
 void builtin_list(Program *program, Derivation *D, State *point, Term *term) {
 	Term *list = term_list_get_nth(term, 1);
 	if(list->type == TYPE_LIST)
-		derivation_push_state(D, state_success(point));
+		derivation_push_state(D, state_success(point, NULL));
 }
 
 /**
@@ -449,7 +495,7 @@ void builtin_list(Program *program, Derivation *D, State *point, Term *term) {
 void builtin_var(Program *program, Derivation *D, State *point, Term *term) {
 	Term *var = term_list_get_nth(term, 1);
 	if(var->type == TYPE_VARIABLE)
-		derivation_push_state(D, state_success(point));
+		derivation_push_state(D, state_success(point, NULL));
 }
 
 /**
@@ -464,7 +510,7 @@ void builtin_var(Program *program, Derivation *D, State *point, Term *term) {
 void builtin_nonvar(Program *program, Derivation *D, State *point, Term *term) {
 	Term *nonvar = term_list_get_nth(term, 1);
 	if(nonvar->type != TYPE_VARIABLE)
-		derivation_push_state(D, state_success(point));
+		derivation_push_state(D, state_success(point, NULL));
 }
 
 void builtin_atom_length(Program *program, Derivation *D, State *point, Term *term) {
@@ -485,8 +531,22 @@ void builtin_is(Program *program, Derivation *D, State *point, Term *term) {
 }
 void builtin_succ(Program *program, Derivation *D, State *point, Term *term) {
 }
+
+/**
+  * 
+  * halt/1
+  * (halt +number)
+  * 
+  * Terminate a Herbrand processor and return message.
+  * (halt X) exits the processor and returns to the system that invoked
+  * the processor, passing a message through the X variable.
+  * 
+  **/
 void builtin_halt(Program *program, Derivation *D, State *point, Term *term) {
+	Term *message = term_list_get_nth(term, 1);
+	exit(message->term.numeral);
 }
+
 void builtin_current_herbrand_flag(Program *program, Derivation *D, State *point, Term *term) {
 }
 void builtin_set_herbrand_flag(Program *program, Derivation *D, State *point, Term *term) {

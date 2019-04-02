@@ -3,7 +3,7 @@
  * FILENAME: builtin.h
  * DESCRIPTION: Functions for evaluating built-in predicates
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 31.03.2019
+ * UPDATED: 02.04.2019
  * 
  *H*/
 
@@ -48,7 +48,9 @@ void builtin_import(Program *program, Derivation *D, State *point, Term *term);
 void builtin_and(Program *program, Derivation *D, State *point, Term *term);
 void builtin_or(Program *program, Derivation *D, State *point, Term *term);
 void builtin_ite(Program *program, Derivation *D, State *point, Term *term);
+void builtin_cut(Program *program, Derivation *D, State *point, Term *term);
 void builtin_not(Program *program, Derivation *D, State *point, Term *term);
+void builtin_call(Program *program, Derivation *D, State *point, Term *term);
 void builtin_once(Program *program, Derivation *D, State *point, Term *term);
 void builtin_repeat(Program *program, Derivation *D, State *point, Term *term);
 void builtin_true(Program *program, Derivation *D, State *point, Term *term);

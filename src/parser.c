@@ -3,7 +3,7 @@
  * FILENAME: parse.c
  * DESCRIPTION: Parse programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 30.03.2019
+ * UPDATED: 02.04.2019
  * 
  *H*/
 
@@ -376,15 +376,13 @@ Parser *parser_expression(Tokenizer *tokenizer, int start) {
 			term = term_alloc();
 			state->value = term;
 			term->type = TYPE_ATOM;
-			term->term.string = malloc(sizeof(char)*(token->length+1));
-			strcpy(term->term.string, token->text);
+			term_set_string(term, token->text);
 			break;
 		case TOKEN_VARIABLE:
 			term = term_alloc();
 			state->value = term;
 			term->type = TYPE_VARIABLE;
-			term->term.string = malloc(sizeof(char)*(token->length+1));
-			strcpy(term->term.string, token->text);
+			term_set_string(term, token->text);
 			break;
 		case TOKEN_NUMERAL:
 			term = term_alloc();
@@ -402,8 +400,7 @@ Parser *parser_expression(Tokenizer *tokenizer, int start) {
 			term = term_alloc();
 			state->value = term;
 			term->type = TYPE_STRING;
-			term->term.string = malloc(sizeof(char)*(token->length+1));
-			strcpy(term->term.string, token->text);
+			term_set_string(term, token->text);
 			break;
 		case TOKEN_LPAR:
 			term = term_list_empty();

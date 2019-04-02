@@ -3,7 +3,9 @@ import
 and
 or
 ite
+! cut
 not
+call
 once
 repeat
 true

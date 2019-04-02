@@ -3,7 +3,7 @@
  * FILENAME: term.h
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 31.03.2019
+ * UPDATED: 02.04.2019
  * 
  *H*/
 
@@ -57,6 +57,13 @@ void term_free(Term *term);
 
 /**
   * 
+  * This function sets the string of the term.
+  * 
+  **/
+void term_set_string(Term *term, char *str);
+
+/**
+  * 
   * This function increases in one the number
   * of references to a term.
   * 
@@ -85,6 +92,14 @@ Term *term_list_create(Term *head, Term *tail);
   * 
   **/
 Term *term_list_empty();
+
+/**
+  * 
+  * This function clones a list, returning a
+  * pointer to a newly initialized Term struct.
+  * 
+  **/
+Term *term_list_clone(Term *term);
 
 /**
   * 
