@@ -68,6 +68,10 @@ void interactive_query() {
 		do {
 			answer = semantics_answer(program, D);
 			substitution_print(answer);
+			if(D->nb_states == 0) {
+				printf(".\n");
+				break;
+			}
 			printf(" ");
 			c = getchar();
 			if(c != '\n')

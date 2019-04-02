@@ -224,9 +224,9 @@ void builtin_cut(Program *program, Derivation *D, State *point, Term *term) {
 	int i;
 	Term *left, *cut;
 	State *parent_cut, *last_cut, *state, *next_state;
-	parent_cut = point;
+	parent_cut = point->parent;
 	cut = term_list_get_nth(term, 0);
-	while(parent_cut->parent != NULL && term_search_term(parent_cut->parent->goal, cut)) {
+	while(parent_cut->parent != NULL && term_search_term(parent_cut->goal, cut)) {
 		last_cut = parent_cut;
 		parent_cut = parent_cut->parent;
 		if(parent_cut->goal != NULL && !term_list_is_null(parent_cut->goal)) {
@@ -240,11 +240,18 @@ void builtin_cut(Program *program, Derivation *D, State *point, Term *term) {
 		}
 	}
 	state = D->points;
-	while(state != NULL && state != parent_cut) {
-		D->nb_states--;
-		next_state = state->next;
-		state_free(state);
-		state = next_state;
+	while(1) {
+		next_state = state;
+		while(next_state != NULL && next_state != parent_cut)
+			next_state = next_state->parent;
+		if(next_state == parent_cut) {
+			D->nb_states--;
+			next_state = state->next;
+			state_free(state);
+			state = next_state;
+		} else {
+			break;
+		}
 	}
 	D->points = state;
 	derivation_push_state(D, state_success(point, NULL));

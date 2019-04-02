@@ -187,6 +187,9 @@ void substitution_print(Substitution *subs) {
 	if(subs == NULL) {
 		printf("false");
 		return;
+	} else if(subs->nb_vars == 0) {
+		printf("true");
+		return;
 	}
 	printf("{");
 	for(i = 0; i < subs->nb_vars; i++) {
