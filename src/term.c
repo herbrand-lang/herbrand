@@ -73,8 +73,7 @@ void term_increase_references(Term *term) {
 
 /**
   * 
-  * This function increases in one the number
-  * of references to a term.
+  * This function checks if term is callable.
   * 
   **/
 int term_is_callable(Term *term) {
@@ -87,6 +86,60 @@ int term_is_callable(Term *term) {
 	while(term->type == TYPE_LIST && !term_list_is_null(term))
 		term = term->term.list->tail;
 	return term_list_is_null(term);
+}
+
+/**
+  * 
+  * This function checks if term is variable.
+  * 
+  **/
+int term_is_variable(Term *term) {
+	return term->type == TYPE_VARIABLE;
+}
+
+/**
+  * 
+  * This function checks if term is an atom.
+  * 
+  **/
+int term_is_atom(Term *term) {
+	return term->type == TYPE_ATOM;
+}
+
+/**
+  * 
+  * This function checks if term is a string.
+  * 
+  **/
+int term_is_string(Term *term) {
+	return term->type == TYPE_STRING;
+}
+
+/**
+  * 
+  * This function checks if term is a number.
+  * 
+  **/
+int term_is_number(Term *term) {
+	return term->type == TYPE_NUMERAL || TYPE_DECIMAL;
+}
+
+/**
+  * 
+  * This function checks if term is a integer.
+  * 
+  **/
+int term_is_integer(Term *term) {
+	return term->type == TYPE_NUMERAL;
+}
+
+/**
+  * 
+  * This function checks if term is a float.
+  * 
+  **/
+int term_is_float(Term *term) {
+	return term->type == TYPE_DECIMAL;
 }
 
 /**

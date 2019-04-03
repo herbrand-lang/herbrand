@@ -14,6 +14,7 @@
 #include "hashmap.h"
 #include "program.h"
 #include "parser.h"
+#include "exception.h"
 
 
 

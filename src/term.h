@@ -72,11 +72,52 @@ void term_increase_references(Term *term);
 
 /**
   * 
-  * This function increases in one the number
-  * of references to a term.
+  * This function checks if term is callable.
   * 
   **/
 int term_is_callable(Term *term);
+
+/**
+  * 
+  * This function checks if term is variable.
+  * 
+  **/
+int term_is_variable(Term *term);
+
+/**
+  * 
+  * This function checks if term is an atom.
+  * 
+  **/
+int term_is_atom(Term *term);
+
+/**
+  * 
+  * This function checks if term is a string.
+  * 
+  **/
+int term_is_string(Term *term);
+
+/**
+  * 
+  * This function checks if term is a number.
+  * 
+  **/
+int term_is_number(Term *term);
+
+/**
+  * 
+  * This function checks if term is a integer.
+  * 
+  **/
+int term_is_integer(Term *term);
+
+/**
+  * 
+  * This function checks if term is a float.
+  * 
+  **/
+int term_is_float(Term *term);
 
 /**
   * 

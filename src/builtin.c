@@ -103,14 +103,27 @@ int builtin_run_predicate(Program *program, Derivation *D, State *point, Term *t
   * 
   **/
 void builtin_consult(Program *program, Derivation *D, State *point, Term *term) {
-	Term *path;
+	Term *path, *error = NULL;
 	FILE *file;
 	path = term_list_get_nth(term, 1);
+	if(term_is_variable(path))
+		error = exception_instantiation_error(term->parent);
+	else if(!term_is_atom(path) && !term_is_string(path)) 
+		error = exception_type_error("string_or_atom", path, term->parent);
+	if(error != NULL) {
+		derivation_push_state(D, state_error(point, error));
+		term_free(error);
+		return;
+	}
 	file = fopen(path->term.string, "r");
 	if(file != NULL) {
 		parser_stream(program, file);
 		fclose(file);
 		derivation_push_state(D, state_success(point, NULL));
+	} else {
+		error = exception_existence_error("source_sink", path, term->parent);
+		derivation_push_state(D, state_error(point, error));
+		term_free(error);
 	}
 }
 
@@ -124,10 +137,19 @@ void builtin_consult(Program *program, Derivation *D, State *point, Term *term) 
   * 
   **/
 void builtin_import(Program *program, Derivation *D, State *point, Term *term) {
-	Term *path;
+	Term *path, *error = NULL;
 	FILE *file;
 	char *module;
 	path = term_list_get_nth(term, 1);
+	if(term_is_variable(path))
+		error = exception_instantiation_error(term->parent);
+	else if(!term_is_atom(path) && !term_is_string(path)) 
+		error = exception_type_error("string_or_atom", path, term->parent);
+	if(error != NULL) {
+		derivation_push_state(D, state_error(point, error));
+		term_free(error);
+		return;
+	}
 	module = malloc(sizeof(char)*(34+strlen(path->term.string)));
 	sprintf(module, "/usr/local/herbrand/modules/%s.hb", path->term.string);
 	file = fopen(module, "r");
@@ -136,16 +158,20 @@ void builtin_import(Program *program, Derivation *D, State *point, Term *term) {
 		parser_stream(program, file);
 		fclose(file);
 		derivation_push_state(D, state_success(point, NULL));
+	} else {
+		error = exception_existence_error("module", path, term->parent);
+		derivation_push_state(D, state_error(point, error));
+		term_free(error);
 	}
 }
 
 /**
   * 
-  * and/2
-  * (and +callable_term +callable_term)
+  * and/*
+  * (and ...+callable_term)
   * 
   * Conjunction.
-  * (and First Second) is true if and only if First is true and Second is true.
+  * (and | Goals) is true if and only if every goal in Goals is true.
   * 
   **/
 void builtin_and(Program *program, Derivation *D, State *point, Term *term) {
@@ -156,23 +182,33 @@ void builtin_and(Program *program, Derivation *D, State *point, Term *term) {
 
 /**
   * 
-  * or/2
-  * (or +callable_term +callable_term)
+  * or/*
+  * (or ...+callable_term)
   * 
   * Disjunction.
-  * (or Either Or) is true if and only if either Either or Or is true.
+  * (or | Goals) is true if and only if any goal in Goals is true.
   * 
   **/
 void builtin_or(Program *program, Derivation *D, State *point, Term *term) {
-	Term *left, *right;
-	left = term_list_get_nth(term, 1);
-	right = term_list_get_nth(term, 2);
-	// Right goal
-	term_increase_references(right);
-	derivation_push_state(D, state_success(point, right));
-	// Left goal
-	term_increase_references(left);
-	derivation_push_state(D, state_success(point, left));
+	Term *list, *head;
+	State *state = NULL, *prev;
+	list = term_list_get_tail(term);
+	while(!term_list_is_null(list)) {
+		prev = state;
+		state = state_alloc();
+		head = term_list_get_head(list);
+		state->goal = head;
+		state->substitution = NULL;
+		state->next = prev;
+		term_increase_references(head);
+		list = term_list_get_tail(list);
+	}
+	while(state != NULL) {
+		derivation_push_state(D, state_success(point, state->goal));
+		prev = state->next;
+		state_free(state);
+		state = prev;
+	}
 }
 
 /**
@@ -227,10 +263,10 @@ void builtin_cut(Program *program, Derivation *D, State *point, Term *term) {
 	State *parent_cut, *last_cut, *state, *next_state;
 	parent_cut = point->parent;
 	cut = term_list_get_nth(term, 0);
-	while(parent_cut->parent != NULL && term_search_term(parent_cut->goal, cut)) {
+	while(parent_cut != NULL && term_search_term(parent_cut->goal, cut)) {
 		last_cut = parent_cut;
 		parent_cut = parent_cut->parent;
-		if(parent_cut->goal != NULL && !term_list_is_null(parent_cut->goal)) {
+		if(parent_cut != NULL && parent_cut->goal != NULL && !term_list_is_null(parent_cut->goal)) {
 			left = term_select_most_left(parent_cut->goal);
 			if(left != NULL
 			&& strcmp(term_list_get_head(left)->term.string, "call") == 0
@@ -242,6 +278,8 @@ void builtin_cut(Program *program, Derivation *D, State *point, Term *term) {
 	}
 	state = D->points;
 	while(1) {
+		if(state == NULL)
+			break;
 		next_state = state;
 		while(next_state != NULL && next_state != parent_cut)
 			next_state = next_state->parent;
@@ -662,7 +700,16 @@ void builtin_succ(Program *program, Derivation *D, State *point, Term *term) {
   * 
   **/
 void builtin_halt(Program *program, Derivation *D, State *point, Term *term) {
-	Term *message = term_list_get_nth(term, 1);
+	Term *error = NULL, *message = term_list_get_nth(term, 1);
+	if(term_is_variable(message))
+		error = exception_instantiation_error(term->parent);
+	else if(!term_is_integer(message)) 
+		error = exception_type_error("integer", message, term->parent);
+	if(error != NULL) {
+		derivation_push_state(D, state_error(point, error));
+		term_free(error);
+		return;
+	}
 	exit(message->term.numeral);
 }
 

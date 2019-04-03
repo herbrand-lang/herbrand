@@ -114,7 +114,8 @@ State *state_alloc() {
 void state_free(State *state) {
 	if(state->goal != NULL)
 		term_free(state->goal);
-	substitution_free(state->substitution);
+	if(state->substitution != NULL)
+		substitution_free(state->substitution);
 	free(state);
 }
 
