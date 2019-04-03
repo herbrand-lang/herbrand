@@ -150,8 +150,8 @@ void builtin_import(Program *program, Derivation *D, State *point, Term *term) {
 		term_free(error);
 		return;
 	}
-	module = malloc(sizeof(char)*(34+strlen(path->term.string)));
-	sprintf(module, "/usr/local/herbrand/modules/%s.hb", path->term.string);
+	module = malloc(sizeof(char)*((strlen(HERBRAND_PATH)+strlen(path->term.string)+1)));
+	sprintf(module, HERBRAND_PATH "modules/%s.hb", path->term.string);
 	file = fopen(module, "r");
 	free(module);
 	if(file != NULL) {

@@ -57,7 +57,7 @@ void interactive_query() {
 	program = program_alloc();
 	while(1) {
 		while(term == NULL) {
-			printf("herbrand> ");
+			printf("\x1b[1m\x1b[31mherbrand>\x1b[0m ");
 			term = parser_term(stdin);
 		}
 		if(term->type == TYPE_ATOM && strcmp(term->term.string, "exit") == 0) {

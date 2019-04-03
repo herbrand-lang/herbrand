@@ -21,6 +21,10 @@
 #ifndef LOGIC_BUILTIN_H
 #define LOGIC_BUILTIN_H
 
+#ifndef HERBRAND_PATH
+#define HERBRAND_PATH "/usr/local/herbrand/"
+#endif
+
 #define BUILTIN_HASH_SIZE 256
 char *builtin_keys[BUILTIN_HASH_SIZE];
 void (*builtin_handlers[BUILTIN_HASH_SIZE])();

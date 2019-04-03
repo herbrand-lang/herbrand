@@ -348,20 +348,22 @@ void term_print(Term *term) {
 		return;
 	switch(term->type) {
 		case TYPE_ATOM:
+			printf("\x1b[1m\x1b[34m%s\x1b[0m", term->term.string);
+			break;
 		case TYPE_VARIABLE:
-			printf("%s", term->term.string);
+			printf("\x1b[1m\x1b[36m%s\x1b[0m", term->term.string);
 			break;
 		case TYPE_NUMERAL:
-			printf("%d", term->term.numeral);
+			printf("\x1b[1m\x1b[33m%d\x1b[0m", term->term.numeral);
 			break;
 		case TYPE_DECIMAL:
-			printf("%f", term->term.decimal);
+			printf("\x1b[1m\x1b[33m%f\x1b[0m", term->term.decimal);
 			break;
 		case TYPE_STRING:
-			printf("\"%s\"", term->term.string);
+			printf("\x1b[1m\x1b[32m\"%s\"\x1b[0m", term->term.string);
 			break;
 		case TYPE_LIST:
-			printf("(");
+			printf("\x1b[1m(\x1b[0m");
 			list = term;
 			while(list->type == TYPE_LIST && list->term.list->head != NULL) {
 				if(length)
@@ -371,10 +373,10 @@ void term_print(Term *term) {
 				list = list->term.list->tail;
 			}
 			if(list->type != TYPE_LIST) {
-				printf("|");
+				printf("\x1b[1m|\x1b[0m");
 				term_print(list);
 			}
-			printf(")");
+			printf("\x1b[1m)\x1b[0m");
 			break;
 	}
 }

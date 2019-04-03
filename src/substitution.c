@@ -197,7 +197,7 @@ void substitution_print(Substitution *subs) {
 	printf("{");
 	for(i = 0; i < subs->nb_vars; i++) {
 		if(i > 0) printf(", ");
-		printf("%s/", subs->domain[i]);
+		printf("\x1b[1m\x1b[36m%s\x1b[0m/", subs->domain[i]);
 		term_print(subs->range[i]);
 	}
 	printf("}");
