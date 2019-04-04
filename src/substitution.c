@@ -191,6 +191,7 @@ void substitution_print(Substitution *subs) {
 		printf("true");
 		return;
 	} else if(subs->nb_vars == 1 && strcmp(subs->domain[0], "$error") == 0) {
+		printf("\x1b[1m\x1b[31muncaught exception:\x1b[0m ");
 		term_print(subs->range[0]);
 		return;
 	}

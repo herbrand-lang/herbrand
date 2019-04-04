@@ -3,7 +3,7 @@
  * FILENAME: term.c
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 03.04.2019
+ * UPDATED: 05.04.2019
  * 
  *H*/
 
@@ -140,6 +140,16 @@ int term_is_integer(Term *term) {
   **/
 int term_is_float(Term *term) {
 	return term->type == TYPE_DECIMAL;
+}
+
+/**
+  * 
+  * This function checks if term is a catcher.
+  * 
+  **/
+int term_is_catcher(Term *term) {
+	return term_is_callable(term) && !term_list_is_null(term)
+		&& strcmp(term_list_get_head(term)->term.string, "$catcher") == 0;
 }
 
 /**
@@ -331,6 +341,41 @@ Term **term_get_variables(Term *term, int *nb_vars) {
 		free(vars_head);
 		free(vars_tail);
 		return vars;
+	} else {
+		return NULL;
+	}
+}
+
+/**
+  * 
+  * This function returns the list of catchers
+  * contained in the term.
+  * 
+  **/
+void **term_get_catchers(Term *term, int *nb_catchers) {
+	void **catchers_head, **catchers_tail, **catchers;
+	int i, nb_catchers_head, nb_catchers_tail;
+	if(term->type == TYPE_LIST && !term_list_is_null(term)) {
+		if(term_is_catcher(term)) {
+			(*nb_catchers)++;
+			catchers = malloc(sizeof(void*));
+			catchers[0] = term_list_get_head(term)->parent;
+			return catchers;
+		} else {
+			nb_catchers_head = 0;
+			nb_catchers_tail = 0;
+			catchers_head = term_get_catchers(term_list_get_head(term), &nb_catchers_head);
+			catchers_tail = term_get_catchers(term_list_get_tail(term), &nb_catchers_tail);
+			(*nb_catchers) = nb_catchers_head + nb_catchers_tail;
+			catchers = malloc(sizeof(void*)*(*nb_catchers));
+			for(i = 0; i < nb_catchers_head; i++)
+				catchers[i] = catchers_head[i];
+			for(i = 0; i < nb_catchers_tail; i++)
+				catchers[nb_catchers_head+i] = catchers_tail[i];
+			free(catchers_head);
+			free(catchers_tail);
+			return catchers;
+		}
 	} else {
 		return NULL;
 	}

@@ -12,6 +12,7 @@ true
 false
 catch
 throw
+$catcher _catcher
 = unification
 /= not_unification
 asserta

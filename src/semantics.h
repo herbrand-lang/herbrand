@@ -3,7 +3,7 @@
  * FILENAME: semantics.h
  * DESCRIPTION: Declarative semantics for the language
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 03.04.2019
+ * UPDATED: 05.04.2019
  * 
  *H*/
 
@@ -25,6 +25,14 @@
   *
   **/
 Derivation *semantics_query(Term *goal);
+
+/**
+  * 
+  * This function tries to catch an exception. Returns
+  * 1 when the exception is catched, or 0 otherwise.
+  *
+  **/
+int semantics_catch(Derivation *D, State *point);
 
 /**
   * 

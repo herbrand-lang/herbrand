@@ -3,7 +3,7 @@
  * FILENAME: term.h
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 03.04.2019
+ * UPDATED: 05.04.2019
  * 
  *H*/
 
@@ -28,7 +28,7 @@ typedef struct Term {
 	} term;
 	Type type;
   int references;
-  char *parent;
+  void *parent;
 } Term;
 
 typedef struct List {
@@ -121,6 +121,13 @@ int term_is_float(Term *term);
 
 /**
   * 
+  * This function checks if term is a catcher.
+  * 
+  **/
+int term_is_catcher(Term *term);
+
+/**
+  * 
   * This function renames the variables of a term.
   * 
   **/
@@ -201,6 +208,14 @@ Term *term_list_set_tail(Term *list, Term *term);
   * 
   **/
 Term **term_get_variables(Term *term, int *nb_vars);
+
+/**
+  * 
+  * This function returns the list of catchers
+  * contained in the term.
+  * 
+  **/
+void **term_get_catchers(Term *term, int *nb_catchers);
 
 /**
   * 
