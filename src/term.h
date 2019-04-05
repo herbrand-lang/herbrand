@@ -17,13 +17,14 @@
 #ifndef LOGIC_TERM_H
 #define LOGIC_TERM_H
 
-typedef enum {TYPE_ATOM, TYPE_VARIABLE, TYPE_NUMERAL, TYPE_DECIMAL, TYPE_STRING, TYPE_LIST} Type;
+typedef enum {TYPE_ATOM, TYPE_VARIABLE, TYPE_NUMERAL, TYPE_DECIMAL, TYPE_CHAR, TYPE_STRING, TYPE_LIST} Type;
 
 typedef struct Term {
 	union {
 		int numeral;
+    wchar_t character;
 		double decimal;
-		char *string;
+		wchar_t *string;
 		struct List *list;
 	} term;
 	Type type;
@@ -61,7 +62,7 @@ void term_free(Term *term);
   * to a newly initialized Term struct.
   * 
   **/
-Term *term_init_atom(char *atom);
+Term *term_init_atom(wchar_t *atom);
 
 /**
   * 
@@ -73,10 +74,26 @@ Term *term_init_numeral(int numeral);
 
 /**
   * 
+  * This function initializes an string returning a
+  * pointer to a newly initialized Term struct.
+  * 
+  **/
+Term *term_init_string(wchar_t *string);
+
+/**
+  * 
+  * This function initializes a character returning a
+  * pointer to a newly initialized Term struct.
+  * 
+  **/
+Term *term_init_char(wchar_t character);
+
+/**
+  * 
   * This function sets the string of the term.
   * 
   **/
-void term_set_string(Term *term, char *str);
+void term_set_string(Term *term, wchar_t *str);
 
 /**
   * 
@@ -187,6 +204,14 @@ Term *term_list_clone(Term *term);
   * 
   **/
 int term_list_is_null(Term *term);
+
+/**
+  * 
+  * This function checks whether a list represents
+  * an string.
+  * 
+  **/
+int term_list_is_string(Term *term);
 
 /**
   * 

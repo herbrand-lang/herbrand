@@ -3,7 +3,7 @@
  * FILENAME: unification.c
  * DESCRIPTION: Functions for syntactic unification
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 30.03.2019
+ * UPDATED: 05.05.2019
  * 
  *H*/
 
@@ -18,10 +18,12 @@
   * 
   **/
 Substitution *semantics_unify_terms(Term *term1, Term *term2, int occurs_check) {
-	Substitution *subs;
+	Substitution *subs, *subs2, *mgu;
+	Term *character, *tail;
+	int n, length;
 	if(
-		term1->type == TYPE_VARIABLE && strcmp(term1->term.string, "_") == 0 ||
-		term2->type == TYPE_VARIABLE && strcmp(term2->term.string, "_") == 0
+		term1->type == TYPE_VARIABLE && wcscmp(term1->term.string, "_") == 0 ||
+		term2->type == TYPE_VARIABLE && wcscmp(term2->term.string, "_") == 0
 	) {
 		return substitution_alloc(0);
 	} else if(term1->type == TYPE_VARIABLE) {
@@ -38,6 +40,8 @@ Substitution *semantics_unify_terms(Term *term1, Term *term2, int occurs_check) 
 				return semantics_unify_lists(term1, term2, occurs_check); 
 			case TYPE_ATOM:
 				return semantics_unify_atoms(term1, term2);
+			case TYPE_CHAR:
+				return semantics_unify_chars(term1, term2);
 			case TYPE_STRING:
 				return semantics_unify_strings(term1, term2);
 			case TYPE_NUMERAL:
@@ -47,6 +51,47 @@ Substitution *semantics_unify_terms(Term *term1, Term *term2, int occurs_check) 
 			default:
 				return NULL;
 		}
+	} else if(term1->type == TYPE_LIST && term2->type == TYPE_STRING) {
+		if(term_list_is_null(term1) || wcslen(term2->term.string) == 0) {
+			if(term_list_is_null(term1) && wcslen(term2->term.string) == 0)
+				return substitution_alloc(0);
+			else
+				return NULL;
+		}
+		n = 0;
+		length = wcslen(term2->term.string);
+		subs = substitution_alloc(0);
+		while(term1->type == TYPE_LIST && !term_list_is_null(term1) && n < length) {
+			character = term_init_char(term2->term.string[n]);
+			mgu = semantics_unify_terms(character, term1->term.list->head, occurs_check);
+			if(mgu != NULL) {
+				subs2 = substitution_compose(subs, mgu, 1);
+				substitution_free(subs);
+				substitution_free(mgu);
+				subs = subs2;
+			} else {
+				substitution_free(subs);
+				term_free(character);
+				return NULL;
+			}
+			term_free(character);
+			term1 = term1->term.list->tail;
+			n++;
+		}
+		tail = term_init_string(term2->term.string + sizeof(char)*n);
+		mgu = semantics_unify_terms(term1, tail, occurs_check);
+		term_free(tail);
+		if(mgu == NULL) {
+			substitution_free(subs);
+			return NULL;
+		}
+		subs2 = substitution_compose(subs, mgu, 1);
+		substitution_free(subs);
+		substitution_free(mgu);
+		subs = subs2;
+		return subs;
+	} else if(term1->type == TYPE_STRING && term2->type == TYPE_LIST) {
+		return semantics_unify_terms(term2, term1, occurs_check);
 	}
 	return NULL;
 }
@@ -140,7 +185,19 @@ Substitution *semantics_unify_decimals(Term *dec1, Term *dec2) {
   * 
   **/
 Substitution *semantics_unify_atoms(Term *atom1, Term *atom2) {
-	if(strcmp(atom1->term.string, atom2->term.string) == 0)
+	if(wcscmp(atom1->term.string, atom2->term.string) == 0)
+		return substitution_alloc(0); 
+	return NULL;
+}
+
+/**
+  * 
+  * This function returns the most general unifier of two characters.
+  * If chars are not unifiable, returns NULL.
+  * 
+  **/
+Substitution *semantics_unify_chars(Term *char1, Term *char2) {
+	if(char1->term.character == char2->term.character)
 		return substitution_alloc(0); 
 	return NULL;
 }
@@ -152,7 +209,7 @@ Substitution *semantics_unify_atoms(Term *atom1, Term *atom2) {
   * 
   **/
 Substitution *semantics_unify_strings(Term *str1, Term *str2) {
-	if(strcmp(str1->term.string, str2->term.string) == 0)
+	if(wcscmp(str1->term.string, str2->term.string) == 0)
 		return substitution_alloc(0); 
 	return NULL;
 }

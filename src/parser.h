@@ -25,7 +25,7 @@ typedef struct Parser {
     int start;
     int next;
     int success;
-    char error[100];
+    wchar_t error[100];
 } Parser;
 
 #endif

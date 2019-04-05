@@ -57,7 +57,7 @@ void term_free(Term *term) {
   * to a newly initialized Term struct.
   * 
   **/
-Term *term_init_atom(char *atom) {
+Term *term_init_atom(wchar_t *atom) {
 	Term *term = term_alloc();
 	term->type = TYPE_ATOM;
 	term_set_string(term, atom);
@@ -79,12 +79,38 @@ Term *term_init_numeral(int numeral) {
 
 /**
   * 
+  * This function initializes an string returning a
+  * pointer to a newly initialized Term struct.
+  * 
+  **/
+Term *term_init_string(wchar_t *string) {
+	Term *term = term_alloc();
+	term->type = TYPE_STRING;
+	term_set_string(term, string);
+	return term;
+}
+
+/**
+  * 
+  * This function initializes a character returning a
+  * pointer to a newly initialized Term struct.
+  * 
+  **/
+Term *term_init_char(wchar_t character) {
+	Term *term = term_alloc();
+	term->type = TYPE_CHAR;
+	term->term.character = character;
+	return term;
+}
+
+/**
+  * 
   * This function sets the string of the term.
   * 
   **/
-void term_set_string(Term *term, char *str) {
-	term->term.string = malloc(sizeof(char)*(strlen(str)+1));
-	strcpy(term->term.string, str);
+void term_set_string(Term *term, wchar_t *str) {
+	term->term.string = malloc(sizeof(wchar_t)*(wcslen(str)+1));
+	wcscpy(term->term.string, str);
 }
 
 /**
@@ -175,7 +201,7 @@ int term_is_float(Term *term) {
   **/
 int term_is_catcher(Term *term) {
 	return term_is_callable(term) && !term_list_is_null(term)
-		&& strcmp(term_list_get_head(term)->term.string, "$catcher") == 0;
+		&& wcscmp(term_list_get_head(term)->term.string, "$catcher") == 0;
 }
 
 /**
@@ -198,7 +224,7 @@ Term *term_rename_variables(Term *term, int *id, Hashmap *vars) {
 				mod /= 10;
 				length++;
 			}
-			var->term.string = malloc(sizeof(char)*length);
+			var->term.string = malloc(sizeof(wchar_t)*length);
 			sprintf(var->term.string, "$%d", index);
 		} else {
 			(*id)++;
@@ -207,7 +233,7 @@ Term *term_rename_variables(Term *term, int *id, Hashmap *vars) {
 				mod /= 10;
 				length++;
 			}
-			var->term.string = malloc(sizeof(char)*length);
+			var->term.string = malloc(sizeof(wchar_t)*length);
 			hashmap_append(vars, term->term.string, *id);
 			sprintf(var->term.string, "$%d", *id);
 		}
@@ -295,6 +321,21 @@ int term_list_is_null(Term *term) {
 
 /**
   * 
+  * This function checks whether a list represents
+  * an string.
+  * 
+  **/
+int term_list_is_string(Term *term) {
+	while(term->type == TYPE_LIST && !term_list_is_null(term)) {
+		if(term->term.list->head->type != TYPE_CHAR)
+			return 0;
+		term = term->term.list->tail;
+	}
+	return term_list_is_null(term) || term->type == TYPE_STRING;
+}
+
+/**
+  * 
   * This function returns the head of a list.
   * 
   **/
@@ -363,7 +404,7 @@ Term *term_list_set_tail(Term *list, Term *term) {
 Term **term_get_variables(Term *term, int *nb_vars) {
 	Term **vars_head, **vars_tail, **vars;
 	int i, nb_vars_head, nb_vars_tail;
-	if(term->type == TYPE_VARIABLE && strcmp(term->term.string, "_") != 0) {
+	if(term->type == TYPE_VARIABLE && wcscmp(term->term.string, "_") != 0) {
 		(*nb_vars)++;
 		vars = malloc(sizeof(Term*));
 		vars[0] = term;
@@ -445,10 +486,24 @@ void term_print(Term *term) {
 		case TYPE_DECIMAL:
 			printf("\x1b[1m\x1b[33m%f\x1b[0m", term->term.decimal);
 			break;
+		case TYPE_CHAR:
+			printf("\x1b[1m\x1b[32m'%c'\x1b[0m", term->term.character);
+			break;
 		case TYPE_STRING:
 			printf("\x1b[1m\x1b[32m\"%s\"\x1b[0m", term->term.string);
 			break;
 		case TYPE_LIST:
+			if(term_list_is_string(term)) {
+				printf("\x1b[1m\x1b[32m\"");
+				while(term->type == TYPE_LIST && !term_list_is_null(term)) {
+					printf("%c", term->term.list->head->term.character);
+					term = term->term.list->tail;
+				}
+				if(term->type == TYPE_STRING)
+					printf("%s", term->term.string);
+				printf("\"\x1b[0m");
+				break;
+			}
 			printf("\x1b[1m(\x1b[0m");
 			list = term;
 			while(list->type == TYPE_LIST && list->term.list->head != NULL) {

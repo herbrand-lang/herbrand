@@ -26,7 +26,7 @@ Substitution LOGIC_SUBSTITUTION_ID = {NULL, NULL, NULL, 0, 0};
   **/
 Substitution *substitution_alloc(int nb_vars) {
 	Substitution *subs = malloc(sizeof(Substitution));
-	subs->domain = malloc(sizeof(char*)*nb_vars);
+	subs->domain = malloc(sizeof(wchar_t*)*nb_vars);
 	subs->range = malloc(sizeof(Term*)*nb_vars);
 	subs->indices = hashmap_alloc(nb_vars);
 	subs->nb_vars = 0;
@@ -45,7 +45,7 @@ Substitution *substitution_alloc_from_term(Term *term) {
 	int i, nb_vars = 0;
 	Term **vars = term_get_variables(term, &nb_vars);
 	Substitution *subs = malloc(sizeof(Substitution));
-	subs->domain = malloc(sizeof(char*)*nb_vars);
+	subs->domain = malloc(sizeof(wchar_t*)*nb_vars);
 	subs->range = malloc(sizeof(Term*)*nb_vars);
 	subs->indices = hashmap_alloc(nb_vars);
 	subs->nb_vars = 0;
@@ -98,12 +98,12 @@ void substitution_increase_references(Substitution *subs) {
   * Returns 0 if the request fails, or 1 if it succeeds.
   * 
   **/
-int substitution_add_link(Substitution *subs, char *var, Term *value) {
+int substitution_add_link(Substitution *subs, wchar_t *var, Term *value) {
 	if(subs->nb_vars == subs->max_vars)
 		return 0;
-	subs->domain[subs->nb_vars] = malloc(sizeof(char)*(strlen(var)+1));
+	subs->domain[subs->nb_vars] = malloc(sizeof(wchar_t)*(strlen(var)+1));
 	subs->range[subs->nb_vars] = value;
-	strcpy(subs->domain[subs->nb_vars], var);
+	wcscpy(subs->domain[subs->nb_vars], var);
 	hashmap_append(subs->indices, var, subs->nb_vars);
 	subs->nb_vars++;
 	term_increase_references(value);
@@ -117,7 +117,7 @@ int substitution_add_link(Substitution *subs, char *var, Term *value) {
   * in the substitution, returns NULL.
   * 
   **/
-Term *substitution_get_link(Substitution *subs, char *var) {
+Term *substitution_get_link(Substitution *subs, wchar_t *var) {
 	int index = hashmap_lookup(subs->indices, var);
 	if(index != -1)
 		return subs->range[index];
@@ -190,7 +190,7 @@ void substitution_print(Substitution *subs) {
 	} else if(subs->nb_vars == 0) {
 		printf("true");
 		return;
-	} else if(subs->nb_vars == 1 && strcmp(subs->domain[0], "$error") == 0) {
+	} else if(subs->nb_vars == 1 && wcscmp(subs->domain[0], "$error") == 0) {
 		printf("\x1b[1m\x1b[31muncaught exception:\x1b[0m ");
 		term_print(subs->range[0]);
 		return;

@@ -3,7 +3,7 @@
  * FILENAME: tokenizer.c
  * DESCRIPTION: Split source code into lexical components
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 02.04.2019
+ * UPDATED: 05.04.2019
  * 
  *H*/
 
@@ -80,7 +80,7 @@ int tokenizer_init_token(Tokenizer *tokenizer) {
 				return -1;
 	tokenizer->tokens[token] = malloc(sizeof(Token));
 	ptr_token = tokenizer->tokens[token];
-	ptr_token->text = malloc(sizeof(char)*N_CHARS_TOKEN);
+	ptr_token->text = malloc(sizeof(wchar_t)*N_CHARS_TOKEN);
 	ptr_token->text[0] = '\0';
 	ptr_token->length = 0;
 	ptr_token->line = tokenizer->line;
@@ -95,7 +95,7 @@ int tokenizer_init_token(Tokenizer *tokenizer) {
   * This function adds a character into a previously allocated token.
   * 
   **/
-int tokenizer_add_char_token(Tokenizer *tokenizer, int token, char character) {
+int tokenizer_add_char_token(Tokenizer *tokenizer, int token, wchar_t character) {
 	Token *ptr_token = tokenizer->tokens[token];
 	if(ptr_token->length == 0) {
 		ptr_token->line = tokenizer->line;
@@ -103,7 +103,7 @@ int tokenizer_add_char_token(Tokenizer *tokenizer, int token, char character) {
 	}
 	if(ptr_token->length+1 == ptr_token->max_length) {
 		ptr_token->max_length += N_CHARS_TOKEN;
-		ptr_token->text = realloc(ptr_token->text, sizeof(char)*ptr_token->max_length);
+		ptr_token->text = realloc(ptr_token->text, sizeof(wchar_t)*ptr_token->max_length);
 		if(ptr_token->text == NULL)
 			return 0;
 	}
@@ -120,8 +120,8 @@ int tokenizer_add_char_token(Tokenizer *tokenizer, int token, char character) {
   * 
   **/
 Tokenizer *tokenizer_read_stream(FILE *stream) {
-	char character;
-	int token, token_number_dot = 0, token_graphic = 0, token_string_open = 0, token_start = 1, token_cat = -1, nb_paren = 0;
+	wchar_t character;
+	int token, token_number_dot = 0, token_graphic = 0, token_char_open = 0, token_string_open = 0, token_start = 1, token_cat = -1, nb_paren = 0;
 	Tokenizer *tokenizer = tokenizer_alloc();
 	while(fscanf(stream, "%c", &character) == 1 && !feof(stream) && stream != stdin ||
 	stream == stdin && (nb_paren > 0 || tokenizer->nb_tokens == 0 || tokenizer->nb_tokens > 0 && character != '\n' || !token_start && token_cat == TOKEN_STRING)) {
@@ -140,6 +140,27 @@ Tokenizer *tokenizer_read_stream(FILE *stream) {
 				token_start = 1;
 			} else {
 				token_string_open = 1;
+				token_start = 0;
+			}
+		// Read char
+		} else if((token_start || token_cat == TOKEN_ATOM && token_graphic) && character == '\'' || !token_start && token_cat == TOKEN_CHAR) {
+			if(token_cat != TOKEN_CHAR || token_start) {
+				token = tokenizer_init_token(tokenizer);
+				tokenizer->tokens[token]->category = TOKEN_CHAR;
+			}
+			if(character != '\'')
+				tokenizer_add_char_token(tokenizer, token, character);
+			tokenizer->column++;
+			token_cat = TOKEN_CHAR;
+			if(token_char_open && character == '\'') {
+				token_char_open = 0;
+				token_start = 1;
+				if(tokenizer->tokens[token]->length > 1) {
+					tokenizer->tokens[token]->category = TOKEN_ERROR;
+					break;
+				}
+			} else {
+				token_char_open = 1;
 				token_start = 0;
 			}
 		// Read tag

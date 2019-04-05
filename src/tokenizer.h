@@ -18,10 +18,10 @@
 #define N_TOKENS 100
 #define N_CHARS_TOKEN 16
 
-typedef enum {TOKEN_WHITESPACE, TOKEN_LPAR, TOKEN_RPAR, TOKEN_BAR, TOKEN_ATOM, TOKEN_NUMERAL, TOKEN_DECIMAL, TOKEN_STRING, TOKEN_VARIABLE, TOKEN_TAG, TOKEN_ERROR} Category;
+typedef enum {TOKEN_WHITESPACE, TOKEN_LPAR, TOKEN_RPAR, TOKEN_BAR, TOKEN_ATOM, TOKEN_NUMERAL, TOKEN_DECIMAL, TOKEN_STRING, TOKEN_CHAR, TOKEN_VARIABLE, TOKEN_TAG, TOKEN_ERROR} Category;
 
 typedef struct Token {
-    char *text;
+    wchar_t *text;
     int length;
     int max_length;
     int line;
@@ -87,7 +87,7 @@ int tokenizer_init_token(Tokenizer *tokenizer);
   * This function adds a character into a previously allocated token.
   * 
   **/
-int tokenizer_add_char_token(Tokenizer *tokenizer, int token, char character);
+int tokenizer_add_char_token(Tokenizer *tokenizer, int token, wchar_t character);
 
 /**
   * 

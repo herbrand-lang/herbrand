@@ -175,7 +175,7 @@ void builtin_import(Program *program, Derivation *D, State *point, Term *term) {
 		term_free(error);
 		return;
 	}
-	module = malloc(sizeof(char)*((strlen(HERBRAND_PATH)+strlen(path->term.string)+12)));
+	module = malloc(sizeof(char)*((wcslen(HERBRAND_PATH)+wcslen(path->term.string)+12)));
 	sprintf(module, HERBRAND_PATH "modules/%s.hb", path->term.string);
 	file = fopen(module, "r");
 	free(module);

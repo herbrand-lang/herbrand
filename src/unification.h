@@ -55,6 +55,14 @@ Substitution *semantics_unify_atoms(Term *atom1, Term *atom2);
 
 /**
   * 
+  * This function returns the most general unifier of two characters.
+  * If chars are not unifiable, returns NULL.
+  * 
+  **/
+Substitution *semantics_unify_chars(Term *char1, Term *char2);
+
+/**
+  * 
   * This function returns the most general unifier of two strings.
   * If strings are not unifiable, returns NULL.
   * 

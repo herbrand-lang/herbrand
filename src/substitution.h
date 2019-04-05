@@ -18,7 +18,7 @@
 #define LOGIC_SUBSTITUTION_H
 
 typedef struct Substitution {
-	char **domain;
+	wchar_t **domain;
 	Term **range;
 	Hashmap *indices;
   int max_vars;
@@ -76,7 +76,7 @@ void substitution_increase_references(Substitution *subs);
   * Returns 0 if the request fails, or 1 if it succeeds.
   * 
   **/
-int substitution_add_link(Substitution *subs, char *var, Term *value);
+int substitution_add_link(Substitution *subs, wchar_t *var, Term *value);
 
 /**
   * 
@@ -85,7 +85,7 @@ int substitution_add_link(Substitution *subs, char *var, Term *value);
   * in the substitution, returns NULL.
   * 
   **/
-Term *substitution_get_link(Substitution *subs, char *var);
+Term *substitution_get_link(Substitution *subs, wchar_t *var);
 
 /**
 	*
