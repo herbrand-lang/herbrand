@@ -57,6 +57,22 @@ void term_free(Term *term);
 
 /**
   * 
+  * This function initializes an atom returning a pointer
+  * to a newly initialized Term struct.
+  * 
+  **/
+Term *term_init_atom(char *atom);
+
+/**
+  * 
+  * This function initializes a numeral returning a pointer
+  * to a newly initialized Term struct.
+  * 
+  **/
+Term *term_init_numeral(int numeral);
+
+/**
+  * 
   * This function sets the string of the term.
   * 
   **/
@@ -132,6 +148,14 @@ int term_is_catcher(Term *term);
   * 
   **/
 Term *term_rename_variables(Term *term, int *id, Hashmap *vars);
+
+/**
+  * 
+  * This function returns the length of a list term.
+  * If term is not a well-formed list, returns -1.
+  * 
+  **/
+int term_list_length(Term *list);
 
 /**
   * 

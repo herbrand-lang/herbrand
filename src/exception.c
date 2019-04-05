@@ -3,7 +3,7 @@
  * FILENAME: exception.c
  * DESCRIPTION: Functions for throwing Herbrand errors
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 03.04.2019
+ * UPDATED: 05.04.2019
  * 
  *H*/
 
@@ -111,6 +111,48 @@ Term *exception_existence_error(char *source, Term *found, char *level) {
 	list = term_list_empty();
 	term_list_add_element(list, error);
 	term_list_add_element(list, list_existence);
+	term_list_add_element(list, level_term);
+	return list;
+}
+
+/**
+  * 
+  * This function generates an arity error returning a
+  * pointer to a newly initialized Term struct.
+  * 
+  **/
+Term *exception_arity_error(int arity, int given, Term *found, char *level) {
+	Term *list, *list_arity, *list_given, *list_expected, *error, *arity_error,
+		*expected_term, *given_term, *expected_n, *given_n, *level_term;
+	error = term_init_atom("error");
+	arity_error = term_init_atom("arity_error");
+	expected_term = term_init_atom("expected");
+	given_term = term_init_atom("given");
+	expected_n = term_init_numeral(arity);
+	given_n = term_init_numeral(given);
+	// (expected Arity)
+	list_expected = term_list_empty();
+	term_list_add_element(list_expected, expected_term);
+	term_list_add_element(list_expected, expected_n);
+	// (given Length)
+	list_given = term_list_empty();
+	term_list_add_element(list_given, given_term);
+	term_list_add_element(list_given, given_n);
+	// Level term
+	level_term = term_alloc();
+	level_term->type = TYPE_ATOM;
+	term_set_string(level_term, level == NULL ? "top_level" : level);
+	// Found term
+	term_increase_references(found);
+	// Error term
+	list_arity = term_list_empty();
+	term_list_add_element(list_arity, arity_error);
+	term_list_add_element(list_arity, list_expected);
+	term_list_add_element(list_arity, list_given);
+	term_list_add_element(list_arity, found);
+	list = term_list_empty();
+	term_list_add_element(list, error);
+	term_list_add_element(list, list_arity);
 	term_list_add_element(list, level_term);
 	return list;
 }

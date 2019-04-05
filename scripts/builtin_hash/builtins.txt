@@ -1,54 +1,54 @@
-consult
-import
-and
-or
-ite
-! cut
-not
-call
-once
-repeat
-true
-false
-catch
-throw
-$catcher _catcher
-= unification
-/= not_unification
-asserta
-assertz
-retract
-retractall
-== term_eq
-/== term_ne
-< term_lt
-<= term_le
-> term_gt
->= term_ge
-:== arithmetic_eq
-:/== arithmetic_ne
-:< arithmetic_lt
-:<= arithmetic_le
-:> arithmetic_gt
-:>= arithmetic_ge
-atom
-number
-integer
-float
-string
-ground
-list
-var
-nonvar
-atom_length
-atom_concat
-atom_chars
-string_length
-string_concat
-string_chars
-findall
-is
-succ
-halt
-current_herbrand_flag
-set_herbrand_flag
+consult consult 1
+import import 1
+and and -1
+or or -1
+ite ite 3
+! cut 0
+not not 1
+call call 1
+once once 1
+repeat repeat 0
+true true 0
+false false 0
+catch catch 3
+throw throw 1
+$catcher _catcher 0
+= unification 2
+/= not_unification 2
+asserta asserta 1
+assertz assertz 1
+retract retract 1
+retractall retractall 1
+== term_eq 2
+/== term_ne 2
+< term_lt 2
+<= term_le 2
+> term_gt 2
+>= term_ge 2
+:== arithmetic_eq 2
+:/== arithmetic_ne 2
+:< arithmetic_lt 2
+:<= arithmetic_le 2
+:> arithmetic_gt 2
+:>= arithmetic_ge 2
+atom atom 1
+number number 1
+integer integer 1
+float float 1
+string string 1
+ground ground 1
+list list 1
+var var 1
+nonvar nonvar 1
+atom_length atom_length 2
+atom_concat atom_concat 3
+atom_chars atom_chars 2
+string_length string_length 2
+string_concat string_concat 3
+string_chars string_chars 2
+findall findall 3
+is is 2
+succ succ 2
+halt halt 1
+current_herbrand_flag current_herbrand_flag 2
+set_herbrand_flag set_herbrand_flag 2

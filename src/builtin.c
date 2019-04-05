@@ -64,6 +64,17 @@ void (*builtin_handlers[BUILTIN_HASH_SIZE])() = {
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
 	NULL, builtin_arithmetic_eq, NULL, NULL, NULL, NULL};
 
+int builtin_arities[BUILTIN_HASH_SIZE] = {
+	0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 2, 1, 0, 0, 0, 0, 2, 2, 0, 0, 2, 0, 0, 0, 1, 0, 
+	0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 1, 0, 0, 
+	0, 2, 1, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 2, 0, 0, 2, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 3, 2, 0, 0, 
+	1, 1, 0, 0, 1, -1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 
+	0, 2, 3, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 2, 3, 0, 0, 0, 
+	2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0};
 
 
 
@@ -84,10 +95,24 @@ int builtin_check_predicate(Term *term) {
   * 
   **/
 int builtin_run_predicate(Program *program, Derivation *D, State *point, Term *term) {
-	Term *head = term_list_get_head(term);
-	int key = hashmap_function(BUILTIN_HASH_SIZE, head->term.string);
+	Term *error, *head;
+	int arity, length, key;
+	head = term_list_get_head(term);
+	key = hashmap_function(BUILTIN_HASH_SIZE, head->term.string);
 	if(builtin_keys[key] != NULL && strcmp(head->term.string, builtin_keys[key]) == 0) {
-		builtin_handlers[key](program, D, point, term);
+		arity = builtin_arities[key];
+		length = term_list_length(term)-1;
+		if(length == -1) {
+			error = exception_type_error("callable_term", term, term->parent);
+			derivation_push_state(D, state_error(point, error));
+			term_free(error);
+		} else if(length == arity || arity == -1) {
+			builtin_handlers[key](program, D, point, term);
+		} else {
+			error = exception_arity_error(arity, length, term, term->parent);
+			derivation_push_state(D, state_error(point, error));
+			term_free(error);
+		}
 		return 1;
 	}
 	return 0;
@@ -223,10 +248,23 @@ void builtin_or(Program *program, Derivation *D, State *point, Term *term) {
   * 
   **/
 void builtin_ite(Program *program, Derivation *D, State *point, Term *term) {
-	Term *list, *cut, *list_cut, *cond, *then, *els;
+	Term *list, *cut, *list_cut, *cond, *then, *els, *error = NULL;
 	cond = term_list_get_nth(term, 1);
 	then = term_list_get_nth(term, 2);
 	els = term_list_get_nth(term, 3);
+	if(term_is_variable(cond) || term_is_variable(then) || term_is_variable(els))
+		error = exception_instantiation_error(term->parent);
+	else if(!term_is_callable(cond))
+		error = exception_type_error("callable_term", cond, term->parent);
+	else if(!term_is_callable(then))
+		error = exception_type_error("callable_term", then, term->parent);
+	else if(!term_is_callable(els))
+		error = exception_type_error("callable_term", els, term->parent);
+	if(error != NULL) {
+		derivation_push_state(D, state_error(point, error));
+		term_free(error);
+		return;
+	}
 	// Cut term
 	cut = term_alloc();
 	cut->type = TYPE_ATOM;

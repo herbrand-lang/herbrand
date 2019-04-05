@@ -15,16 +15,14 @@ def hashmap_hash(size, key):
 def hashmap_gen(path):
 	keys = []
 	handlers = []
+	arities = []
 	f = open(path, 'r')
 	i = 0
 	for line in f:
 		line = line.strip().split(' ')
-		if len(line) == 1:
-			keys.append(line[0])
-			handlers.append(line[0])
-		else:
-			keys.append(line[0])
-			handlers.append(line[1])
+		keys.append(line[0])
+		handlers.append(line[1])
+		arities.append(int(line[2]))
 		i += 1
 	f.close()
 	size = len(keys)
@@ -37,7 +35,7 @@ def hashmap_gen(path):
 			n += 1
 	dic = dict()
 	for i in range(size):
-		dic[dist[i]] = (keys[i], handlers[i])
+		dic[dist[i]] = (keys[i], handlers[i], arities[i])
 	# Print array of keys
 	string = "char *builtin_keys[BUILTIN_HASH_SIZE] = {\n\t"
 	line = ""
@@ -64,6 +62,20 @@ def hashmap_gen(path):
 			line += "builtin_%s%s" % (dic[i][1], char)
 		else:
 			line += "NULL%s" % char
+	string += line
+	print string
+	# Print array of arities
+	string = "int builtin_arities[BUILTIN_HASH_SIZE] = {\n\t"
+	line = ""
+	for i in range(n):
+		if len(line) > 76:
+			string += line + "\n\t"
+			line = ""
+		char = "};\n" if i == n-1 else ", "
+		if dic.get(i) != None:
+			line += "%d%s" % (dic[i][2], char)
+		else:
+			line += "0%s" % char
 	string += line
 	print string
 	print n

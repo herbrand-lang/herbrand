@@ -53,6 +53,32 @@ void term_free(Term *term) {
 
 /**
   * 
+  * This function initializes an atom returning a pointer
+  * to a newly initialized Term struct.
+  * 
+  **/
+Term *term_init_atom(char *atom) {
+	Term *term = term_alloc();
+	term->type = TYPE_ATOM;
+	term_set_string(term, atom);
+	return term;
+}
+
+/**
+  * 
+  * This function initializes a numeral returning a pointer
+  * to a newly initialized Term struct.
+  * 
+  **/
+Term *term_init_numeral(int numeral) {
+	Term *term = term_alloc();
+	term->type = TYPE_NUMERAL;
+	term->term.numeral = numeral;
+	return term;
+}
+
+/**
+  * 
   * This function sets the string of the term.
   * 
   **/
@@ -196,6 +222,21 @@ Term *term_rename_variables(Term *term, int *id, Hashmap *vars) {
 		term_increase_references(term);
 		return term;
 	}
+}
+
+/**
+  * 
+  * This function returns the length of a list term.
+  * If term is not a well-formed list, returns -1.
+  * 
+  **/
+int term_list_length(Term *list) {
+	int length = 0;
+	while(list->type == TYPE_LIST && !term_list_is_null(list)) {
+		length++;
+		list = list->term.list->tail;
+	}
+	return list->type == TYPE_LIST ? length : -1;
 }
 
 /**

@@ -3,7 +3,7 @@
  * FILENAME: semantics.c
  * DESCRIPTION: Declarative semantics for the language
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 04.04.2019
+ * UPDATED: 05.04.2019
  * 
  *H*/
 
@@ -67,7 +67,6 @@ int semantics_catch(Derivation *D, State *point) {
 	// Add new point
 	handler = term_list_get_nth(left, 3);
 	state = state_inference(parent_catch, handler, mgu);
-	state->parent = state->parent->parent;
 	derivation_push_state(D, state);
 	substitution_free(mgu);
 	return 1;
@@ -80,7 +79,7 @@ int semantics_catch(Derivation *D, State *point) {
   *
   **/
 Substitution *semantics_answer(Program *program, Derivation *D) {
-	int i;
+	int i, length;
 	State *point, *state;
 	Rule *rule;
 	Clause *clause;
@@ -120,11 +119,20 @@ Substitution *semantics_answer(Program *program, Derivation *D) {
 		} else if(builtin_check_predicate(term_list_get_head(term))) {
 			// Run built-in predicate
 			builtin_run_predicate(program, D, point, term);
+		// User or module predicate
 		} else {
 			rule = program_get_predicate(program, term->term.list->head->term.string, term->parent);
 			// If rule does not exist, fail
 			if(rule == NULL)
 				continue;
+			// Check arity
+			length = term_list_length(term)-1;
+			if(rule->arity != length) {
+				error = exception_arity_error(rule->arity, length, term, term->parent);
+				derivation_push_state(D, state_error(point, error));
+				term_free(error);
+				continue;
+			}
 			// For each clause in the rule, check unification
 			for(i = rule->nb_clauses-1; i >= 0; i--) {
 				clause = clause_rename_variables(rule->clauses[i], &(program->renames));
