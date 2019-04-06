@@ -64,6 +64,35 @@ Term *exception_type_error(wchar_t *type, Term *found, wchar_t *level) {
 
 /**
   * 
+  * This function generates a domain error returning a pointer
+  * to a newly initialized Term struct.
+  * 
+  **/
+Term *exception_domain_error(wchar_t *domain, Term *found, wchar_t *level) {
+	Term *list, *list_domain, *error, *domain_error, *expected, *level_term;
+	error = term_init_atom(L"error");
+	domain_error = term_init_atom(L"domain_error");
+	expected = term_init_atom(domain);
+	// Level term
+	level_term = term_alloc();
+	level_term->type = TYPE_ATOM;
+	term_set_string(level_term, level == NULL ? L"top_level" : level);
+	// Found term
+	term_increase_references(found);
+	// Error term
+	list_domain = term_list_empty();
+	term_list_add_element(list_domain, domain_error);
+	term_list_add_element(list_domain, expected);
+	term_list_add_element(list_domain, found);
+	list = term_list_empty();
+	term_list_add_element(list, error);
+	term_list_add_element(list, list_domain);
+	term_list_add_element(list, level_term);
+	return list;
+}
+
+/**
+  * 
   * This function generates an existence error returning a
   * pointer to a newly initialized Term struct.
   * 

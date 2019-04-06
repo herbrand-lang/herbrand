@@ -29,6 +29,14 @@ Term *exception_type_error(wchar_t *type, Term *found, wchar_t *level);
 
 /**
   * 
+  * This function generates a domain error returning a pointer
+  * to a newly initialized Term struct.
+  * 
+  **/
+Term *exception_domain_error(wchar_t *domain, Term *found, wchar_t *level);
+
+/**
+  * 
   * This function generates an existence error returning a
   * pointer to a newly initialized Term struct.
   * 

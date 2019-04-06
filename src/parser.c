@@ -177,6 +177,8 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
 	while(start < tokenizer->nb_tokens && token->category == TOKEN_TAG) {
 		if(wcscmp(token->text, L"det") == 0) {
 			determinist = 1;
+		} else if(wcscmp(token->text, L"semidet") == 0) {
+			determinist = 2;
 		} else if(wcscmp(token->text, L"nondet") == 0) {
 			determinist = 0;
 		} else if(wcscmp(token->text, L"dynamic") == 0) {

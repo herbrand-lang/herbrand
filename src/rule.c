@@ -111,7 +111,7 @@ int rule_add_clause(Rule *rule, Clause *clause) {
 void rule_print(Rule *rule) {
 	int i;
 	printf(rule->dynamic ? "#dynamic " : "#static ");
-	printf(rule->determinist ? "#det " : "#nondet ");
+	printf(rule->determinist ? (rule->determinist == 2 ? "#semidet " : "#det ") : "#nondet ");
 	printf(rule->local ? "#local " : "");
 	printf("\n");
 	printf("(predicate %ls %d ", rule->name, rule->arity);

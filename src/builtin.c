@@ -13,67 +13,66 @@
 
 wchar_t *builtin_keys[BUILTIN_HASH_SIZE] = {
 	NULL, L":<", NULL, NULL, NULL, NULL, L"var", NULL, NULL, NULL, L"<", L"integer", 
-	NULL, NULL, NULL, NULL, L"string_length", L"<=", NULL, NULL, L"string_chars", 
-	NULL, NULL, NULL, L"list", NULL, NULL, NULL, NULL, L"import", NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, NULL, L">", NULL, NULL, NULL, L"current_herbrand_flag", 
-	NULL, NULL, L":>", NULL, NULL, L"false", L"nonvar", NULL, NULL, NULL, L"set_herbrand_flag", 
-	L"retractall", L"throw", L":>=", NULL, NULL, NULL, NULL, NULL, L"call", NULL, 
+	NULL, NULL, NULL, NULL, NULL, L"<=", NULL, NULL, NULL, NULL, NULL, NULL, L"list", 
+	NULL, NULL, NULL, NULL, L"import", NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, L">", NULL, NULL, NULL, L"current_herbrand_flag", NULL, NULL, L":>", NULL, 
+	NULL, L"false", L"nonvar", NULL, NULL, NULL, L"set_herbrand_flag", L"retractall", 
+	L"throw", L":>=", NULL, NULL, NULL, NULL, NULL, L"call", NULL, NULL, NULL, NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, L"==", NULL, NULL, L"succ", L"number", L"atom_concat", NULL, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, L"/==", NULL, NULL, NULL, 
-	L"catch", L"atom_chars", NULL, NULL, L"ground", L"halt", NULL, NULL, L"asserta", 
-	L"and", NULL, NULL, NULL, NULL, NULL, NULL, NULL, L"not", NULL, NULL, NULL, NULL, 
-	NULL, L"atom", NULL, NULL, NULL, NULL, L"assertz", NULL, NULL, L"/=", L"findall", 
-	NULL, NULL, L"or", NULL, NULL, NULL, NULL, NULL, L"true", NULL, NULL, NULL, NULL, 
-	NULL, L">=", NULL, L"float", NULL, L"is", L"ite", NULL, NULL, NULL, L"=", NULL, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, L"atom_length", NULL, NULL, L"string", 
-	NULL, L":/==", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, L":<=", NULL, NULL, NULL, NULL, NULL, L"repeat", NULL, NULL, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, L"$catcher", NULL, NULL, NULL, NULL, 
-	NULL, L"once", NULL, NULL, L"!", NULL, NULL, NULL, NULL, NULL, NULL, NULL, L"retract", 
-	NULL, NULL, NULL, NULL, NULL, NULL, L"consult", L"string_concat", NULL, NULL, 
+	L"==", NULL, NULL, L"succ", L"number", L"atom_concat", NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, NULL, L"/==", NULL, NULL, NULL, L"catch", L"atom_chars", 
+	NULL, NULL, L"ground", L"halt", NULL, NULL, L"asserta", L"and", NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, L"not", NULL, NULL, NULL, NULL, NULL, L"atom", NULL, 
+	NULL, NULL, NULL, L"assertz", NULL, NULL, L"/=", L"findall", NULL, NULL, L"or", 
+	NULL, NULL, NULL, NULL, NULL, L"true", NULL, NULL, NULL, NULL, NULL, L">=", NULL, 
+	L"float", NULL, L"is", L"ite", NULL, NULL, NULL, L"=", NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, L"atom_length", NULL, NULL, L"string", NULL, L":/==", 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, L":==", NULL, NULL, NULL, NULL};
+	NULL, L":<=", NULL, NULL, NULL, NULL, NULL, L"repeat", NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, L"$catcher", NULL, NULL, NULL, NULL, NULL, L"once", 
+	NULL, NULL, L"!", NULL, NULL, NULL, NULL, NULL, NULL, NULL, L"retract", NULL, 
+	NULL, NULL, NULL, NULL, NULL, L"consult", NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, L":==", NULL, NULL, NULL, NULL};
 
 void (*builtin_handlers[BUILTIN_HASH_SIZE])() = {
 	NULL, builtin_arithmetic_lt, NULL, NULL, NULL, NULL, builtin_var, NULL, NULL, 
-	NULL, builtin_term_lt, builtin_integer, NULL, NULL, NULL, NULL, builtin_string_length, 
-	builtin_term_le, NULL, NULL, builtin_string_chars, NULL, NULL, NULL, builtin_list, 
-	NULL, NULL, NULL, NULL, builtin_import, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, builtin_term_gt, NULL, NULL, NULL, builtin_current_herbrand_flag, NULL, 
-	NULL, builtin_arithmetic_gt, NULL, NULL, builtin_false, builtin_nonvar, NULL, 
-	NULL, NULL, builtin_set_herbrand_flag, builtin_retractall, builtin_throw, builtin_arithmetic_ge, 
-	NULL, NULL, NULL, NULL, NULL, builtin_call, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin_term_eq, 
-	NULL, NULL, builtin_succ, builtin_number, builtin_atom_concat, NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin_term_ne, NULL, NULL, NULL, 
-	builtin_catch, builtin_atom_chars, NULL, NULL, builtin_ground, builtin_halt, 
-	NULL, NULL, builtin_asserta, builtin_and, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, builtin_not, NULL, NULL, NULL, NULL, NULL, builtin_atom, NULL, NULL, NULL, 
-	NULL, builtin_assertz, NULL, NULL, builtin_not_unification, builtin_findall, 
-	NULL, NULL, builtin_or, NULL, NULL, NULL, NULL, NULL, builtin_true, NULL, NULL, 
-	NULL, NULL, NULL, builtin_term_ge, NULL, builtin_float, NULL, builtin_is, builtin_ite, 
-	NULL, NULL, NULL, builtin_unification, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, builtin_atom_length, NULL, NULL, builtin_string, NULL, builtin_arithmetic_ne, 
+	NULL, builtin_term_lt, builtin_integer, NULL, NULL, NULL, NULL, NULL, builtin_term_le, 
+	NULL, NULL, NULL, NULL, NULL, NULL, builtin_list, NULL, NULL, NULL, NULL, builtin_import, 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin_term_gt, NULL, NULL, 
+	NULL, builtin_current_herbrand_flag, NULL, NULL, builtin_arithmetic_gt, NULL, 
+	NULL, builtin_false, builtin_nonvar, NULL, NULL, NULL, builtin_set_herbrand_flag, 
+	builtin_retractall, builtin_throw, builtin_arithmetic_ge, NULL, NULL, NULL, NULL, 
+	NULL, builtin_call, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin_term_eq, NULL, NULL, builtin_succ, 
+	builtin_number, builtin_atom_concat, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, builtin_term_ne, NULL, NULL, NULL, builtin_catch, builtin_atom_chars, 
+	NULL, NULL, builtin_ground, builtin_halt, NULL, NULL, builtin_asserta, builtin_and, 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin_not, NULL, NULL, NULL, NULL, 
+	NULL, builtin_atom, NULL, NULL, NULL, NULL, builtin_assertz, NULL, NULL, builtin_not_unification, 
+	builtin_findall, NULL, NULL, builtin_or, NULL, NULL, NULL, NULL, NULL, builtin_true, 
+	NULL, NULL, NULL, NULL, NULL, builtin_term_ge, NULL, builtin_float, NULL, builtin_is, 
+	builtin_ite, NULL, NULL, NULL, builtin_unification, NULL, NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, builtin_atom_length, NULL, NULL, builtin_string, NULL, 
+	builtin_arithmetic_ne, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, builtin_arithmetic_le, NULL, NULL, NULL, NULL, 
+	NULL, builtin_repeat, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin__catcher, 
+	NULL, NULL, NULL, NULL, NULL, builtin_once, NULL, NULL, builtin_cut, NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, builtin_retract, NULL, NULL, NULL, NULL, NULL, 
+	NULL, builtin_consult, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, builtin_arithmetic_le, NULL, NULL, NULL, NULL, NULL, builtin_repeat, NULL, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin__catcher, NULL, NULL, 
-	NULL, NULL, NULL, builtin_once, NULL, NULL, builtin_cut, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, builtin_retract, NULL, NULL, NULL, NULL, NULL, NULL, builtin_consult, 
-	builtin_string_concat, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, builtin_arithmetic_eq, NULL, NULL, NULL, NULL};
+	NULL, NULL, builtin_arithmetic_eq, NULL, NULL, NULL, NULL};
 
 int builtin_arities[BUILTIN_HASH_SIZE] = {
-	0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 2, 1, 0, 0, 0, 0, 2, 2, 0, 0, 2, 0, 0, 0, 1, 0, 
+	0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 
 	0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 2, 0, 0, 0, 1, 0, 0, 
-	0, 2, 1, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 2, 1, 1, 2, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 2, 0, 0, 2, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 3, 2, 0, 0, 
 	1, 1, 0, 0, 1, -1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 
 	0, 2, 3, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 2, 3, 0, 0, 0, 
 	2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 0, 
+	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0};
 
 
@@ -793,17 +792,58 @@ void builtin_atom_concat(Program *program, Derivation *D, State *point, Term *te
 }
 void builtin_atom_chars(Program *program, Derivation *D, State *point, Term *term) {
 }
-void builtin_string_length(Program *program, Derivation *D, State *point, Term *term) {
-}
-void builtin_string_concat(Program *program, Derivation *D, State *point, Term *term) {
-}
-void builtin_string_chars(Program *program, Derivation *D, State *point, Term *term) {
-}
 void builtin_findall(Program *program, Derivation *D, State *point, Term *term) {
 }
 void builtin_is(Program *program, Derivation *D, State *point, Term *term) {
 }
+
+/**
+  * 
+  * succ/2
+  * (succ +integer -integer)
+  * (succ -integer +integer)
+  * 
+  * Return the successor of a positive number.
+  * (succ Int Succ) is true if and only of Int is greater than or equal to
+  * 0 and Succ is Int + 1.
+  * 
+  **/
 void builtin_succ(Program *program, Derivation *D, State *point, Term *term) {
+	Term *error = NULL, *integer, *succ, *op, *list, *eq;
+	integer = term_list_get_nth(term, 1);
+	succ = term_list_get_nth(term, 2);
+	if(term_is_variable(integer) && term_is_variable(succ))
+		error = exception_instantiation_error(term->parent);
+	else if(!term_is_variable(integer) && !term_is_integer(integer))
+		error = exception_type_error(L"integer", integer, term->parent);
+	else if(!term_is_variable(succ) && !term_is_integer(succ))
+		error = exception_type_error(L"integer", succ, term->parent);
+	else if(term_is_integer(integer) && integer->term.numeral < 0)
+		error = exception_domain_error(L"not_less_than_zero", integer, term->parent);
+	else if(term_is_integer(succ) && succ->term.numeral < 0)
+		error = exception_domain_error(L"not_less_than_zero", succ, term->parent);
+	if(error != NULL) {
+		derivation_push_state(D, state_error(point, error));
+		term_free(error);
+		return;
+	}
+	if(term_is_variable(succ) || succ->term.numeral > 0) {
+		eq = term_init_atom(L"=");
+		list = term_list_empty();
+		term_list_add_element(list, eq);
+		if(term_is_variable(integer)) {
+			op = term_init_numeral(succ->term.numeral-1);
+			term_list_add_element(list, integer);
+			term_increase_references(integer);
+		} else {
+			op = term_init_numeral(integer->term.numeral+1);
+			term_list_add_element(list, succ);
+			term_increase_references(succ);
+		}
+		term_list_add_element(list, op);
+		derivation_push_state(D, state_success(point, list));
+		term_free(list);
+	}
 }
 
 /**

@@ -223,12 +223,16 @@ Tokenizer *tokenizer_read_stream(FILE *stream) {
 			token_cat = TOKEN_ATOM;
 		// Read number
 		} else if(character >= 48 && character <= 57 || !token_start && !token_number_dot && character == L'.') {
-			if(token_cat != TOKEN_NUMERAL || token_start) {
+			if(token_cat != TOKEN_ATOM && (!token_graphic || tokenizer->tokens[token]->length != 1
+			|| tokenizer->tokens[token]->text[0] != L'-') && (token_cat != TOKEN_NUMERAL || token_start)) {
 				token = tokenizer_init_token(tokenizer);
 				tokenizer->tokens[token]->category = TOKEN_NUMERAL;
 				token_start = 0;
 				token_number_dot = 0;
 			}
+			if(tokenizer->tokens[token]->category == TOKEN_ATOM)
+				tokenizer->tokens[token]->category = TOKEN_NUMERAL;
+			token_graphic = 0;
 			if(character == L'.') {
 				token_number_dot = 1;
 				tokenizer->tokens[token]->category = TOKEN_DECIMAL;

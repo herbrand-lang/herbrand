@@ -6,7 +6,7 @@ else
 	HP=$1
 fi
 cd ../../src
-gcc -I/usr/include -L *.h *.c -o herbrand -DHERBRAND_PATH=\"$HP\"
+gcc -I/usr/include -L *.h *.c -o herbrand -DHERBRAND_PATH=L\"$HP\"
 cd ../scripts/install
 if [ -d $HP ]; then
 	rm -r $HP

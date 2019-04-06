@@ -5,7 +5,7 @@ or or -1
 ite ite 3
 ! cut 0
 not not 1
-call call 1
+call call -1
 once once 1
 repeat repeat 0
 true true 0
@@ -43,9 +43,6 @@ nonvar nonvar 1
 atom_length atom_length 2
 atom_concat atom_concat 3
 atom_chars atom_chars 2
-string_length string_length 2
-string_concat string_concat 3
-string_chars string_chars 2
 findall findall 3
 is is 2
 succ succ 2
