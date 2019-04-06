@@ -3,8 +3,8 @@
  * FILENAME: main.c
  * DESCRIPTION: Main file
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
- * COMPILING: gcc -I/usr/include -L *.h *.c -o herbrand -g
+ * UPDATED: 07.04.2019
+ * COMPILING: gcc -I/usr/include -L *.h *.c -o herbrand -lm -g
  * 
  *H*/
 
@@ -20,7 +20,7 @@
 int main(int argc, char *argv[]) {
 	Program *program;
 	FILE *file;
-	char *locale = setlocale(LC_ALL, "");
+	char *locale = setlocale(LC_ALL, ".OCP");
 	if(argc == 2) {
 		file = fopen(argv[1], "r");
 		if(file != NULL) {

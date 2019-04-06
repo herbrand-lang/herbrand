@@ -24,7 +24,7 @@ unsigned long hashmap_function(int size, wchar_t *key) {
 	unsigned int byte, crc, mask;
 	i = 0;
 	crc = 0xFFFFFFFF;
-	while(key[i] != '\0') {
+	while(key[i] != L'\0') {
 		byte = key[i];
 		crc = crc^byte;
 		for(j = 7; j >= 0; j--) {

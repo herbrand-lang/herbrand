@@ -15,6 +15,7 @@
 #include "program.h"
 #include "parser.h"
 #include "exception.h"
+#include "evaluable.h"
 
 
 
@@ -36,7 +37,7 @@ int builtin_arities[BUILTIN_HASH_SIZE];
 
 /**
   * 
-  * This functions cheks if an atom is a built-in
+  * This function cheks if an atom is a built-in
   * predicate.
   * 
   **/
@@ -44,7 +45,7 @@ int builtin_check_predicate(Term *term);
 
 /**
   * 
-  * This functions runs a built-in predicate.
+  * This function runs a built-in predicate.
   * 
   **/
 int builtin_run_predicate(Program *program, Derivation *D, State *point, Term *term);

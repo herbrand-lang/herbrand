@@ -74,6 +74,14 @@ Term *term_init_numeral(int numeral);
 
 /**
   * 
+  * This function initializes a decimal returning a pointer
+  * to a newly initialized Term struct.
+  * 
+  **/
+Term *term_init_decimal(double decimal);
+
+/**
+  * 
   * This function initializes an string returning a
   * pointer to a newly initialized Term struct.
   * 

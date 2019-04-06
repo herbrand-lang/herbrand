@@ -3,7 +3,7 @@
  * FILENAME: tokenizer.c
  * DESCRIPTION: Split source code into lexical components
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 07.04.2019
  * 
  *H*/
 
@@ -223,7 +223,7 @@ Tokenizer *tokenizer_read_stream(FILE *stream) {
 			token_cat = TOKEN_ATOM;
 		// Read number
 		} else if(character >= 48 && character <= 57 || !token_start && !token_number_dot && character == L'.') {
-			if(token_cat != TOKEN_ATOM && (!token_graphic || tokenizer->tokens[token]->length != 1
+			if(token_start || token_cat != TOKEN_ATOM && (!token_graphic || tokenizer->tokens[token]->length != 1
 			|| tokenizer->tokens[token]->text[0] != L'-') && (token_cat != TOKEN_NUMERAL || token_start)) {
 				token = tokenizer_init_token(tokenizer);
 				tokenizer->tokens[token]->category = TOKEN_NUMERAL;

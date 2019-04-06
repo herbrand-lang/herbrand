@@ -12,11 +12,11 @@
 
 
 /**
-	* 
-	* This function creates a term returning a pointer
-	* to a newly initialized Term struct.
-	* 
-	**/
+  * 
+  * This function creates a term returning a pointer
+  * to a newly initialized Term struct.
+  * 
+  **/
 Term *term_alloc() {
 	Term *term = malloc(sizeof(Term));
 	term->references = 0;
@@ -25,10 +25,10 @@ Term *term_alloc() {
 }
 
 /**
-	* 
-	* This function frees a previously allocated term.
-	* 
-	**/
+  * 
+  * This function frees a previously allocated term.
+  * 
+  **/
 void term_free(Term *term) {
 	if(term->references > 0) {
 		term->references--;
@@ -52,11 +52,11 @@ void term_free(Term *term) {
 }
 
 /**
-	* 
-	* This function initializes an atom returning a pointer
-	* to a newly initialized Term struct.
-	* 
-	**/
+  * 
+  * This function initializes an atom returning a pointer
+  * to a newly initialized Term struct.
+  * 
+  **/
 Term *term_init_atom(wchar_t *atom) {
 	Term *term = term_alloc();
 	term->type = TYPE_ATOM;
@@ -65,11 +65,11 @@ Term *term_init_atom(wchar_t *atom) {
 }
 
 /**
-	* 
-	* This function initializes a numeral returning a pointer
-	* to a newly initialized Term struct.
-	* 
-	**/
+  * 
+  * This function initializes a numeral returning a pointer
+  * to a newly initialized Term struct.
+  * 
+  **/
 Term *term_init_numeral(int numeral) {
 	Term *term = term_alloc();
 	term->type = TYPE_NUMERAL;
@@ -78,11 +78,24 @@ Term *term_init_numeral(int numeral) {
 }
 
 /**
-	* 
-	* This function initializes an string returning a
-	* pointer to a newly initialized Term struct.
-	* 
-	**/
+  * 
+  * This function initializes a decimal returning a pointer
+  * to a newly initialized Term struct.
+  * 
+  **/
+Term *term_init_decimal(double decimal) {
+	Term *term = term_alloc();
+	term->type = TYPE_DECIMAL;
+	term->term.decimal = decimal;
+	return term;
+}
+
+/**
+  * 
+  * This function initializes an string returning a
+  * pointer to a newly initialized Term struct.
+  * 
+  **/
 Term *term_init_string(wchar_t *string) {
 	Term *term = term_alloc();
 	term->type = TYPE_STRING;
@@ -91,11 +104,11 @@ Term *term_init_string(wchar_t *string) {
 }
 
 /**
-	* 
-	* This function initializes a character returning a
-	* pointer to a newly initialized Term struct.
-	* 
-	**/
+  * 
+  * This function initializes a character returning a
+  * pointer to a newly initialized Term struct.
+  * 
+  **/
 Term *term_init_char(wchar_t character) {
 	Term *term = term_alloc();
 	term->type = TYPE_CHAR;
@@ -104,30 +117,30 @@ Term *term_init_char(wchar_t character) {
 }
 
 /**
-	* 
-	* This function sets the string of the term.
-	* 
-	**/
+  * 
+  * This function sets the string of the term.
+  * 
+  **/
 void term_set_string(Term *term, wchar_t *str) {
 	term->term.string = malloc(sizeof(wchar_t)*(wcslen(str)+1));
 	wcscpy(term->term.string, str);
 }
 
 /**
-	* 
-	* This function increases in one the number
-	* of references to a term.
-	* 
-	**/
+  * 
+  * This function increases in one the number
+  * of references to a term.
+  * 
+  **/
 void term_increase_references(Term *term) {
 	term->references++;
 }
 
 /**
-	* 
-	* This function checks if term is callable.
-	* 
-	**/
+  * 
+  * This function checks if term is callable.
+  * 
+  **/
 int term_is_callable(Term *term) {
 	if(term->type != TYPE_LIST)
 		return 0;
@@ -141,74 +154,74 @@ int term_is_callable(Term *term) {
 }
 
 /**
-	* 
-	* This function checks if term is variable.
-	* 
-	**/
+  * 
+  * This function checks if term is variable.
+  * 
+  **/
 int term_is_variable(Term *term) {
 	return term->type == TYPE_VARIABLE;
 }
 
 /**
-	* 
-	* This function checks if term is an atom.
-	* 
-	**/
+  * 
+  * This function checks if term is an atom.
+  * 
+  **/
 int term_is_atom(Term *term) {
 	return term->type == TYPE_ATOM;
 }
 
 /**
-	* 
-	* This function checks if term is a string.
-	* 
-	**/
+  * 
+  * This function checks if term is a string.
+  * 
+  **/
 int term_is_string(Term *term) {
 	return term->type == TYPE_STRING;
 }
 
 /**
-	* 
-	* This function checks if term is a number.
-	* 
-	**/
+  * 
+  * This function checks if term is a number.
+  * 
+  **/
 int term_is_number(Term *term) {
 	return term->type == TYPE_NUMERAL || TYPE_DECIMAL;
 }
 
 /**
-	* 
-	* This function checks if term is a integer.
-	* 
-	**/
+  * 
+  * This function checks if term is a integer.
+  * 
+  **/
 int term_is_integer(Term *term) {
 	return term->type == TYPE_NUMERAL;
 }
 
 /**
-	* 
-	* This function checks if term is a float.
-	* 
-	**/
+  * 
+  * This function checks if term is a float.
+  * 
+  **/
 int term_is_float(Term *term) {
 	return term->type == TYPE_DECIMAL;
 }
 
 /**
-	* 
-	* This function checks if term is a catcher.
-	* 
-	**/
+  * 
+  * This function checks if term is a catcher.
+  * 
+  **/
 int term_is_catcher(Term *term) {
 	return term_is_callable(term) && !term_list_is_null(term)
 		&& wcscmp(term_list_get_head(term)->term.string, L"$catcher") == 0;
 }
 
 /**
-	* 
-	* This function compares two terms.
-	* 
-	**/
+  * 
+  * This function compares two terms.
+  * 
+  **/
 int term_compare(Term *term1, Term *term2) {
 	int i, cmp;
 	wchar_t char1, char2;
@@ -293,10 +306,10 @@ int term_compare(Term *term1, Term *term2) {
 }
 
 /**
-	* 
-	* This function renames the variables of a term.
-	* 
-	**/
+  * 
+  * This function renames the variables of a term.
+  * 
+  **/
 Term *term_rename_variables(Term *term, int *id, Hashmap *vars) {
 	int index, mod, length = 2;
 	Term *var;
@@ -339,11 +352,11 @@ Term *term_rename_variables(Term *term, int *id, Hashmap *vars) {
 }
 
 /**
-	* 
-	* This function returns the length of a list term.
-	* If term is not a well-formed list, returns -1.
-	* 
-	**/
+  * 
+  * This function returns the length of a list term.
+  * If term is not a well-formed list, returns -1.
+  * 
+  **/
 int term_list_length(Term *list) {
 	int length = 0;
 	while(list->type == TYPE_LIST && !term_list_is_null(list)) {
@@ -354,11 +367,11 @@ int term_list_length(Term *list) {
 }
 
 /**
-	* 
-	* This function creates a list, returning a
-	* pointer to a newly initialized Term struct.
-	* 
-	**/
+  * 
+  * This function creates a list, returning a
+  * pointer to a newly initialized Term struct.
+  * 
+  **/
 Term *term_list_create(Term *head, Term *tail) {
 	Term *list = term_alloc();
 	list->type = TYPE_LIST;
@@ -369,11 +382,11 @@ Term *term_list_create(Term *head, Term *tail) {
 }
 
 /**
-	* 
-	* This function creates an empty list, returning a
-	* pointer to a newly initialized Term struct.
-	* 
-	**/
+  * 
+  * This function creates an empty list, returning a
+  * pointer to a newly initialized Term struct.
+  * 
+  **/
 Term *term_list_empty() {
 	Term *list = term_alloc();
 	list->type = TYPE_LIST;
@@ -384,11 +397,11 @@ Term *term_list_empty() {
 }
 
 /**
-	* 
-	* This function clones a list, returning a
-	* pointer to a newly initialized Term struct.
-	* 
-	**/
+  * 
+  * This function clones a list, returning a
+  * pointer to a newly initialized Term struct.
+  * 
+  **/
 Term *term_list_clone(Term *term) {
 	if(term_list_is_null(term))
 		return term_list_empty();
@@ -399,20 +412,20 @@ Term *term_list_clone(Term *term) {
 }
 
 /**
-	* 
-	* This function checks whether a list is empty.
-	* 
-	**/
+  * 
+  * This function checks whether a list is empty.
+  * 
+  **/
 int term_list_is_null(Term *term) {
 	return term->type == TYPE_LIST && term->term.list->head == NULL;
 }
 
 /**
-	* 
-	* This function checks whether a list represents
-	* an string.
-	* 
-	**/
+  * 
+  * This function checks whether a list represents
+  * an string.
+  * 
+  **/
 int term_list_is_string(Term *term) {
 	while(term->type == TYPE_LIST && !term_list_is_null(term)) {
 		if(term->term.list->head->type != TYPE_CHAR)
@@ -423,28 +436,28 @@ int term_list_is_string(Term *term) {
 }
 
 /**
-	* 
-	* This function returns the head of a list.
-	* 
-	**/
+  * 
+  * This function returns the head of a list.
+  * 
+  **/
 Term *term_list_get_head(Term *term) {
 	return term->term.list->head;
 }
 
 /**
-	* 
-	* This function returns the tail of a list.
-	* 
-	**/
+  * 
+  * This function returns the tail of a list.
+  * 
+  **/
 Term *term_list_get_tail(Term *term) {
 	return term->term.list->tail;
 }
 
 /**
-	* 
-	* This function returns the nth-elemnt of a list.
-	* 
-	**/
+  * 
+  * This function returns the nth-elemnt of a list.
+  * 
+  **/
 Term *term_list_get_nth(Term *term, int index) {
 	while(index > 0 && term->type == TYPE_LIST) {
 		term = term->term.list->tail;
@@ -454,11 +467,11 @@ Term *term_list_get_nth(Term *term, int index) {
 }
 
 /**
-	* 
-	* This function adds an element to a list, returning
-	* the pointer to the last element inserted in the struct.
-	* 
-	**/
+  * 
+  * This function adds an element to a list, returning
+  * the pointer to the last element inserted in the struct.
+  * 
+  **/
 Term *term_list_add_element(Term *list, Term *term) {
 	while(list->term.list->head != NULL)
 			list = list->term.list->tail;
@@ -468,11 +481,11 @@ Term *term_list_add_element(Term *list, Term *term) {
 }
 
 /**
-	* 
-	* This function adds an element as a tail list. The 
-	* tail underlying the list will be deallocated.
-	* 
-	**/
+  * 
+  * This function adds an element as a tail list. The 
+  * tail underlying the list will be deallocated.
+  * 
+  **/
 Term *term_list_set_tail(Term *list, Term *term) {
 		Term *prev;
 		while(list->term.list->head != NULL) {
@@ -484,11 +497,11 @@ Term *term_list_set_tail(Term *list, Term *term) {
 }
 
 /**
-	* 
-	* This function returns the list of variables
-	* contained in the term.
-	* 
-	**/
+  * 
+  * This function returns the list of variables
+  * contained in the term.
+  * 
+  **/
 Term **term_get_variables(Term *term, int *nb_vars) {
 	Term **vars_head, **vars_tail, **vars;
 	int i, nb_vars_head, nb_vars_tail;
@@ -517,11 +530,11 @@ Term **term_get_variables(Term *term, int *nb_vars) {
 }
 
 /**
-	* 
-	* This function returns the list of catchers
-	* contained in the term.
-	* 
-	**/
+  * 
+  * This function returns the list of catchers
+  * contained in the term.
+  * 
+  **/
 void **term_get_catchers(Term *term, int *nb_catchers) {
 	void **catchers_head, **catchers_tail, **catchers;
 	int i, nb_catchers_head, nb_catchers_tail;
@@ -552,10 +565,10 @@ void **term_get_catchers(Term *term, int *nb_catchers) {
 }
 
 /**
-	* 
-	* This function prints for the standard output a term.
-	* 
-	**/
+  * 
+  * This function prints for the standard output a term.
+  * 
+  **/
 void term_print(Term *term) {
 	int length = 0;
 	Term *list;
@@ -611,11 +624,11 @@ void term_print(Term *term) {
 }
 
 /**
-	* 
-	* This function selects the most left term
-	* of the goal in a state.
-	* 
-	**/
+  * 
+  * This function selects the most left term
+  * of the goal in a state.
+  * 
+  **/
 Term *term_select_most_left(Term *term) {
 	if(term == NULL || term_list_is_null(term))
 		return NULL;
@@ -625,11 +638,11 @@ Term *term_select_most_left(Term *term) {
 }
 
 /**
-	* 
-	* This function replaces the most left term
-	* of the goal in a state.
-	* 
-	**/
+  * 
+  * This function replaces the most left term
+  * of the goal in a state.
+  * 
+  **/
 Term *term_replace_most_left(Term *term, Term *head) {
 	if(term->type == TYPE_LIST && term->term.list->head->type == TYPE_LIST && !term_list_is_null(term->term.list->head)) {
 		term_increase_references(term->term.list->tail);
@@ -654,10 +667,10 @@ Term *term_replace_most_left(Term *term, Term *head) {
 }
 
 /**
-	* 
-	* This function finds a term.
-	* 
-	**/
+  * 
+  * This function finds a term.
+  * 
+  **/
 int term_search_term(Term *term, Term *needle) {
 	if(term == needle)
 		return 1;

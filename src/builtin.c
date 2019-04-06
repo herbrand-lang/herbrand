@@ -79,7 +79,7 @@ int builtin_arities[BUILTIN_HASH_SIZE] = {
 
 /**
   * 
-  * This functions cheks if an atom is a built-in
+  * This function cheks if an atom is a built-in
   * predicate.
   * 
   **/
@@ -90,7 +90,7 @@ int builtin_check_predicate(Term *term) {
 
 /**
   * 
-  * This functions runs a built-in predicate.
+  * This function runs a built-in predicate.
   * 
   **/
 int builtin_run_predicate(Program *program, Derivation *D, State *point, Term *term) {
@@ -885,7 +885,34 @@ void builtin_atom_chars(Program *program, Derivation *D, State *point, Term *ter
 }
 void builtin_findall(Program *program, Derivation *D, State *point, Term *term) {
 }
+
+/**
+  * 
+  * is/2
+  * (is ?term @evaluable)
+  * 
+  * Evaluate expression.
+  * (is Result Expression) is true if and only if evaluating Expression as
+  * an expression gives Result as a result.
+  * 
+  **/
 void builtin_is(Program *program, Derivation *D, State *point, Term *term) {
+	Term *eq, *list, *result, *expr, *eval;
+	result = term_list_get_nth(term, 1);
+	expr = term_list_get_nth(term, 2);
+	eval = evaluable_eval_term(expr);
+	if(eval != NULL && (eval->type == TYPE_NUMERAL || eval->type == TYPE_DECIMAL)) {
+		eq = term_init_atom(L"=");
+		list = term_list_empty();
+		term_list_add_element(list, eq);
+		term_list_add_element(list, result);
+		term_list_add_element(list, eval);
+		term_increase_references(result);
+		derivation_push_state(D, state_success(point, list));
+		term_free(list);
+	} else {
+		derivation_push_state(D, state_error(point, eval));
+	}
 }
 
 /**

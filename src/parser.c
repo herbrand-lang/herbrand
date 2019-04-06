@@ -404,7 +404,7 @@ Parser *parser_expression(Tokenizer *tokenizer, int start) {
 			term = term_alloc();
 			state->value = term;
 			term->type = TYPE_DECIMAL;
-			term->term.decimal = wcstof(token->text, &end);
+			term->term.decimal = wcstod(token->text, &end);
 			break;
 		case TOKEN_STRING:
 			term = term_alloc();
