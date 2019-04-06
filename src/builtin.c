@@ -623,18 +623,109 @@ void builtin_retract(Program *program, Derivation *D, State *point, Term *term) 
 }
 void builtin_retractall(Program *program, Derivation *D, State *point, Term *term) {
 }
+
+/**
+  * 
+  * (==)/2
+  * (== @term @term)
+  * 
+  * Term identical.
+  * True if the compared terms are identical.
+  * 
+  **/
 void builtin_term_eq(Program *program, Derivation *D, State *point, Term *term) {
+	Term *left, *right;
+	left = term_list_get_nth(term, 1);
+	right = term_list_get_nth(term, 2);
+	if(term_compare(left, right) == 0)
+		derivation_push_state(D, state_success(point, NULL));
 }
+
+/**
+  * 
+  * (/==)/2
+  * (/== @term @term)
+  * 
+  * Term not identical.
+  * True if the compared terms are not identical.
+  * 
+  **/
 void builtin_term_ne(Program *program, Derivation *D, State *point, Term *term) {
+	Term *left, *right;
+	left = term_list_get_nth(term, 1);
+	right = term_list_get_nth(term, 2);
+	if(term_compare(left, right) != 0)
+		derivation_push_state(D, state_success(point, NULL));
 }
+
+/**
+  * 
+  * (<)/2
+  * (< @term @term)
+  * 
+  * Term less than.
+  * True if the first term is less than the second one.
+  * 
+  **/
 void builtin_term_lt(Program *program, Derivation *D, State *point, Term *term) {
+	Term *left, *right;
+	left = term_list_get_nth(term, 1);
+	right = term_list_get_nth(term, 2);
+	if(term_compare(left, right) == -1)
+		derivation_push_state(D, state_success(point, NULL));
 }
+
+/**
+  * 
+  * (<=)/2
+  * (<= @term @term)
+  * 
+  * Term less than or equal to.
+  * True if the first term is less than or equal to the second one.
+  * 
+  **/
 void builtin_term_le(Program *program, Derivation *D, State *point, Term *term) {
+	Term *left, *right;
+	left = term_list_get_nth(term, 1);
+	right = term_list_get_nth(term, 2);
+	if(term_compare(left, right) <= 0)
+		derivation_push_state(D, state_success(point, NULL));
 }
+
+/**
+  * 
+  * (>)/2
+  * (> @term @term)
+  * 
+  * Term greater than.
+  * True if the first term is greater than the second one.
+  * 
+  **/
 void builtin_term_gt(Program *program, Derivation *D, State *point, Term *term) {
+	Term *left, *right;
+	left = term_list_get_nth(term, 1);
+	right = term_list_get_nth(term, 2);
+	if(term_compare(left, right) == 1)
+		derivation_push_state(D, state_success(point, NULL));
 }
+
+/**
+  * 
+  * (>=)/2
+  * (>= @term @term)
+  * 
+  * Term greater than or equal to.
+  * True if the first term is greater than or equal to the second one.
+  * 
+  **/
 void builtin_term_ge(Program *program, Derivation *D, State *point, Term *term) {
+	Term *left, *right;
+	left = term_list_get_nth(term, 1);
+	right = term_list_get_nth(term, 2);
+	if(term_compare(left, right) >= 0)
+		derivation_push_state(D, state_success(point, NULL));
 }
+
 void builtin_arithmetic_eq(Program *program, Derivation *D, State *point, Term *term) {
 }
 void builtin_arithmetic_ne(Program *program, Derivation *D, State *point, Term *term) {

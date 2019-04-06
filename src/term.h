@@ -17,7 +17,7 @@
 #ifndef LOGIC_TERM_H
 #define LOGIC_TERM_H
 
-typedef enum {TYPE_ATOM, TYPE_VARIABLE, TYPE_NUMERAL, TYPE_DECIMAL, TYPE_CHAR, TYPE_STRING, TYPE_LIST} Type;
+typedef enum {TYPE_CHAR, TYPE_VARIABLE, TYPE_ATOM, TYPE_NUMERAL, TYPE_DECIMAL, TYPE_STRING, TYPE_LIST} Type;
 
 typedef struct Term {
 	union {
@@ -158,6 +158,13 @@ int term_is_float(Term *term);
   * 
   **/
 int term_is_catcher(Term *term);
+
+/**
+  * 
+  * This function compares two terms.
+  * 
+  **/
+int term_compare(Term *term1, Term *term2);
 
 /**
   * 
