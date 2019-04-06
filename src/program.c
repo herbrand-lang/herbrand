@@ -78,12 +78,19 @@ int program_is_full(Program *program) {
   * 
   **/
 int program_add_module(Program *program, Module *module) {
+  int key;
 	if(program_is_full(program))
 		if(program_realloc(program) == 0)
 			return 0;
-	hashmap_append(program->indices, module->name, program->nb_modules);
-	program->modules[program->nb_modules] = module;
-	program->nb_modules++;
+  key = hashmap_lookup(program->indices, module->name);
+  if(key != -1) {
+    module_free(program->modules[key]);
+    program->modules[key] = module;
+  } else {
+    hashmap_append(program->indices, module->name, program->nb_modules);
+    program->modules[program->nb_modules] = module;
+    program->nb_modules++;
+  }
 	return 1;
 }
 

@@ -78,6 +78,7 @@ void hashmap_append(Hashmap *map, wchar_t *key, int value) {
 	while(p != NULL) {
 		if(wcscmp(p->key, key) == 0) {
 			p->value = value;
+			free(q->key);
 			free(q);
 			return;
 		}
