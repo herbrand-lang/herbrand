@@ -3,7 +3,7 @@
  * FILENAME: program.c
  * DESCRIPTION: Data structures and functions for storing and manipuling programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 31.03.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
@@ -27,7 +27,7 @@ Program *program_alloc() {
 	program->renames = 0;
 	// Add user-defined module
 	module = module_alloc();
-	module_set_name(module, "user");
+	module_set_name(module, L"user");
 	program_add_module(program, module);
 	return program;
 }
@@ -94,7 +94,7 @@ int program_add_module(Program *program, Module *module) {
   * in the program, returns NULL.
   * 
   **/
-Module *program_get_module(Program *program, char *module_name) {
+Module *program_get_module(Program *program, wchar_t *module_name) {
 	int index = hashmap_lookup(program->indices, module_name);
 	if(index == -1)
 		return NULL;
@@ -108,7 +108,7 @@ Module *program_get_module(Program *program, char *module_name) {
   * in the program, returns NULL.
   * 
   **/
-Rule *program_get_predicate(Program *program, char *predicate_name, char *from) {
+Rule *program_get_predicate(Program *program, wchar_t *predicate_name, wchar_t *from) {
 	int i;
 	Rule *rule = NULL;
 	for(i = 0; i < program->nb_modules && rule == NULL; i++)
@@ -126,7 +126,7 @@ Rule *program_get_predicate(Program *program, char *predicate_name, char *from) 
 void program_listing(Program *program) {
 	int i;
 	for(i = 0; i < program->nb_modules; i++) {
-		printf("(module %s)\n", program->modules[i]->name);
+		printf("(module %ls)\n", program->modules[i]->name);
 		module_listing(program->modules[i]);
 	}
 }

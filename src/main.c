@@ -3,7 +3,7 @@
  * FILENAME: main.c
  * DESCRIPTION: Main file
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 02.04.2019
+ * UPDATED: 06.04.2019
  * COMPILING: gcc -I/usr/include -L *.h *.c -o herbrand -g
  * 
  *H*/
@@ -18,9 +18,9 @@
   * 
   **/
 int main(int argc, char *argv[]) {
-	char character;
 	Program *program;
 	FILE *file;
+	char *locale = setlocale(LC_ALL, "");
 	if(argc == 2) {
 		file = fopen(argv[1], "r");
 		if(file != NULL) {
@@ -52,7 +52,7 @@ void interactive_query() {
 	FILE *file;
 	Derivation *D;
 	Substitution *answer;
-	char c, d;
+	wchar_t c, d;
 	Term *term = NULL;
 	program = program_alloc();
 	while(1) {
@@ -60,7 +60,7 @@ void interactive_query() {
 			printf("\x1b[1m\x1b[31mherbrand>\x1b[0m ");
 			term = parser_term(stdin);
 		}
-		if(term->type == TYPE_ATOM && strcmp(term->term.string, "exit") == 0) {
+		if(term->type == TYPE_ATOM && wcscmp(term->term.string, L"exit") == 0) {
 			term_free(term);
 			break;
 		}
@@ -73,10 +73,10 @@ void interactive_query() {
 				break;
 			}
 			printf(" ");
-			c = getchar();
+			c = fgetwc(stdin);
 			if(c != '\n')
-				while((d = getchar()) != '\n' && d != EOF);
-		} while(answer != NULL && c == ';');
+				while((d = fgetwc(stdin)) != L'\n' && d != WEOF);
+		} while(answer != NULL && c == L';');
 		printf("\n");
 		term_free(term);
 		derivation_free(D);

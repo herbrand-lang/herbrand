@@ -3,7 +3,7 @@
  * FILENAME: unification.c
  * DESCRIPTION: Functions for syntactic unification
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 05.05.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
@@ -22,8 +22,8 @@ Substitution *semantics_unify_terms(Term *term1, Term *term2, int occurs_check) 
 	Term *character, *tail;
 	int n, length;
 	if(
-		term1->type == TYPE_VARIABLE && wcscmp(term1->term.string, "_") == 0 ||
-		term2->type == TYPE_VARIABLE && wcscmp(term2->term.string, "_") == 0
+		term1->type == TYPE_VARIABLE && wcscmp(term1->term.string, L"_") == 0 ||
+		term2->type == TYPE_VARIABLE && wcscmp(term2->term.string, L"_") == 0
 	) {
 		return substitution_alloc(0);
 	} else if(term1->type == TYPE_VARIABLE) {
@@ -78,7 +78,7 @@ Substitution *semantics_unify_terms(Term *term1, Term *term2, int occurs_check) 
 			term1 = term1->term.list->tail;
 			n++;
 		}
-		tail = term_init_string(term2->term.string + sizeof(char)*n);
+		tail = term_init_string(term2->term.string+n);
 		mgu = semantics_unify_terms(term1, tail, occurs_check);
 		term_free(tail);
 		if(mgu == NULL) {

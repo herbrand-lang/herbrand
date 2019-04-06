@@ -3,13 +3,13 @@
  * FILENAME: tokenizer.h
  * DESCRIPTION: Split source code into lexical components
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 25.01.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <wchar.h>
 
 
 

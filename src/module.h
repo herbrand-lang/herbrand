@@ -3,12 +3,13 @@
  * FILENAME: module.h
  * DESCRIPTION: Data structures and functions for storing and manipuling modules
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 31.03.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <wchar.h>
 #include "rule.h"
 #include "hashmap.h"
 #define N_PREDICATES 32
@@ -21,7 +22,7 @@
 typedef struct Module {
 	Rule **predicates;
 	Hashmap *indices;
-	char *name;
+	wchar_t *name;
 	int nb_predicates;
 	int max_predicates;
 } Module;
@@ -61,7 +62,7 @@ void module_free(Module *module);
   * This function sets the name of a module.
   * 
   **/
-void module_set_name(Module *module, char *name);
+void module_set_name(Module *module, wchar_t *name);
 
 /**
   * This function checks if a module cannot store new
@@ -86,7 +87,7 @@ int module_add_predicate(Module *module, Rule *rule);
   * in the program, returns NULL.
   * 
   **/
-Rule *module_get_predicate(Module *module, char *predicate_name, char *from);
+Rule *module_get_predicate(Module *module, wchar_t *predicate_name, wchar_t *from);
 
 /**
   * 

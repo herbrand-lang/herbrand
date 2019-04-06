@@ -3,7 +3,7 @@
  * FILENAME: derivation.c
  * DESCRIPTION: Data structures and functions for derivations
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 03.04.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
@@ -183,7 +183,7 @@ State *state_error(State *point, Term *term) {
 	State *state = state_alloc();
 	state->goal = NULL;
 	state->substitution = substitution_alloc(1);
-	substitution_add_link(state->substitution, "$error", term);
+	substitution_add_link(state->substitution, L"$error", term);
 	state->parent = point;
 	return state;
 }

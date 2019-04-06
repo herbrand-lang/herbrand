@@ -3,7 +3,7 @@
  * FILENAME: builtin.c
  * DESCRIPTION: Functions for evaluating built-in predicates
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 05.04.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
@@ -11,29 +11,29 @@
 
 
 
-char *builtin_keys[BUILTIN_HASH_SIZE] = {
-	NULL, ":<", NULL, NULL, NULL, NULL, "var", NULL, NULL, NULL, "<", "integer", 
-	NULL, NULL, NULL, NULL, "string_length", "<=", NULL, NULL, "string_chars", NULL, 
-	NULL, NULL, "list", NULL, NULL, NULL, NULL, "import", NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, ">", NULL, NULL, NULL, "current_herbrand_flag", NULL, 
-	NULL, ":>", NULL, NULL, "false", "nonvar", NULL, NULL, NULL, "set_herbrand_flag", 
-	"retractall", "throw", ":>=", NULL, NULL, NULL, NULL, NULL, "call", NULL, NULL, 
+wchar_t *builtin_keys[BUILTIN_HASH_SIZE] = {
+	NULL, L":<", NULL, NULL, NULL, NULL, L"var", NULL, NULL, NULL, L"<", L"integer", 
+	NULL, NULL, NULL, NULL, L"string_length", L"<=", NULL, NULL, L"string_chars", 
+	NULL, NULL, NULL, L"list", NULL, NULL, NULL, NULL, L"import", NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, L">", NULL, NULL, NULL, L"current_herbrand_flag", 
+	NULL, NULL, L":>", NULL, NULL, L"false", L"nonvar", NULL, NULL, NULL, L"set_herbrand_flag", 
+	L"retractall", L"throw", L":>=", NULL, NULL, NULL, NULL, NULL, L"call", NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, "==", NULL, NULL, "succ", "number", "atom_concat", NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, "/==", NULL, NULL, NULL, "catch", "atom_chars", 
-	NULL, NULL, "ground", "halt", NULL, NULL, "asserta", "and", NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, "not", NULL, NULL, NULL, NULL, NULL, "atom", NULL, NULL, 
-	NULL, NULL, "assertz", NULL, NULL, "/=", "findall", NULL, NULL, "or", NULL, NULL, 
-	NULL, NULL, NULL, "true", NULL, NULL, NULL, NULL, NULL, ">=", NULL, "float", 
-	NULL, "is", "ite", NULL, NULL, NULL, "=", NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, "atom_length", NULL, NULL, "string", NULL, ":/==", NULL, NULL, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, ":<=", 
-	NULL, NULL, NULL, NULL, NULL, "repeat", NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, "$catcher", NULL, NULL, NULL, NULL, NULL, "once", NULL, NULL, "!", 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, "retract", NULL, NULL, NULL, NULL, 
-	NULL, NULL, "consult", "string_concat", NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, L"==", NULL, NULL, L"succ", L"number", L"atom_concat", NULL, 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, L"/==", NULL, NULL, NULL, 
+	L"catch", L"atom_chars", NULL, NULL, L"ground", L"halt", NULL, NULL, L"asserta", 
+	L"and", NULL, NULL, NULL, NULL, NULL, NULL, NULL, L"not", NULL, NULL, NULL, NULL, 
+	NULL, L"atom", NULL, NULL, NULL, NULL, L"assertz", NULL, NULL, L"/=", L"findall", 
+	NULL, NULL, L"or", NULL, NULL, NULL, NULL, NULL, L"true", NULL, NULL, NULL, NULL, 
+	NULL, L">=", NULL, L"float", NULL, L"is", L"ite", NULL, NULL, NULL, L"=", NULL, 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, L"atom_length", NULL, NULL, L"string", 
+	NULL, L":/==", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, L":<=", NULL, NULL, NULL, NULL, NULL, L"repeat", NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, L"$catcher", NULL, NULL, NULL, NULL, 
+	NULL, L"once", NULL, NULL, L"!", NULL, NULL, NULL, NULL, NULL, NULL, NULL, L"retract", 
+	NULL, NULL, NULL, NULL, NULL, NULL, L"consult", L"string_concat", NULL, NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, ":==", NULL, NULL, NULL, NULL};
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, L":==", NULL, NULL, NULL, NULL};
 
 void (*builtin_handlers[BUILTIN_HASH_SIZE])() = {
 	NULL, builtin_arithmetic_lt, NULL, NULL, NULL, NULL, builtin_var, NULL, NULL, 
@@ -86,7 +86,7 @@ int builtin_arities[BUILTIN_HASH_SIZE] = {
   **/
 int builtin_check_predicate(Term *term) {
 	int key = hashmap_function(BUILTIN_HASH_SIZE, term->term.string);
-	return builtin_keys[key] != NULL && strcmp(term->term.string, builtin_keys[key]) == 0;
+	return builtin_keys[key] != NULL && wcscmp(term->term.string, builtin_keys[key]) == 0;
 }
 
 /**
@@ -99,11 +99,11 @@ int builtin_run_predicate(Program *program, Derivation *D, State *point, Term *t
 	int arity, length, key;
 	head = term_list_get_head(term);
 	key = hashmap_function(BUILTIN_HASH_SIZE, head->term.string);
-	if(builtin_keys[key] != NULL && strcmp(head->term.string, builtin_keys[key]) == 0) {
+	if(builtin_keys[key] != NULL && wcscmp(head->term.string, builtin_keys[key]) == 0) {
 		arity = builtin_arities[key];
 		length = term_list_length(term)-1;
 		if(length == -1) {
-			error = exception_type_error("callable_term", term, term->parent);
+			error = exception_type_error(L"callable_term", term, term->parent);
 			derivation_push_state(D, state_error(point, error));
 			term_free(error);
 		} else if(length == arity || arity == -1) {
@@ -134,7 +134,7 @@ void builtin_consult(Program *program, Derivation *D, State *point, Term *term) 
 	if(term_is_variable(path))
 		error = exception_instantiation_error(term->parent);
 	else if(!term_is_atom(path) && !term_is_string(path)) 
-		error = exception_type_error("string_or_atom", path, term->parent);
+		error = exception_type_error(L"string_or_atom", path, term->parent);
 	if(error != NULL) {
 		derivation_push_state(D, state_error(point, error));
 		term_free(error);
@@ -146,7 +146,7 @@ void builtin_consult(Program *program, Derivation *D, State *point, Term *term) 
 		fclose(file);
 		derivation_push_state(D, state_success(point, NULL));
 	} else {
-		error = exception_existence_error("source_sink", path, term->parent);
+		error = exception_existence_error(L"source_sink", path, term->parent);
 		derivation_push_state(D, state_error(point, error));
 		term_free(error);
 	}
@@ -164,19 +164,21 @@ void builtin_consult(Program *program, Derivation *D, State *point, Term *term) 
 void builtin_import(Program *program, Derivation *D, State *point, Term *term) {
 	Term *path, *error = NULL;
 	FILE *file;
-	char *module;
+	wchar_t *module;
+	int size;
 	path = term_list_get_nth(term, 1);
 	if(term_is_variable(path))
 		error = exception_instantiation_error(term->parent);
 	else if(!term_is_atom(path) && !term_is_string(path)) 
-		error = exception_type_error("string_or_atom", path, term->parent);
+		error = exception_type_error(L"string_or_atom", path, term->parent);
 	if(error != NULL) {
 		derivation_push_state(D, state_error(point, error));
 		term_free(error);
 		return;
 	}
-	module = malloc(sizeof(char)*((wcslen(HERBRAND_PATH)+wcslen(path->term.string)+12)));
-	sprintf(module, HERBRAND_PATH "modules/%s.hb", path->term.string);
+	size = wcslen(HERBRAND_PATH)+wcslen(path->term.string)+12;
+	module = malloc(sizeof(wchar_t)*size);
+	swprintf(module, size, HERBRAND_PATH L"modules/%ls.hb", path->term.string);
 	file = fopen(module, "r");
 	free(module);
 	if(file != NULL) {
@@ -184,7 +186,7 @@ void builtin_import(Program *program, Derivation *D, State *point, Term *term) {
 		fclose(file);
 		derivation_push_state(D, state_success(point, NULL));
 	} else {
-		error = exception_existence_error("module", path, term->parent);
+		error = exception_existence_error(L"module", path, term->parent);
 		derivation_push_state(D, state_error(point, error));
 		term_free(error);
 	}
@@ -255,11 +257,11 @@ void builtin_ite(Program *program, Derivation *D, State *point, Term *term) {
 	if(term_is_variable(cond) || term_is_variable(then) || term_is_variable(els))
 		error = exception_instantiation_error(term->parent);
 	else if(!term_is_callable(cond))
-		error = exception_type_error("callable_term", cond, term->parent);
+		error = exception_type_error(L"callable_term", cond, term->parent);
 	else if(!term_is_callable(then))
-		error = exception_type_error("callable_term", then, term->parent);
+		error = exception_type_error(L"callable_term", then, term->parent);
 	else if(!term_is_callable(els))
-		error = exception_type_error("callable_term", els, term->parent);
+		error = exception_type_error(L"callable_term", els, term->parent);
 	if(error != NULL) {
 		derivation_push_state(D, state_error(point, error));
 		term_free(error);
@@ -268,7 +270,7 @@ void builtin_ite(Program *program, Derivation *D, State *point, Term *term) {
 	// Cut term
 	cut = term_alloc();
 	cut->type = TYPE_ATOM;
-	term_set_string(cut, "!");
+	term_set_string(cut, L"!");
 	// Cut call
 	list_cut = term_list_empty();
 	term_list_add_element(list_cut, cut);
@@ -307,7 +309,7 @@ void builtin_cut(Program *program, Derivation *D, State *point, Term *term) {
 		if(parent_cut != NULL && parent_cut->goal != NULL && !term_list_is_null(parent_cut->goal)) {
 			left = term_select_most_left(parent_cut->goal);
 			if(left != NULL
-			&& strcmp(term_list_get_head(left)->term.string, "call") == 0
+			&& wcscmp(term_list_get_head(left)->term.string, L"call") == 0
 			&& term_search_term(left, cut)) {
 				parent_cut = last_cut;
 				break;
@@ -349,21 +351,21 @@ void builtin_not(Program *program, Derivation *D, State *point, Term *term) {
 	// Cut term
 	cut = term_alloc();
 	cut->type = TYPE_ATOM;
-	term_set_string(cut, "!");
+	term_set_string(cut, L"!");
 	// Cut call
 	list_cut = term_list_empty();
 	term_list_add_element(list_cut, cut);
 	// False term
 	fail = term_alloc();
 	fail->type = TYPE_ATOM;
-	term_set_string(fail, "false");
+	term_set_string(fail, L"false");
 	// False call
 	list_fail = term_list_empty();
 	term_list_add_element(list_fail, fail);
 	// Call term
 	call = term_alloc();
 	call->type = TYPE_ATOM;
-	term_set_string(call, "call");
+	term_set_string(call, L"call");
 	// Goal call
 	list_goal = term_list_empty();
 	term_list_add_element(list_goal, call);
@@ -415,11 +417,11 @@ void builtin_once(Program *program, Derivation *D, State *point, Term *term) {
 	// Cut term
 	cut = term_alloc();
 	cut->type = TYPE_ATOM;
-	term_set_string(cut, "!");
+	term_set_string(cut, L"!");
 	// Call term
 	call = term_alloc();
 	call->type = TYPE_ATOM;
-	term_set_string(call, "call");
+	term_set_string(call, L"call");
 	// Cut call
 	list_cut = term_list_empty();
 	term_list_add_element(list_cut, cut);
@@ -504,11 +506,11 @@ void builtin_catch(Program *program, Derivation *D, State *point, Term *term) {
 	// Call term
 	call = term_alloc();
 	call->type = TYPE_ATOM;
-	term_set_string(call, "call");
+	term_set_string(call, L"call");
 	// True term
 	control = term_alloc();
 	control->type = TYPE_ATOM;
-	term_set_string(control, "$catcher");
+	term_set_string(control, L"$catcher");
 	control->parent = point;
 	// Goal call
 	list_call = term_list_empty();
@@ -809,7 +811,7 @@ void builtin_halt(Program *program, Derivation *D, State *point, Term *term) {
 	if(term_is_variable(message))
 		error = exception_instantiation_error(term->parent);
 	else if(!term_is_integer(message)) 
-		error = exception_type_error("integer", message, term->parent);
+		error = exception_type_error(L"integer", message, term->parent);
 	if(error != NULL) {
 		derivation_push_state(D, state_error(point, error));
 		term_free(error);

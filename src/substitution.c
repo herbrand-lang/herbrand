@@ -3,7 +3,7 @@
  * FILENAME: program.c
  * DESCRIPTION: Data structures and functions for storing and manipuling substitutions
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 03.04.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
@@ -101,7 +101,7 @@ void substitution_increase_references(Substitution *subs) {
 int substitution_add_link(Substitution *subs, wchar_t *var, Term *value) {
 	if(subs->nb_vars == subs->max_vars)
 		return 0;
-	subs->domain[subs->nb_vars] = malloc(sizeof(wchar_t)*(strlen(var)+1));
+	subs->domain[subs->nb_vars] = malloc(sizeof(wchar_t)*(wcslen(var)+1));
 	subs->range[subs->nb_vars] = value;
 	wcscpy(subs->domain[subs->nb_vars], var);
 	hashmap_append(subs->indices, var, subs->nb_vars);
@@ -190,7 +190,7 @@ void substitution_print(Substitution *subs) {
 	} else if(subs->nb_vars == 0) {
 		printf("true");
 		return;
-	} else if(subs->nb_vars == 1 && wcscmp(subs->domain[0], "$error") == 0) {
+	} else if(subs->nb_vars == 1 && wcscmp(subs->domain[0], L"$error") == 0) {
 		printf("\x1b[1m\x1b[31muncaught exception:\x1b[0m ");
 		term_print(subs->range[0]);
 		return;
@@ -198,7 +198,7 @@ void substitution_print(Substitution *subs) {
 	printf("{");
 	for(i = 0; i < subs->nb_vars; i++) {
 		if(i > 0) printf(", ");
-		printf("\x1b[1m\x1b[36m%s\x1b[0m/", subs->domain[i]);
+		printf("\x1b[1m\x1b[36m%ls\x1b[0m/", subs->domain[i]);
 		term_print(subs->range[i]);
 	}
 	printf("}");

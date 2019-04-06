@@ -3,13 +3,13 @@
  * FILENAME: hashmap.h
  * DESCRIPTION: 
  * AUTHORS: José Antonio Riaza Valverde
- * DATE: 31.03.2019
+ * DATE: 06.04.2019
  * 
  *H*/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <wchar.h>
 
 
 
@@ -18,7 +18,7 @@
 
 typedef struct HashmapRegister {
     struct HashmapRegister *next;
-    unsigned char *key;
+    wchar_t *key;
     int value;
 } HashmapRegister;
 
@@ -37,7 +37,7 @@ typedef struct Hashmap {
   * into a map of certain size.
   *
   **/
-unsigned long hashmap_function(int size, unsigned char *key);
+unsigned long hashmap_function(int size, wchar_t *key);
 
 /**
   *
@@ -45,21 +45,21 @@ unsigned long hashmap_function(int size, unsigned char *key);
   * into a map.
   *
   **/
-unsigned long hashmap_hash(Hashmap *map, unsigned char *key);
+unsigned long hashmap_hash(Hashmap *map, wchar_t *key);
 
 /**
   *
   * This function looks up an element into a map.
   *
   **/
-int hashmap_lookup(Hashmap *map, unsigned char *key);
+int hashmap_lookup(Hashmap *map, wchar_t *key);
 
 /**
   *
   * This function adds an element into a map.
   *
   **/
-void hashmap_append(Hashmap *map, unsigned char *key, int value);
+void hashmap_append(Hashmap *map, wchar_t *key, int value);
 
 /**
   * 

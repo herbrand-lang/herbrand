@@ -3,13 +3,13 @@
  * FILENAME: term.h
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 05.04.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <wchar.h>
 #include "hashmap.h"
 
 

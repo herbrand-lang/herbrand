@@ -3,7 +3,7 @@
  * FILENAME: builtin.h
  * DESCRIPTION: Functions for evaluating built-in predicates
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 05.04.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
@@ -22,11 +22,11 @@
 #define LOGIC_BUILTIN_H
 
 #ifndef HERBRAND_PATH
-#define HERBRAND_PATH "/usr/local/herbrand/"
+#define HERBRAND_PATH L"/usr/local/herbrand/"
 #endif
 
 #define BUILTIN_HASH_SIZE 256
-char *builtin_keys[BUILTIN_HASH_SIZE];
+wchar_t *builtin_keys[BUILTIN_HASH_SIZE];
 void (*builtin_handlers[BUILTIN_HASH_SIZE])();
 int builtin_arities[BUILTIN_HASH_SIZE];
 

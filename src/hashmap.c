@@ -3,7 +3,7 @@
  * FILENAME: hashmap.c
  * DESCRIPTION: 
  * AUTHORS: José Antonio Riaza Valverde
- * DATE: 31.03.2019
+ * DATE: 06.04.2019
  * 
  *H*/
 
@@ -19,7 +19,7 @@
   * into a map of certain size.
   *
   **/
-unsigned long hashmap_function(int size, unsigned char *key) {
+unsigned long hashmap_function(int size, wchar_t *key) {
 	int i, j;
 	unsigned int byte, crc, mask;
 	i = 0;
@@ -42,7 +42,7 @@ unsigned long hashmap_function(int size, unsigned char *key) {
   * into a map.
   *
   **/
-unsigned long hashmap_hash(Hashmap *map, unsigned char *key) {
+unsigned long hashmap_hash(Hashmap *map, wchar_t *key) {
 	return hashmap_function(map->nb_registers, key);
 }
 
@@ -51,10 +51,10 @@ unsigned long hashmap_hash(Hashmap *map, unsigned char *key) {
   * This function looks up an element into a map.
   *
   **/
-int hashmap_lookup(Hashmap *map, unsigned char *key) {
+int hashmap_lookup(Hashmap *map, wchar_t *key) {
     HashmapRegister *p;
 	for(p = map->map[hashmap_hash(map, key)]; p != NULL; p = p->next)
-		if(strcmp(p->key, key) == 0)
+		if(wcscmp(p->key, key) == 0)
 			return p->value;
 	return -1;
 }
@@ -64,19 +64,19 @@ int hashmap_lookup(Hashmap *map, unsigned char *key) {
   * This function adds an element into a map.
   *
   **/
-void hashmap_append(Hashmap *map, unsigned char *key, int value) {
+void hashmap_append(Hashmap *map, wchar_t *key, int value) {
 	int hash = hashmap_hash(map, key);
 	HashmapRegister *p = map->map[hash], *q = malloc(sizeof(HashmapRegister)), *r;
 	q->next = NULL;
-	q->key = malloc(sizeof(char)*(strlen(key)+1));
-	strcpy(q->key, key);
+	q->key = malloc(sizeof(wchar_t)*(wcslen(key)+1));
+	wcscpy(q->key, key);
 	q->value = value;
 	if(p == NULL) {
 		map->map[hash] = q;
 		return;
 	}
 	while(p != NULL) {
-		if(strcmp(p->key, key) == 0) {
+		if(wcscmp(p->key, key) == 0) {
 			p->value = value;
 			free(q);
 			return;
@@ -146,7 +146,7 @@ void hashmap_print(Hashmap *map) {
 		if(p != NULL) {
 			printf("\n\t(hash %d", i);
 			while(p != NULL) {
-				printf("\n\t\t((key \"%s\") (value %d))", p->key, p->value);
+				printf("\n\t\t((key \"%ls\") (value %d))", p->key, p->value);
 				p = p->next;
 			}
 		}

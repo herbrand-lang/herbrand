@@ -3,7 +3,7 @@
  * FILENAME: program.c
  * DESCRIPTION: Data structures and functions for storing and manipuling substitutions
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 03.04.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 

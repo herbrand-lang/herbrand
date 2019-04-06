@@ -3,7 +3,7 @@
  * FILENAME: module.c
  * DESCRIPTION: Data structures and functions for storing and manipuling modules
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 31.03.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
@@ -62,11 +62,11 @@ void module_free(Module *module) {
   * This function sets the name of a module.
   * 
   **/
-void module_set_name(Module *module, char *name) {
+void module_set_name(Module *module, wchar_t *name) {
 	if(module->name != NULL)
         free(module->name);
-    module->name = malloc(sizeof(char)*(strlen(name)+1));
-    strcpy(module->name, name);
+    module->name = malloc(sizeof(wchar_t)*(wcslen(name)+1));
+    wcscpy(module->name, name);
 }
 
 /**
@@ -103,7 +103,7 @@ int module_add_predicate(Module *module, Rule *rule) {
   * in the module, returns NULL.
   * 
   **/
-Rule *module_get_predicate(Module *module, char *predicate_name, char *from) {
+Rule *module_get_predicate(Module *module, wchar_t *predicate_name, wchar_t *from) {
 	int index_from, index_pred = hashmap_lookup(module->indices, predicate_name);
 	if(index_pred == -1)
 		return NULL;
@@ -127,7 +127,7 @@ Rule *module_get_predicate(Module *module, char *predicate_name, char *from) {
 void module_listing(Module *module) {
 	int i;
 	for(i = 0; i < module->nb_predicates; i++) {
-		printf("%s/%d :: ", module->predicates[i]->name, module->predicates[i]->arity);
+		printf("%ls/%d :: ", module->predicates[i]->name, module->predicates[i]->arity);
 		term_print(module->predicates[i]->type);
 		printf(module->predicates[i]->dynamic ? " #dynamic" : " #static");
 		printf(module->predicates[i]->determinist ? " #det" : " #nondet");

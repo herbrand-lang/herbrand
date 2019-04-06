@@ -3,11 +3,11 @@
  * FILENAME: unification.h
  * DESCRIPTION: Functions for syntactic unification
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 30.03.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
-#include <string.h>
+#include <wchar.h>
 #include "term.h"
 #include "substitution.h"
 

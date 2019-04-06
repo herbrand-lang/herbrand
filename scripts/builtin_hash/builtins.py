@@ -37,7 +37,7 @@ def hashmap_gen(path):
 	for i in range(size):
 		dic[dist[i]] = (keys[i], handlers[i], arities[i])
 	# Print array of keys
-	string = "char *builtin_keys[BUILTIN_HASH_SIZE] = {\n\t"
+	string = "wchar_t *builtin_keys[BUILTIN_HASH_SIZE] = {\n\t"
 	line = ""
 	for i in range(n):
 		if len(line) > 76:
@@ -45,7 +45,7 @@ def hashmap_gen(path):
 			line = ""
 		char = "};\n" if i == n-1 else ", "
 		if dic.get(i) != None:
-			line += "\"%s\"%s" % (dic[i][0], char)
+			line += "L\"%s\"%s" % (dic[i][0], char)
 		else:
 			line += "NULL%s" % char
 	string += line

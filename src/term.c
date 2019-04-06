@@ -3,7 +3,7 @@
  * FILENAME: term.c
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 05.04.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
@@ -201,7 +201,7 @@ int term_is_float(Term *term) {
   **/
 int term_is_catcher(Term *term) {
 	return term_is_callable(term) && !term_list_is_null(term)
-		&& wcscmp(term_list_get_head(term)->term.string, "$catcher") == 0;
+		&& wcscmp(term_list_get_head(term)->term.string, L"$catcher") == 0;
 }
 
 /**
@@ -225,7 +225,7 @@ Term *term_rename_variables(Term *term, int *id, Hashmap *vars) {
 				length++;
 			}
 			var->term.string = malloc(sizeof(wchar_t)*length);
-			sprintf(var->term.string, "$%d", index);
+			swprintf(var->term.string, length+2, L"$%d", index);
 		} else {
 			(*id)++;
 			mod = *id;
@@ -235,7 +235,7 @@ Term *term_rename_variables(Term *term, int *id, Hashmap *vars) {
 			}
 			var->term.string = malloc(sizeof(wchar_t)*length);
 			hashmap_append(vars, term->term.string, *id);
-			sprintf(var->term.string, "$%d", *id);
+			swprintf(var->term.string, length+2, L"$%d", *id);
 		}
 		return var;
 	} else if(term->type == TYPE_LIST && !term_list_is_null(term)) {
@@ -404,7 +404,7 @@ Term *term_list_set_tail(Term *list, Term *term) {
 Term **term_get_variables(Term *term, int *nb_vars) {
 	Term **vars_head, **vars_tail, **vars;
 	int i, nb_vars_head, nb_vars_tail;
-	if(term->type == TYPE_VARIABLE && wcscmp(term->term.string, "_") != 0) {
+	if(term->type == TYPE_VARIABLE && wcscmp(term->term.string, L"_") != 0) {
 		(*nb_vars)++;
 		vars = malloc(sizeof(Term*));
 		vars[0] = term;
@@ -475,10 +475,10 @@ void term_print(Term *term) {
 		return;
 	switch(term->type) {
 		case TYPE_ATOM:
-			printf("\x1b[1m\x1b[34m%s\x1b[0m", term->term.string);
+			printf("\x1b[1m\x1b[34m%ls\x1b[0m", term->term.string);
 			break;
 		case TYPE_VARIABLE:
-			printf("\x1b[1m\x1b[36m%s\x1b[0m", term->term.string);
+			printf("\x1b[1m\x1b[36m%ls\x1b[0m", term->term.string);
 			break;
 		case TYPE_NUMERAL:
 			printf("\x1b[1m\x1b[33m%d\x1b[0m", term->term.numeral);
@@ -487,20 +487,20 @@ void term_print(Term *term) {
 			printf("\x1b[1m\x1b[33m%f\x1b[0m", term->term.decimal);
 			break;
 		case TYPE_CHAR:
-			printf("\x1b[1m\x1b[32m'%c'\x1b[0m", term->term.character);
+			printf("\x1b[1m\x1b[32m'%lc'\x1b[0m", term->term.character);
 			break;
 		case TYPE_STRING:
-			printf("\x1b[1m\x1b[32m\"%s\"\x1b[0m", term->term.string);
+			printf("\x1b[1m\x1b[32m\"%ls\"\x1b[0m", term->term.string);
 			break;
 		case TYPE_LIST:
 			if(term_list_is_string(term)) {
 				printf("\x1b[1m\x1b[32m\"");
 				while(term->type == TYPE_LIST && !term_list_is_null(term)) {
-					printf("%c", term->term.list->head->term.character);
+					printf("%lc", term->term.list->head->term.character);
 					term = term->term.list->tail;
 				}
 				if(term->type == TYPE_STRING)
-					printf("%s", term->term.string);
+					printf("%ls", term->term.string);
 				printf("\"\x1b[0m");
 				break;
 			}

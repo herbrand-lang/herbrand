@@ -3,7 +3,7 @@
  * FILENAME: parse.c
  * DESCRIPTION: Parse programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 05.04.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
@@ -36,10 +36,10 @@ Term *parser_term(FILE *stream) {
 	if(!state->success) {
 		token = state->next < tokenizer->nb_tokens ? state->next : tokenizer->nb_tokens-1;
 		printf(
-			"(parser-error (line %d) (column %d) (found \"%s\")\n\t(message \"%s\"))\n",
+			"(parser-error (line %d) (column %d) (found \"%ls\")\n\t(message \"%ls\"))\n",
 			tokenizer->tokens[token]->line,
 			tokenizer->tokens[token]->column,
-			state->next < tokenizer->nb_tokens ? tokenizer->tokens[token]->text : "",
+			state->next < tokenizer->nb_tokens ? tokenizer->tokens[token]->text : L"",
 			state->error);
 		term = NULL;
 	} else {
@@ -82,7 +82,7 @@ void parser_program(Program *program, Tokenizer *tokenizer) {
 		parser_free(state);
 		state = NULL;
 	} else {
-		module = program_get_module(program, "user");
+		module = program_get_module(program, L"user");
 		start = 0;
 	}
 	// Parse predicates
@@ -92,10 +92,10 @@ void parser_program(Program *program, Tokenizer *tokenizer) {
 		if(!state->success) {
 			n_token = state->next < tokenizer->nb_tokens ? state->next : tokenizer->nb_tokens-1;
 			printf(
-				"(parser-error (line %d) (column %d) (found \"%s\")\n\t(message \"%s\"))\n",
+				"(parser-error (line %d) (column %d) (found \"%ls\")\n\t(message \"%ls\"))\n",
 				tokenizer->tokens[n_token]->line,
 				tokenizer->tokens[n_token]->column,
-				state->next < tokenizer->nb_tokens ? tokenizer->tokens[n_token]->text : "",
+				state->next < tokenizer->nb_tokens ? tokenizer->tokens[n_token]->text : L"",
 				state->error);
 			if(state->value != NULL)
 				rule_free(state->value);
@@ -125,7 +125,7 @@ Parser *parser_module(Tokenizer *tokenizer, int start) {
 	// Module atom
 	start++;
 	token = tokenizer->tokens[start];
-	if(token->category != TOKEN_ATOM || wcscmp(token->text, "module") != 0)
+	if(token->category != TOKEN_ATOM || wcscmp(token->text, L"module") != 0)
 		return NULL;
 	state = malloc(sizeof(Parser));
 	state->success = 0;
@@ -135,7 +135,7 @@ Parser *parser_module(Tokenizer *tokenizer, int start) {
 	start++;
 	token = tokenizer->tokens[start];
 	if(token->category != TOKEN_ATOM) {
-		wcscpy(state->error, "name (an atom) expected in module declaration");
+		wcscpy(state->error, L"name (an atom) expected in module declaration");
 		state->next = start;
 		return state;
 	}
@@ -146,7 +146,7 @@ Parser *parser_module(Tokenizer *tokenizer, int start) {
 	token = tokenizer->tokens[start];
 	if(token->category != TOKEN_RPAR) {
 		module_free(module);
-		wcscpy(state->error, "right parenthesis ')' expected at the end of module declaration");
+		wcscpy(state->error, L"right parenthesis ')' expected at the end of module declaration");
 		state->next = start;
 		return state;
 	}
@@ -165,6 +165,7 @@ Parser *parser_module(Tokenizer *tokenizer, int start) {
   **/
 Parser *parser_predicate(Tokenizer *tokenizer, int start) {
 	int arity, dynamic = 0, determinist = 0, local = 0;
+	wchar_t *end;
 	Rule *rule;
 	Token *token;
 	Parser *state = malloc(sizeof(Parser)), *state_expr;
@@ -174,15 +175,15 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
 	// Tags
 	token = tokenizer->tokens[start];
 	while(start < tokenizer->nb_tokens && token->category == TOKEN_TAG) {
-		if(wcscmp(token->text, "det") == 0) {
+		if(wcscmp(token->text, L"det") == 0) {
 			determinist = 1;
-		} else if(wcscmp(token->text, "nondet") == 0) {
+		} else if(wcscmp(token->text, L"nondet") == 0) {
 			determinist = 0;
-		} else if(wcscmp(token->text, "dynamic") == 0) {
+		} else if(wcscmp(token->text, L"dynamic") == 0) {
 			dynamic = 1;
-		} else if(wcscmp(token->text, "static") == 0) {
+		} else if(wcscmp(token->text, L"static") == 0) {
 			dynamic = 0;
-		} else if(wcscmp(token->text, "local") == 0) {
+		} else if(wcscmp(token->text, L"local") == 0) {
 			local = 1;
 		}
 		start++;
@@ -193,7 +194,7 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
 	state->value = rule;
 	// Left parenthesis
 	if(token->category != TOKEN_LPAR) {
-		wcscpy(state->error, "predicate declaration expected");
+		wcscpy(state->error, L"predicate declaration expected");
 		state->success = 0;
 		return state;
 	}
@@ -201,8 +202,8 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
 	start++;
 	state->next = start;
 	token = tokenizer->tokens[start];
-	if(token->category != TOKEN_ATOM || wcscmp(token->text, "predicate") != 0) {
-		wcscpy(state->error, "predicate declaration expected");
+	if(token->category != TOKEN_ATOM || wcscmp(token->text, L"predicate") != 0) {
+		wcscpy(state->error, L"predicate declaration expected");
 		state->success = 0;
 		return state;
 	}
@@ -211,7 +212,7 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
 	state->next = start;
 	token = tokenizer->tokens[start];
 	if(token->category != TOKEN_ATOM) {
-		wcscpy(state->error, "name (an atom) expected in predicate declaration");
+		wcscpy(state->error, L"name (an atom) expected in predicate declaration");
 		state->success = 0;
 		return state;
 	}
@@ -221,13 +222,13 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
 	state->next = start;
 	token = tokenizer->tokens[start];
 	if(token->category != TOKEN_NUMERAL) {
-		wcscpy(state->error, "arity (a non-negative numeral) expected in predicate declaration");
+		wcscpy(state->error, L"arity (a non-negative numeral) expected in predicate declaration");
 		state->success = 0;
 		return state;
 	}
-	arity = atoi(token->text);
+	arity = wcstol(token->text, &end, 10);
 	if(arity < 0) {
-		wcscpy(state->error, "arity (a non-negative numeral) expected in predicate declaration");
+		wcscpy(state->error, L"arity (a non-negative numeral) expected in predicate declaration");
 		state->success = 0;
 		return state;
 	}
@@ -262,7 +263,7 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
 	}
 	// Right parenthesis
 	if(token->category != TOKEN_RPAR) {
-		wcscpy(state->error, "right parenthesis ')' expected at the end of predicate declaration");
+		wcscpy(state->error, L"right parenthesis ')' expected at the end of predicate declaration");
 		state->success = 0;
 		return state;
 	}
@@ -276,7 +277,7 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
   * This function parses a clause of a predicate declaration.
   * 
   **/
-Parser *parser_clause(Tokenizer *tokenizer, int start, char *rule_name, int arity) {
+Parser *parser_clause(Tokenizer *tokenizer, int start, wchar_t *rule_name, int arity) {
 	int expected = arity;
 	Token *token;
 	Parser *state = malloc(sizeof(Parser)), *state_expr;
@@ -288,7 +289,7 @@ Parser *parser_clause(Tokenizer *tokenizer, int start, char *rule_name, int arit
 	// Left parenthesis
 	token = tokenizer->tokens[start];
 	if(token->category != TOKEN_LPAR) {
-		wcscpy(state->error, "clause definition or right parenthesis ')' expected");
+		wcscpy(state->error, L"clause definition or right parenthesis ')' expected");
 		state->success = 0;
 		return state;
 	}
@@ -318,7 +319,7 @@ Parser *parser_clause(Tokenizer *tokenizer, int start, char *rule_name, int arit
 	if(arity > 0) {
 		clause_free(clause);
 		term_free(list);
-		sprintf(state->error, "not enough arguments in clause definition (%d given, %d expected)", expected-arity, expected);
+		swprintf(state->error, 100, L"not enough arguments in clause definition (%d given, %d expected)", expected-arity, expected);
 		state->success = 0;
 		state->value = NULL;
 		return state;
@@ -348,7 +349,7 @@ Parser *parser_clause(Tokenizer *tokenizer, int start, char *rule_name, int arit
 	if(token->category != TOKEN_RPAR) {
 		clause_free(clause);
 		term_free(list);
-		wcscpy(state->error, "right parenthesis ')' expected at the end of predicate declaration");
+		wcscpy(state->error, L"right parenthesis ')' expected at the end of predicate declaration");
 		state->success = 0;
 		state->value = NULL;
 		return state;
@@ -365,6 +366,7 @@ Parser *parser_clause(Tokenizer *tokenizer, int start, char *rule_name, int arit
   **/
 Parser *parser_expression(Tokenizer *tokenizer, int start) {
 	int length = 0;
+	wchar_t *end;
 	Parser *state = malloc(sizeof(Parser));
 	Term *term, *list;
 	state->success = 1;
@@ -394,13 +396,13 @@ Parser *parser_expression(Tokenizer *tokenizer, int start) {
 			term = term_alloc();
 			state->value = term;
 			term->type = TYPE_NUMERAL;
-			term->term.numeral = atoi(token->text);
+			term->term.numeral = wcstol(token->text, &end, 10);
 			break;
 		case TOKEN_DECIMAL:
 			term = term_alloc();
 			state->value = term;
 			term->type = TYPE_DECIMAL;
-			term->term.decimal = atof(token->text);
+			term->term.decimal = wcstof(token->text, &end);
 			break;
 		case TOKEN_STRING:
 			term = term_alloc();
@@ -434,7 +436,7 @@ Parser *parser_expression(Tokenizer *tokenizer, int start) {
 			if(start >= tokenizer->nb_tokens || tokenizer->tokens[start]->category != TOKEN_RPAR){
 				state->success = 0;
 				state->next = start;
-				wcscpy(state->error, "right parenthesis ')' or expression expected");
+				wcscpy(state->error, L"right parenthesis ')' or expression expected");
 			}
 			state->next++;
 			state->value = term;
@@ -442,7 +444,7 @@ Parser *parser_expression(Tokenizer *tokenizer, int start) {
 		case TOKEN_ERROR:
 		default:
 			state->success = 0;
-			wcscpy(state->error, "unexpected token");
+			wcscpy(state->error, L"unexpected token");
 			state->next--;
 			break;
 	}

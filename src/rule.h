@@ -3,13 +3,13 @@
  * FILENAME: rule.h
  * DESCRIPTION: Data structures and functions for storing and manipuling rules
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 31.03.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <wchar.h>
 #include "clause.h"
 #include "term.h"
 #define N_CLAUSES 1
@@ -23,7 +23,7 @@
 typedef struct Rule {
 	Clause **clauses;
 	Term *type;
-	char *name;
+	wchar_t *name;
 	int arity;
 	int nb_clauses;
 	int max_clauses;
@@ -75,7 +75,7 @@ int rule_is_full(Rule *rule);
   * the request fails, or 1 if it succeeds.
   * 
   **/
-int rule_set_name(Rule *rule, char *name);
+int rule_set_name(Rule *rule, wchar_t *name);
 
 /**
   * 

@@ -3,7 +3,7 @@
  * FILENAME: program.h
  * DESCRIPTION: Data structures and functions for storing and manipuling programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 31.03.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
@@ -79,7 +79,7 @@ int program_add_module(Program *program, Module *module);
   * in the program, returns NULL.
   * 
   **/
-Module *program_get_module(Program *program, char *module_name);
+Module *program_get_module(Program *program, wchar_t *module_name);
 
 /**
   * 
@@ -88,7 +88,7 @@ Module *program_get_module(Program *program, char *module_name);
   * in the program, returns NULL.
   * 
   **/
-Rule *program_get_predicate(Program *program, char *predicate_name, char *from);
+Rule *program_get_predicate(Program *program, wchar_t *predicate_name, wchar_t *from);
 
 /**
   * 

@@ -3,7 +3,7 @@
  * FILENAME: parse.h
  * DESCRIPTION: Parse programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 25.01.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
@@ -80,7 +80,7 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start);
   * This function parses a clause of a predicate declaration.
   * 
   **/
-Parser *parser_clause(Tokenizer *tokenizer, int start, char *rule_name, int arity);
+Parser *parser_clause(Tokenizer *tokenizer, int start, wchar_t *rule_name, int arity);
 
 /**
   * 

@@ -3,7 +3,7 @@
  * FILENAME: exception.c
  * DESCRIPTION: Functions for throwing Herbrand errors
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 05.04.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
@@ -17,7 +17,7 @@
   * pointer to a newly initialized Term struct.
   * 
   **/
-Term *exception_instantiation_error(char *level);
+Term *exception_instantiation_error(wchar_t *level);
 
 /**
   * 
@@ -25,7 +25,7 @@ Term *exception_instantiation_error(char *level);
   * to a newly initialized Term struct.
   * 
   **/
-Term *exception_type_error(char *type, Term *found, char *level);
+Term *exception_type_error(wchar_t *type, Term *found, wchar_t *level);
 
 /**
   * 
@@ -33,7 +33,7 @@ Term *exception_type_error(char *type, Term *found, char *level);
   * pointer to a newly initialized Term struct.
   * 
   **/
-Term *exception_existence_error(char *source, Term *found, char *level);
+Term *exception_existence_error(wchar_t *source, Term *found, wchar_t *level);
 
 /**
   * 
@@ -41,4 +41,4 @@ Term *exception_existence_error(char *source, Term *found, char *level);
   * pointer to a newly initialized Term struct.
   * 
   **/
-Term *exception_arity_error(int arity, int given, Term *found, char *level);
+Term *exception_arity_error(int arity, int given, Term *found, wchar_t *level);

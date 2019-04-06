@@ -3,7 +3,7 @@
  * FILENAME: rule.c
  * DESCRIPTION: Data structures and functions for storing and manipuling rules
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 31.03.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
@@ -78,11 +78,11 @@ int rule_is_full(Rule *rule) {
   * the request fails, or 1 if it succeeds.
   * 
   **/
-int rule_set_name(Rule *rule, char *name) {
+int rule_set_name(Rule *rule, wchar_t *name) {
 	if(rule->name != NULL)
 		free(rule->name);
-	rule->name = malloc(sizeof(char)*(strlen(name)+1));
-	strcpy(rule->name, name);
+	rule->name = malloc(sizeof(wchar_t)*(wcslen(name)+1));
+	wcscpy(rule->name, name);
 	return name != NULL;
 }
 
@@ -114,7 +114,7 @@ void rule_print(Rule *rule) {
 	printf(rule->determinist ? "#det " : "#nondet ");
 	printf(rule->local ? "#local " : "");
 	printf("\n");
-	printf("(predicate %s %d ", rule->name, rule->arity);
+	printf("(predicate %ls %d ", rule->name, rule->arity);
 	term_print(rule->type);
 	printf("\n");
 	for(i = 0; i < rule->nb_clauses; i++) {

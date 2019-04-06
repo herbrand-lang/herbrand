@@ -3,7 +3,7 @@
  * FILENAME: semantics.c
  * DESCRIPTION: Declarative semantics for the language
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 05.04.2019
+ * UPDATED: 06.04.2019
  * 
  *H*/
 
@@ -38,7 +38,7 @@ int semantics_catch(Derivation *D, State *point) {
 	Term *left, *catcher, *handler, *error;
 	Substitution *mgu = NULL;
 	parent_catch = point->parent;
-	error = substitution_get_link(point->substitution, "$error");
+	error = substitution_get_link(point->substitution, L"$error");
 	// Find catcher
 	if(parent_catch == NULL)
 		return 0;
@@ -93,7 +93,7 @@ Substitution *semantics_answer(Program *program, Derivation *D) {
 		derivation_push_visited_state(D, point);
 		term = term_select_most_left(point->goal);
 		// If there is an error, return it
-		if(substitution_get_link(point->substitution, "$error") != NULL) {
+		if(substitution_get_link(point->substitution, L"$error") != NULL) {
 			// Catch exception
 			if(semantics_catch(D, point))
 				continue;
@@ -112,7 +112,7 @@ Substitution *semantics_answer(Program *program, Derivation *D) {
 
 		// If not callable term, error
 		if(!term_is_callable(term)) {
-			error = exception_type_error("callable_term", term, term->parent);
+			error = exception_type_error(L"callable_term", term, term->parent);
 			derivation_push_state(D, state_error(point, error));
 			term_free(error);
 		// If is a built-in predicate
