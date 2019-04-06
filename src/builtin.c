@@ -130,6 +130,8 @@ int builtin_run_predicate(Program *program, Derivation *D, State *point, Term *t
 void builtin_consult(Program *program, Derivation *D, State *point, Term *term) {
 	Term *path, *error = NULL;
 	FILE *file;
+	char *c_path;
+	size_t size;
 	path = term_list_get_nth(term, 1);
 	if(term_is_variable(path))
 		error = exception_instantiation_error(term->parent);
@@ -140,7 +142,11 @@ void builtin_consult(Program *program, Derivation *D, State *point, Term *term) 
 		term_free(error);
 		return;
 	}
-	file = fopen(path->term.string, "r");
+	size = wcslen(path->term.string)+1;
+	c_path = malloc(sizeof(char)*size);
+	wcstombs(c_path, path->term.string, size);
+	file = fopen(c_path, "r");
+	free(c_path);
 	if(file != NULL) {
 		parser_stream(program, file);
 		fclose(file);
@@ -165,7 +171,8 @@ void builtin_import(Program *program, Derivation *D, State *point, Term *term) {
 	Term *path, *error = NULL;
 	FILE *file;
 	wchar_t *module;
-	int size;
+	char *c_module;
+	size_t size;
 	path = term_list_get_nth(term, 1);
 	if(term_is_variable(path))
 		error = exception_instantiation_error(term->parent);
@@ -178,9 +185,12 @@ void builtin_import(Program *program, Derivation *D, State *point, Term *term) {
 	}
 	size = wcslen(HERBRAND_PATH)+wcslen(path->term.string)+12;
 	module = malloc(sizeof(wchar_t)*size);
+	c_module = malloc(sizeof(char)*size);
 	swprintf(module, size, HERBRAND_PATH L"modules/%ls.hb", path->term.string);
-	file = fopen(module, "r");
+	wcstombs(c_module, module, size);
+	file = fopen(c_module, "r");
 	free(module);
+	free(c_module);
 	if(file != NULL) {
 		parser_stream(program, file);
 		fclose(file);

@@ -52,7 +52,7 @@ void interactive_query() {
 	FILE *file;
 	Derivation *D;
 	Substitution *answer;
-	wchar_t c, d;
+	char c, d;
 	Term *term = NULL;
 	program = program_alloc();
 	while(1) {
@@ -73,10 +73,10 @@ void interactive_query() {
 				break;
 			}
 			printf(" ");
-			c = fgetwc(stdin);
+			c = getchar();
 			if(c != '\n')
-				while((d = fgetwc(stdin)) != L'\n' && d != WEOF);
-		} while(answer != NULL && c == L';');
+				while((d = getchar()) != '\n' && d != EOF);
+		} while(answer != NULL && c == ';');
 		printf("\n");
 		term_free(term);
 		derivation_free(D);
