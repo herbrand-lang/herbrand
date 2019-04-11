@@ -310,11 +310,11 @@ void builtin_cut(Program *program, Derivation *D, State *point, Term *term) {
 	int i;
 	Term *left, *cut;
 	State *parent_cut, *last_cut, *state, *next_state;
-	parent_cut = point->parent;
+	parent_cut = point->next;
 	cut = term_list_get_nth(term, 0);
 	while(parent_cut != NULL && term_search_term(parent_cut->goal, cut)) {
 		last_cut = parent_cut;
-		parent_cut = parent_cut->parent;
+		parent_cut = parent_cut->next;
 		if(parent_cut != NULL && parent_cut->goal != NULL && !term_list_is_null(parent_cut->goal)) {
 			left = term_select_most_left(parent_cut->goal);
 			if(left != NULL
@@ -331,7 +331,7 @@ void builtin_cut(Program *program, Derivation *D, State *point, Term *term) {
 			break;
 		next_state = state;
 		while(next_state != NULL && next_state != parent_cut)
-			next_state = next_state->parent;
+			next_state = next_state->next;
 		if(next_state == parent_cut) {
 			D->nb_states--;
 			next_state = state->next;
@@ -463,7 +463,6 @@ void builtin_repeat(Program *program, Derivation *D, State *point, Term *term) {
 	term_increase_references(point->goal);
 	state->substitution = point->substitution;
 	substitution_increase_references(point->substitution);
-	state->parent = point;
 	derivation_push_state(D, state);
 	derivation_push_state(D, state_success(point, NULL));
 }

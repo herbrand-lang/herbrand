@@ -30,6 +30,7 @@ typedef struct Rule {
 	int dynamic;
 	int determinist;
 	int local;
+  int tail_recursive;
 } Rule;
 
 #endif

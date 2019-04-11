@@ -43,6 +43,13 @@
 	(X (_|T)
 		(member X T)))
 
+#semidet
+(predicate nonmember 2 ((list _) (list _))
+	(_ ())
+	(X (Y|T)
+		(/== X Y)
+		(nonmember X T)))
+
 (predicate nth 3 (int (list _) _)
 	(0 (H|_) H)
 	(N (_|T) X

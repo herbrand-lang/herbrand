@@ -27,6 +27,7 @@ Rule *rule_alloc(int dynamic, int determinist, int local) {
 	rule->dynamic = dynamic;
 	rule->determinist = determinist;
 	rule->local = local;
+	rule->tail_recursive = 0;
 	return rule;
 }
 

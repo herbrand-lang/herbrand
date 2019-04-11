@@ -1,12 +1,12 @@
 #!/bin/bash
 
 if [ "$#" -ne 1 ]; then
-	HP="/usr/local/herbrand"
+	HP="/usr/local/herbrand/"
 else
 	HP=$1
 fi
 cd ../../src
-gcc -I/usr/include -L *.h *.c -o herbrand -DHERBRAND_PATH=L\"$HP\"
+gcc -I/usr/include -L *.h *.c -o herbrand -DHERBRAND_PATH=L\"$HP\" -lm -Ofast
 cd ../scripts/install
 if [ -d $HP ]; then
 	rm -r $HP

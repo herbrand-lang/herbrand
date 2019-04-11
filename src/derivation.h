@@ -17,9 +17,10 @@
 
 typedef struct State {
   Term *goal;
+  Term *most_left;
   Substitution *substitution;
-	struct State *parent;
   struct State *next;
+  int rule_inference;
 } State;
 
 typedef struct Derivation {

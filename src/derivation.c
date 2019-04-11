@@ -98,9 +98,10 @@ State *derivation_pop_state(Derivation *D) {
 State *state_alloc() {
 	State *state = malloc(sizeof(State));
 	state->goal = NULL;
+	state->most_left = NULL;
 	state->next = NULL;
-	state->parent = NULL;
 	state->substitution = NULL;
+	state->rule_inference = -1;
 	return state;
 }
 
@@ -149,7 +150,6 @@ State *state_inference(State *point, Term *body, Substitution *subs) {
   	if(left != NULL)
 		term_free(left);
 	state->substitution = substitution_compose(point->substitution, subs, 0);
-	state->parent = point;
 	return state;
 }
 
@@ -168,7 +168,6 @@ State *state_success(State *point, Term *term) {
   		term_free(goal);
 	substitution_increase_references(point->substitution);
 	state->substitution = point->substitution;
-	state->parent = point;
 	return state;
 }
 
@@ -184,7 +183,6 @@ State *state_error(State *point, Term *term) {
 	state->goal = NULL;
 	state->substitution = substitution_alloc(1);
 	substitution_add_link(state->substitution, L"$error", term);
-	state->parent = point;
 	return state;
 }
 

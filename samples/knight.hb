@@ -24,6 +24,7 @@
 	)
 )
 
+#local
 (predicate tour 5 (int int int (list (list int)) (list (list int)))
 	(_ _ 24 Tour Tour)
 	(Row Col N Visited Tour
@@ -34,7 +35,7 @@
 		(> X 0) (< X 6)
 		(is Y (+ J Col))
 		(> Y 0) (< Y 6)
-		(not (member (X Y) Visited))
+		(nonmember (X Y) Visited)
 		(tour X Y M ((Row Col)|Visited) Tour)
 	)
 )

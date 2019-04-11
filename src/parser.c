@@ -164,7 +164,7 @@ Parser *parser_module(Tokenizer *tokenizer, int start) {
   * 
   **/
 Parser *parser_predicate(Tokenizer *tokenizer, int start) {
-	int arity, dynamic = 0, determinist = 0, local = 0;
+	int arity, dynamic = 0, determinist = 0, local = 0, tailrec = 0;
 	wchar_t *end;
 	Rule *rule;
 	Token *token;
@@ -187,12 +187,15 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
 			dynamic = 0;
 		} else if(wcscmp(token->text, L"local") == 0) {
 			local = 1;
+		} else if(wcscmp(token->text, L"tailrec") == 0) {
+			tailrec = 1;
 		}
 		start++;
 		state->next = start;
 		token = tokenizer->tokens[start];
 	}
 	rule = rule_alloc(dynamic, determinist, local);
+	rule->tail_recursive = tailrec;
 	state->value = rule;
 	// Left parenthesis
 	if(token->category != TOKEN_LPAR) {
