@@ -45,11 +45,15 @@ int evaluable_check_term(Term *term) {
   * 
   **/
 Term *evaluable_eval_term(Term *term) {
-	Term *error, *head, *list, *eval;
+	Term *error, *head, *list, *eval, *pointer;
 	int arity, length, key;
-	if(term->type == TYPE_NUMERAL || term->type == TYPE_DECIMAL) {
+	if(term_is_number(term)) {
 		term_increase_references(term);
 		return term;
+	} else if(term->type == TYPE_VARIABLE) {
+		return exception_instantiation_error(term->parent);
+	} else if(!term_is_evaluable(term)) {
+		return exception_type_error(L"evaluable", term, term->parent);
 	}
 	head = term_list_get_head(term);
 	key = hashmap_function(EVALUABLE_HASH_SIZE, head->term.string);
@@ -62,11 +66,23 @@ Term *evaluable_eval_term(Term *term) {
 			list = term_list_empty();
 			term_list_add_element(list, head);
 			term_increase_references(head);
+			pointer = term;
 			term = term->term.list->tail;
 			while(term->type == TYPE_LIST && !term_list_is_null(term)) {
 				eval = evaluable_eval_term(term->term.list->head);
+				if(!term_is_number(eval)) {
+					term_free(list);
+					return eval;
+				}
 				term_list_add_element(list, eval);
 				term = term->term.list->tail;
+			}
+			if(term->type == TYPE_VARIABLE) {
+				term_free(list);
+				return exception_instantiation_error(pointer->parent);
+			} else if(!term_list_is_null(term)) {
+				term_free(list);
+				return exception_type_error(L"evaluable", pointer, pointer->parent);
 			}
 			eval = evaluable_handlers[key](list);
 			term_free(list);
@@ -74,8 +90,45 @@ Term *evaluable_eval_term(Term *term) {
 		} else {
 			return exception_arity_error(arity, length, term, term->parent);
 		}
+	} else {
+		return exception_type_error(L"evaluable", term, term->parent);
 	}
 	return NULL;
+}
+
+/**
+  * 
+  * This function evaluates an compares two evaluable terms.
+  * 
+  **/
+int evaluable_compare_terms(Term *term1, Term* term2, Term **error) {
+	int comparison;
+	Term *eval1, *eval2;
+	eval1 = evaluable_eval_term(term1);
+	if(!term_is_number(eval1)) {
+		*error = eval1;
+		return -2;
+	}
+	eval2 = evaluable_eval_term(term2);
+	if(!term_is_number(eval2)) {
+		*error = eval2;
+		term_free(eval1);
+		return -2;
+	}
+	if(eval1->type == TYPE_NUMERAL) {
+		if(eval2->type == TYPE_NUMERAL)
+			comparison = eval1->term.numeral < eval2->term.numeral ? -1 : eval1->term.numeral > eval2->term.numeral;
+		else
+			comparison = eval1->term.numeral < eval2->term.decimal ? -1 : eval1->term.numeral > eval2->term.decimal;
+	} else {
+		if(eval2->type == TYPE_NUMERAL)
+			comparison = eval1->term.decimal < eval2->term.numeral ? -1 : eval1->term.decimal > eval2->term.numeral;
+		else
+			comparison = eval1->term.decimal < eval2->term.decimal ? -1 : eval1->term.decimal > eval2->term.decimal;
+	}
+	term_free(eval1);
+	term_free(eval2);
+	return comparison;
 }
 
 /**

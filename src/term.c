@@ -155,6 +155,17 @@ int term_is_callable(Term *term) {
 
 /**
   * 
+  * This function checks if term is evaluable.
+  * 
+  **/
+int term_is_evaluable(Term *term) {
+	if(term->type != TYPE_LIST || term_list_is_null(term))
+		return 0;
+	return term->term.list->head->type == TYPE_ATOM;
+}
+
+/**
+  * 
   * This function checks if term is variable.
   * 
   **/
@@ -186,7 +197,7 @@ int term_is_string(Term *term) {
   * 
   **/
 int term_is_number(Term *term) {
-	return term->type == TYPE_NUMERAL || TYPE_DECIMAL;
+	return term->type == TYPE_NUMERAL || term->type == TYPE_DECIMAL;
 }
 
 /**

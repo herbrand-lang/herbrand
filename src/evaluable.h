@@ -3,7 +3,7 @@
  * FILENAME: evaluable.h
  * DESCRIPTION: Functions for evaluating arithmetic terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 07.04.2019
+ * UPDATED: 11.04.2019
  * 
  *H*/
 
@@ -43,6 +43,13 @@ int evaluable_check_term(Term *term);
   * 
   **/
 Term *evaluable_eval_term(Term *term);
+
+/**
+  * 
+  * This function evaluates an compares two evaluable terms.
+  * 
+  **/
+int evaluable_compare_terms(Term *term1, Term* term2, Term **error);
 
 Term *evaluable_pi(Term *term);
 Term *evaluable_e(Term *term);

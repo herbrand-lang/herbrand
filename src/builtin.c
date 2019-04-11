@@ -726,17 +726,136 @@ void builtin_term_ge(Program *program, Derivation *D, State *point, Term *term) 
 		derivation_push_state(D, state_success(point, NULL));
 }
 
+/**
+  * 
+  * (:==)/2
+  * (:== @evaluable @evaluable)
+  * 
+  * Arithmetic equal.
+  * True if both numbers are equal.
+  * 
+  **/
 void builtin_arithmetic_eq(Program *program, Derivation *D, State *point, Term *term) {
+	int comparison;
+	Term *error, *left, *right;
+	left = term_list_get_nth(term, 1);
+	right = term_list_get_nth(term, 2);
+	comparison = evaluable_compare_terms(left, right, &error);
+	if(comparison == -2) {
+		derivation_push_state(D, state_error(point, error));
+		term_free(error);
+	} else if(comparison == 0)
+		derivation_push_state(D, state_success(point, NULL));
 }
+
+/**
+  * 
+  * (:/==)/2
+  * (:/== @evaluable @evaluable)
+  * 
+  * Arithmetic not equal.
+  * True if the compared numbers are not equal.
+  * 
+  **/
 void builtin_arithmetic_ne(Program *program, Derivation *D, State *point, Term *term) {
+	int comparison;
+	Term *error, *left, *right;
+	left = term_list_get_nth(term, 1);
+	right = term_list_get_nth(term, 2);
+	comparison = evaluable_compare_terms(left, right, &error);
+	if(comparison == -2) {
+		derivation_push_state(D, state_error(point, error));
+		term_free(error);
+	} else if(comparison != 0)
+		derivation_push_state(D, state_success(point, NULL));
 }
+
+/**
+  * 
+  * (:<)/2
+  * (:< @evaluable @evaluable)
+  * 
+  * Arithmetic less than.
+  * True if the first number is less than the second one.
+  * 
+  **/
 void builtin_arithmetic_lt(Program *program, Derivation *D, State *point, Term *term) {
+	int comparison;
+	Term *error, *left, *right;
+	left = term_list_get_nth(term, 1);
+	right = term_list_get_nth(term, 2);
+	comparison = evaluable_compare_terms(left, right, &error);
+	if(comparison == -2) {
+		derivation_push_state(D, state_error(point, error));
+		term_free(error);
+	} else if(comparison == -1)
+		derivation_push_state(D, state_success(point, NULL));
 }
+
+/**
+  * 
+  * (:<=)/2
+  * (:<= @evaluable @evaluable)
+  * 
+  * Arithmetic less than or equal to.
+  * True if the first number is less than or equal to the second one.
+  * 
+  **/
 void builtin_arithmetic_le(Program *program, Derivation *D, State *point, Term *term) {
+	int comparison;
+	Term *error, *left, *right;
+	left = term_list_get_nth(term, 1);
+	right = term_list_get_nth(term, 2);
+	comparison = evaluable_compare_terms(left, right, &error);
+	if(comparison == -2) {
+		derivation_push_state(D, state_error(point, error));
+		term_free(error);
+	} else if(comparison <= 0)
+		derivation_push_state(D, state_success(point, NULL));
 }
+
+/**
+  * 
+  * (:>)/2
+  * (:> @evaluable @evaluable)
+  * 
+  * Arithmetic greater than.
+  * True if the first number is greater than the second one.
+  * 
+  **/
 void builtin_arithmetic_gt(Program *program, Derivation *D, State *point, Term *term) {
+	int comparison;
+	Term *error, *left, *right;
+	left = term_list_get_nth(term, 1);
+	right = term_list_get_nth(term, 2);
+	comparison = evaluable_compare_terms(left, right, &error);
+	if(comparison == -2) {
+		derivation_push_state(D, state_error(point, error));
+		term_free(error);
+	} else if(comparison == 1)
+		derivation_push_state(D, state_success(point, NULL));
 }
+
+/**
+  * 
+  * (:>=)/2
+  * (:>= @evaluable @evaluable)
+  * 
+  * Arithmetic greater than or equal to.
+  * True if the first number is greater than or equal to the second one.
+  * 
+  **/
 void builtin_arithmetic_ge(Program *program, Derivation *D, State *point, Term *term) {
+	int comparison;
+	Term *error, *left, *right;
+	left = term_list_get_nth(term, 1);
+	right = term_list_get_nth(term, 2);
+	comparison = evaluable_compare_terms(left, right, &error);
+	if(comparison == -2) {
+		derivation_push_state(D, state_error(point, error));
+		term_free(error);
+	} else if(comparison >= 0)
+		derivation_push_state(D, state_success(point, NULL));
 }
 
 /**
@@ -934,6 +1053,7 @@ void builtin_is(Program *program, Derivation *D, State *point, Term *term) {
 		term_free(list);
 	} else {
 		derivation_push_state(D, state_error(point, eval));
+		term_free(eval);
 	}
 }
 

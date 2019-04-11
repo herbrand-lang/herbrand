@@ -120,6 +120,13 @@ int term_is_callable(Term *term);
 
 /**
   * 
+  * This function checks if term is evaluable.
+  * 
+  **/
+int term_is_evaluable(Term *term);
+
+/**
+  * 
   * This function checks if term is variable.
   * 
   **/
