@@ -28,7 +28,7 @@ wchar_t *builtin_keys[BUILTIN_HASH_SIZE] = {
 	L"float", NULL, L"is", L"ite", NULL, NULL, NULL, L"=", NULL, NULL, L"char", NULL, 
 	NULL, NULL, NULL, NULL, NULL, L"atom_length", NULL, NULL, L"string", NULL, L":/==", 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, L":<=", NULL, NULL, NULL, NULL, NULL, L"repeat", NULL, NULL, NULL, NULL, 
+	NULL, L":<=", NULL, NULL, NULL, NULL, NULL, L"repeat", NULL, NULL, NULL, L"char_code", 
 	NULL, NULL, NULL, NULL, NULL, L"$catcher", NULL, NULL, NULL, NULL, NULL, L"once", 
 	NULL, NULL, L"!", NULL, NULL, NULL, NULL, NULL, NULL, NULL, L"retract", NULL, 
 	NULL, NULL, NULL, NULL, NULL, L"consult", NULL, NULL, NULL, NULL, NULL, NULL, 
@@ -56,12 +56,13 @@ void (*builtin_handlers[BUILTIN_HASH_SIZE])() = {
 	NULL, NULL, NULL, NULL, NULL, NULL, builtin_atom_length, NULL, NULL, builtin_string, 
 	NULL, builtin_arithmetic_ne, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, builtin_arithmetic_le, NULL, NULL, NULL, 
-	NULL, NULL, builtin_repeat, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	builtin__catcher, NULL, NULL, NULL, NULL, NULL, builtin_once, NULL, NULL, builtin_cut, 
-	NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin_retract, NULL, NULL, NULL, 
-	NULL, NULL, NULL, builtin_consult, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, NULL, builtin_repeat, NULL, NULL, NULL, builtin_char_code, NULL, NULL, 
+	NULL, NULL, NULL, builtin__catcher, NULL, NULL, NULL, NULL, NULL, builtin_once, 
+	NULL, NULL, builtin_cut, NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin_retract, 
+	NULL, NULL, NULL, NULL, NULL, NULL, builtin_consult, NULL, NULL, NULL, NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, builtin_arithmetic_eq, NULL, NULL, NULL, NULL};
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin_arithmetic_eq, NULL, NULL, 
+	NULL, NULL};
 
 int builtin_arities[BUILTIN_HASH_SIZE] = {
 	0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 
@@ -71,10 +72,9 @@ int builtin_arities[BUILTIN_HASH_SIZE] = {
 	1, 1, 0, 0, 1, -1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 
 	0, 2, 3, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 2, 3, 0, 0, 0, 
 	2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0};
-
 
 
 
@@ -1120,6 +1120,50 @@ void builtin_atom_chars(Program *program, Derivation *D, State *point, Term *ter
 		derivation_push_state(D, state_success(point, list));
 		term_free(list);
 		free(atom_id);
+	}
+}
+
+/**
+  * 
+  * char_code/2
+  * (char_code +character ?character_code)
+  * (char_code -character +character_code)
+  * 
+  * Character code of a character.
+  * (char_code Char Code) succeeds if and only if Code is the character code of Char.
+  * 
+  **/
+void builtin_char_code(Program *program, Derivation *D, State *point, Term *term) {
+	Term *character, *code, *new, *eq, *list, *error = NULL;
+	character = term_list_get_nth(term, 1);
+	code = term_list_get_nth(term, 2);
+	if(character->type == TYPE_VARIABLE && code->type == TYPE_VARIABLE)
+		error = exception_instantiation_error(term->parent);
+	if(error != NULL) {
+		derivation_push_state(D, state_error(point, error));
+		term_free(error);
+		return;
+	}
+	if(character->type != TYPE_VARIABLE) {
+		new = term_init_numeral((int)character->term.character);
+		eq = term_init_atom(L"=");
+		list = term_list_empty();
+		term_list_add_element(list, eq);
+		term_list_add_element(list, code);
+		term_list_add_element(list, new);
+		term_increase_references(code);
+		derivation_push_state(D, state_success(point, list));
+		term_free(list);
+	} else {
+		new = term_init_char((wchar_t)code->term.numeral);
+		eq = term_init_atom(L"=");
+		list = term_list_empty();
+		term_list_add_element(list, eq);
+		term_list_add_element(list, character);
+		term_list_add_element(list, new);
+		term_increase_references(character);
+		derivation_push_state(D, state_success(point, list));
+		term_free(list);
 	}
 }
 

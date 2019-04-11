@@ -20,7 +20,7 @@
 int main(int argc, char *argv[]) {
 	Program *program;
 	FILE *file;
-	char *locale = setlocale(LC_ALL, ".OCP");
+	char *locale = setlocale(LC_ALL, "");
 	if(argc == 2) {
 		file = fopen(argv[1], "r");
 		if(file != NULL) {

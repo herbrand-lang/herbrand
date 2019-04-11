@@ -96,6 +96,7 @@ void builtin_nonvar(Program *program, Derivation *D, State *point, Term *term);
 void builtin_atom_length(Program *program, Derivation *D, State *point, Term *term);
 void builtin_atom_concat(Program *program, Derivation *D, State *point, Term *term);
 void builtin_atom_chars(Program *program, Derivation *D, State *point, Term *term);
+void builtin_char_code(Program *program, Derivation *D, State *point, Term *term);
 void builtin_findall(Program *program, Derivation *D, State *point, Term *term);
 void builtin_is(Program *program, Derivation *D, State *point, Term *term);
 void builtin_succ(Program *program, Derivation *D, State *point, Term *term);
