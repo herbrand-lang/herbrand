@@ -3,7 +3,7 @@
  * FILENAME: builtin.c
  * DESCRIPTION: Functions for evaluating built-in predicates
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 11.04.2019
  * 
  *H*/
 
@@ -1018,12 +1018,111 @@ void builtin_nonvar(Program *program, Derivation *D, State *point, Term *term) {
 		derivation_push_state(D, state_success(point, NULL));
 }
 
+/**
+  * 
+  * atom_length/2
+  * (atom_length +atom ?integer)
+  * 
+  * Length of an atom.
+  * (atom_length Atom Length) is true if and only if the number of characters
+  * in the name of Atom is equal to Length. If Length is not instantiated,
+  * atom_length will calculate the length of Atom's name.
+  * 
+  **/
 void builtin_atom_length(Program *program, Derivation *D, State *point, Term *term) {
+	Term *atom, *length, *size, *eq, *list, *error = NULL;
+	atom = term_list_get_nth(term, 1);
+	length = term_list_get_nth(term, 2);
+	if(atom->type == TYPE_VARIABLE)
+		error = exception_instantiation_error(term->parent);
+	if(error != NULL) {
+		derivation_push_state(D, state_error(point, error));
+		term_free(error);
+		return;
+	}
+	size = term_init_numeral(wcslen(atom->term.string));
+	eq = term_init_atom(L"=");
+	list = term_list_empty();
+	term_list_add_element(list, eq);
+	term_list_add_element(list, length);
+	term_list_add_element(list, size);
+	term_increase_references(length);
+	derivation_push_state(D, state_success(point, list));
+	term_free(list);
 }
+
 void builtin_atom_concat(Program *program, Derivation *D, State *point, Term *term) {
 }
+
+/**
+  * 
+  * atom_chars/2
+  * (atom_chars +atom ?string)
+  * (atom_chars -atom +string)
+  * 
+  * Express an atom as a list of one character atoms.
+  * (atom_chars Atom List) succeeds if and only if List is made up of
+  * characters that in order form Atom.
+  * 
+  **/
 void builtin_atom_chars(Program *program, Derivation *D, State *point, Term *term) {
+	int i, size;
+	wchar_t *atom_id;
+	Term *atom, *chars, *string, *eq, *list, *error = NULL;
+	atom = term_list_get_nth(term, 1);
+	chars = term_list_get_nth(term, 2);
+	if(atom->type == TYPE_VARIABLE && chars->type == TYPE_VARIABLE)
+		error = exception_instantiation_error(term->parent);
+	else if(atom->type == TYPE_VARIABLE && !term_is_string(chars) && !term_list_is_string(chars))
+		error = exception_type_error(L"string", chars, chars->parent); 
+	if(error != NULL) {
+		derivation_push_state(D, state_error(point, error));
+		term_free(error);
+		return;
+	}
+	if(atom->type != TYPE_VARIABLE) {
+		string = term_init_string(atom->term.string);
+		eq = term_init_atom(L"=");
+		list = term_list_empty();
+		term_list_add_element(list, eq);
+		term_list_add_element(list, chars);
+		term_list_add_element(list, string);
+		term_increase_references(chars);
+		derivation_push_state(D, state_success(point, list));
+		term_free(list);
+	} else {
+		i = 0;
+		size = 100;
+		atom_id = malloc(sizeof(wchar_t)*size);
+		while(chars->type == TYPE_LIST && !term_list_is_null(chars)) {
+			if(i == size) {
+				size += 100;
+				atom_id = realloc(atom_id, sizeof(wchar_t)*size);
+			}
+			atom_id[i] = chars->term.list->head->term.character;
+			chars = chars->term.list->tail;
+			i++;
+		}
+		atom_id[i] = L'\0';
+		if(chars->type == TYPE_STRING) {
+			if(size-i-1 < wcslen(chars->term.string)) {
+				size += wcslen(chars->term.string);
+				atom_id = realloc(atom_id, sizeof(wchar_t)*size);
+			}
+			wcscpy(atom_id+i, chars->term.string);
+		}
+		eq = term_init_atom(L"=");
+		list = term_list_empty();
+		term_list_add_element(list, eq);
+		term_list_add_element(list, atom);
+		term_list_add_element(list, term_init_atom(atom_id));
+		term_increase_references(atom);
+		derivation_push_state(D, state_success(point, list));
+		term_free(list);
+		free(atom_id);
+	}
 }
+
 void builtin_findall(Program *program, Derivation *D, State *point, Term *term) {
 }
 
