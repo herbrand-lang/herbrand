@@ -25,7 +25,7 @@ wchar_t *builtin_keys[BUILTIN_HASH_SIZE] = {
 	NULL, NULL, NULL, NULL, L"not", NULL, NULL, NULL, NULL, NULL, L"atom", NULL, 
 	NULL, NULL, NULL, L"assertz", NULL, NULL, L"/=", L"findall", NULL, NULL, L"or", 
 	NULL, NULL, NULL, NULL, NULL, L"true", NULL, NULL, NULL, NULL, NULL, L">=", NULL, 
-	L"float", NULL, L"is", L"ite", NULL, NULL, NULL, L"=", NULL, NULL, NULL, NULL, 
+	L"float", NULL, L"is", L"ite", NULL, NULL, NULL, L"=", NULL, NULL, L"char", NULL, 
 	NULL, NULL, NULL, NULL, NULL, L"atom_length", NULL, NULL, L"string", NULL, L":/==", 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
 	NULL, L":<=", NULL, NULL, NULL, NULL, NULL, L"repeat", NULL, NULL, NULL, NULL, 
@@ -52,16 +52,16 @@ void (*builtin_handlers[BUILTIN_HASH_SIZE])() = {
 	NULL, builtin_atom, NULL, NULL, NULL, NULL, builtin_assertz, NULL, NULL, builtin_not_unification, 
 	builtin_findall, NULL, NULL, builtin_or, NULL, NULL, NULL, NULL, NULL, builtin_true, 
 	NULL, NULL, NULL, NULL, NULL, builtin_term_ge, NULL, builtin_float, NULL, builtin_is, 
-	builtin_ite, NULL, NULL, NULL, builtin_unification, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, builtin_atom_length, NULL, NULL, builtin_string, NULL, 
-	builtin_arithmetic_ne, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, NULL, NULL, NULL, builtin_arithmetic_le, NULL, NULL, NULL, NULL, 
-	NULL, builtin_repeat, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin__catcher, 
-	NULL, NULL, NULL, NULL, NULL, builtin_once, NULL, NULL, builtin_cut, NULL, NULL, 
-	NULL, NULL, NULL, NULL, NULL, builtin_retract, NULL, NULL, NULL, NULL, NULL, 
-	NULL, builtin_consult, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	builtin_ite, NULL, NULL, NULL, builtin_unification, NULL, NULL, builtin_char, 
+	NULL, NULL, NULL, NULL, NULL, NULL, builtin_atom_length, NULL, NULL, builtin_string, 
+	NULL, builtin_arithmetic_ne, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	NULL, NULL, NULL, NULL, NULL, NULL, builtin_arithmetic_le, NULL, NULL, NULL, 
+	NULL, NULL, builtin_repeat, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+	builtin__catcher, NULL, NULL, NULL, NULL, NULL, builtin_once, NULL, NULL, builtin_cut, 
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, builtin_retract, NULL, NULL, NULL, 
+	NULL, NULL, NULL, builtin_consult, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
 	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
-	NULL, NULL, builtin_arithmetic_eq, NULL, NULL, NULL, NULL};
+	NULL, NULL, NULL, NULL, builtin_arithmetic_eq, NULL, NULL, NULL, NULL};
 
 int builtin_arities[BUILTIN_HASH_SIZE] = {
 	0, 2, 0, 0, 0, 0, 1, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 1, 0, 
@@ -70,10 +70,11 @@ int builtin_arities[BUILTIN_HASH_SIZE] = {
 	0, 0, 2, 0, 0, 2, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 3, 2, 0, 0, 
 	1, 1, 0, 0, 1, -1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 
 	0, 2, 3, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 0, 2, 3, 0, 0, 0, 
-	2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 2, 0, 0, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0};
+
 
 
 
@@ -770,6 +771,21 @@ void builtin_number(Program *program, Derivation *D, State *point, Term *term) {
 
 /**
   * 
+  * char/1
+  * (char @term)
+  * 
+  * Check if char.
+  * (char X) is true if and only if X is a char.
+  * 
+  **/
+void builtin_char(Program *program, Derivation *D, State *point, Term *term) {
+	Term *character = term_list_get_nth(term, 1);
+	if(character->type == TYPE_CHAR) 
+		derivation_push_state(D, state_success(point, NULL));
+}
+
+/**
+  * 
   * integer/1
   * (integer @term)
   * 
@@ -809,8 +825,15 @@ void builtin_float(Program *program, Derivation *D, State *point, Term *term) {
   **/
 void builtin_string(Program *program, Derivation *D, State *point, Term *term) {
 	Term *string = term_list_get_nth(term, 1);
-	if(string->type == TYPE_STRING)
-		derivation_push_state(D, state_success(point, NULL));
+	if(string->type == TYPE_STRING || string->type == TYPE_LIST) {
+		while(string != NULL && string->type == TYPE_LIST && !term_list_is_null(string)) {
+			if(string->term.list->head->type != TYPE_CHAR)
+				return;
+			string = string->term.list->tail;
+		}
+		if(string->type == TYPE_STRING || term_list_is_null(string))
+			derivation_push_state(D, state_success(point, NULL));
+	}
 }
 
 /**

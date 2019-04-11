@@ -3,7 +3,7 @@
  * FILENAME: evaluable.c
  * DESCRIPTION: Functions for evaluating arithmetic terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 07.04.2019
+ * UPDATED: 11.04.2019
  * 
  *H*/
 
@@ -125,7 +125,7 @@ Term *evaluable_tau(Term *term) {
 Term *evaluable_add(Term *term) {
 	Term *head;
 	int is_float = 0;
-	double sum = 0;
+	long double sum = 0;
 	term = term->term.list->tail;
 	while(!term_list_is_null(term)) {
 		head = term->term.list->head;
@@ -150,7 +150,7 @@ Term *evaluable_add(Term *term) {
 Term *evaluable_sub(Term *term) {
 	Term *head;
 	int is_float;
-	double sum;
+	long double sum;
 	term = term->term.list->tail;
 	head = term->term.list->head;
 	is_float = head->type == TYPE_DECIMAL;
@@ -179,7 +179,7 @@ Term *evaluable_sub(Term *term) {
 Term *evaluable_mul(Term *term) {
 	Term *head;
 	int is_float = 0;
-	double prod = 1;
+	long double prod = 1;
 	term = term->term.list->tail;
 	while(!term_list_is_null(term)) {
 		head = term->term.list->head;

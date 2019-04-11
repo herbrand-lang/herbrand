@@ -3,7 +3,7 @@
  * FILENAME: builtin.h
  * DESCRIPTION: Functions for evaluating built-in predicates
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 11.04.2019
  * 
  *H*/
 
@@ -85,6 +85,7 @@ void builtin_arithmetic_gt(Program *program, Derivation *D, State *point, Term *
 void builtin_arithmetic_ge(Program *program, Derivation *D, State *point, Term *term);
 void builtin_atom(Program *program, Derivation *D, State *point, Term *term);
 void builtin_number(Program *program, Derivation *D, State *point, Term *term);
+void builtin_char(Program *program, Derivation *D, State *point, Term *term);
 void builtin_integer(Program *program, Derivation *D, State *point, Term *term);
 void builtin_float(Program *program, Derivation *D, State *point, Term *term);
 void builtin_string(Program *program, Derivation *D, State *point, Term *term);

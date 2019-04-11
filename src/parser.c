@@ -3,7 +3,7 @@
  * FILENAME: parse.c
  * DESCRIPTION: Parse programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 11.04.2019
  * 
  *H*/
 
@@ -401,13 +401,13 @@ Parser *parser_expression(Tokenizer *tokenizer, int start) {
 			term = term_alloc();
 			state->value = term;
 			term->type = TYPE_NUMERAL;
-			term->term.numeral = wcstol(token->text, &end, 10);
+			term->term.numeral = wcstoll(token->text, &end, 10);
 			break;
 		case TOKEN_DECIMAL:
 			term = term_alloc();
 			state->value = term;
 			term->type = TYPE_DECIMAL;
-			term->term.decimal = wcstod(token->text, &end);
+			term->term.decimal = wcstold(token->text, &end);
 			break;
 		case TOKEN_STRING:
 			term = term_alloc();

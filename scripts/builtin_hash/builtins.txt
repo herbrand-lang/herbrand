@@ -33,6 +33,7 @@ retractall retractall 1
 :>= arithmetic_ge 2
 atom atom 1
 number number 1
+char char 1
 integer integer 1
 float float 1
 string string 1

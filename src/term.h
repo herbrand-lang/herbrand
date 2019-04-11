@@ -3,7 +3,7 @@
  * FILENAME: term.h
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 11.04.2019
  * 
  *H*/
 
@@ -21,9 +21,9 @@ typedef enum {TYPE_CHAR, TYPE_VARIABLE, TYPE_ATOM, TYPE_NUMERAL, TYPE_DECIMAL, T
 
 typedef struct Term {
 	union {
-		int numeral;
+		long long int numeral;
     wchar_t character;
-		double decimal;
+		long double decimal;
 		wchar_t *string;
 		struct List *list;
 	} term;
@@ -70,7 +70,7 @@ Term *term_init_atom(wchar_t *atom);
   * to a newly initialized Term struct.
   * 
   **/
-Term *term_init_numeral(int numeral);
+Term *term_init_numeral(long long int numeral);
 
 /**
   * 
@@ -78,7 +78,7 @@ Term *term_init_numeral(int numeral);
   * to a newly initialized Term struct.
   * 
   **/
-Term *term_init_decimal(double decimal);
+Term *term_init_decimal(long double decimal);
 
 /**
   * 

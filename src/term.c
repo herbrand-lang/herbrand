@@ -70,7 +70,7 @@ Term *term_init_atom(wchar_t *atom) {
   * to a newly initialized Term struct.
   * 
   **/
-Term *term_init_numeral(int numeral) {
+Term *term_init_numeral(long long int numeral) {
 	Term *term = term_alloc();
 	term->type = TYPE_NUMERAL;
 	term->term.numeral = numeral;
@@ -83,7 +83,7 @@ Term *term_init_numeral(int numeral) {
   * to a newly initialized Term struct.
   * 
   **/
-Term *term_init_decimal(double decimal) {
+Term *term_init_decimal(long double decimal) {
 	Term *term = term_alloc();
 	term->type = TYPE_DECIMAL;
 	term->term.decimal = decimal;
@@ -582,10 +582,10 @@ void term_print(Term *term) {
 			printf("\x1b[1m\x1b[36m%ls\x1b[0m", term->term.string);
 			break;
 		case TYPE_NUMERAL:
-			printf("\x1b[1m\x1b[33m%d\x1b[0m", term->term.numeral);
+			printf("\x1b[1m\x1b[33m%lli\x1b[0m", term->term.numeral);
 			break;
 		case TYPE_DECIMAL:
-			printf("\x1b[1m\x1b[33m%f\x1b[0m", term->term.decimal);
+			printf("\x1b[1m\x1b[33m%Lf\x1b[0m", term->term.decimal);
 			break;
 		case TYPE_CHAR:
 			printf("\x1b[1m\x1b[32m'%lc'\x1b[0m", term->term.character);
