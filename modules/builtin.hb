@@ -122,7 +122,7 @@
 ;; asserta/1
 ;; (asserta @clause)
 ;;
-;; Add term to the Prolog database.
+;; Add term to the Herbrand database.
 ;; (asserta Clause) is true. It has for side effect the addition of the clause Clause to the database, placing
 ;; it before any other facts or rules with the same functor.
 #builtin #det
@@ -131,7 +131,7 @@
 ;; assertz/1
 ;; (assertz @clause)
 ;;
-;; Add term to the Prolog database.
+;; Add term to the Herbrand database.
 ;; (assertz Clause) is true. Same side effect as asserta/1, but placing Clause after all the facts and rules
 ;; with the same functor.
 #builtin #det
@@ -140,7 +140,7 @@
 ;; retract/1
 ;; (retract +clause)
 ;;
-;; Delete term from Prolog database.
+;; Delete term from Herbrand database.
 ;; (retract Clause) is true if there's at least one predicate in the database with the clause Clause. It has
 ;; for side effect the removal of that predicate.
 #builtin #semidet
