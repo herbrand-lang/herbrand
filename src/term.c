@@ -3,7 +3,7 @@
  * FILENAME: term.c
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 14.11.2019
  * 
  *H*/
 
@@ -198,6 +198,15 @@ int term_is_string(Term *term) {
   **/
 int term_is_number(Term *term) {
 	return term->type == TYPE_NUMERAL || term->type == TYPE_DECIMAL;
+}
+
+/**
+  * 
+  * This function checks if term is a character.
+  * 
+  **/
+int term_is_char(Term *term) {
+	return term->type == TYPE_CHAR;
 }
 
 /**
