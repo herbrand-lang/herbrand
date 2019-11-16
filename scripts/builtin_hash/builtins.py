@@ -26,7 +26,7 @@ def hashmap_gen(path):
 		i += 1
 	f.close()
 	size = len(keys)
-	n = size
+	n = int(argv[2]) # size
 	while True:
 		dist = map(lambda x: hashmap_hash(n, x), keys)
 		if len(set(dist)) == size:

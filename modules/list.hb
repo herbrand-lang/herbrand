@@ -32,7 +32,7 @@
 ;; (foldr :callable_term +list +term -term)
 ;;
 ;; Reduce list to a single value.
-;; (foldl Goal Start List End) is true if and only if End is the result of applying Goal to the elements
+;; (foldr Goal Start List End) is true if and only if End is the result of applying Goal to the elements
 ;; of List, from right to left, in a cumulative way, using Start as initial accumulator.
 (predicate foldr 4 (term term (list term) (list term))
 	(_ Acc () Acc)

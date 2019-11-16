@@ -400,6 +400,14 @@
 
 ; TYPE TESTING
 
+;; typeof/2
+;; (typeof @term ?term)
+;;
+;; Check the type of an expression.
+;; (typeof X T) is true if T unifies with the type of X.
+#builtin #semidet
+(predicate typeof 2 (term term))
+
 ;; atom/1
 ;; (atom @term)
 ;;

@@ -3,7 +3,7 @@
  * FILENAME: builtin.h
  * DESCRIPTION: Functions for evaluating built-in predicates
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 11.04.2019
+ * UPDATED: 16.11.2019
  * 
  *H*/
 
@@ -16,6 +16,7 @@
 #include "parser.h"
 #include "exception.h"
 #include "evaluable.h"
+#include "type_check.h"
 
 
 
@@ -26,7 +27,7 @@
 #define HERBRAND_PATH L"/usr/local/herbrand/"
 #endif
 
-#define BUILTIN_HASH_SIZE 256
+#define BUILTIN_HASH_SIZE 1024
 wchar_t *builtin_keys[BUILTIN_HASH_SIZE];
 void (*builtin_handlers[BUILTIN_HASH_SIZE])();
 int builtin_arities[BUILTIN_HASH_SIZE];
@@ -83,6 +84,7 @@ void builtin_arithmetic_lt(Program *program, Derivation *D, State *point, Term *
 void builtin_arithmetic_le(Program *program, Derivation *D, State *point, Term *term);
 void builtin_arithmetic_gt(Program *program, Derivation *D, State *point, Term *term);
 void builtin_arithmetic_ge(Program *program, Derivation *D, State *point, Term *term);
+void builtin_typeof(Program *program, Derivation *D, State *point, Term *term);
 void builtin_atom(Program *program, Derivation *D, State *point, Term *term);
 void builtin_number(Program *program, Derivation *D, State *point, Term *term);
 void builtin_char(Program *program, Derivation *D, State *point, Term *term);

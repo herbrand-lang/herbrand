@@ -31,6 +31,7 @@ retractall retractall 1
 :<= arithmetic_le 2
 :> arithmetic_gt 2
 :>= arithmetic_ge 2
+typeof typeof 2
 atom atom 1
 number number 1
 char char 1
