@@ -3,7 +3,7 @@
  * FILENAME: term.h
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 14.11.2019
+ * UPDATED: 16.11.2019
  * 
  *H*/
 
@@ -63,6 +63,14 @@ void term_free(Term *term);
   * 
   **/
 Term *term_init_atom(wchar_t *atom);
+
+/**
+  * 
+  * This function initializes a variable returning a pointer
+  * to a newly initialized Term struct.
+  * 
+  **/
+Term *term_init_variable(wchar_t *var);
 
 /**
   * 

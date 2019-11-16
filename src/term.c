@@ -3,7 +3,7 @@
  * FILENAME: term.c
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 14.11.2019
+ * UPDATED: 16.11.2019
  * 
  *H*/
 
@@ -61,6 +61,19 @@ Term *term_init_atom(wchar_t *atom) {
 	Term *term = term_alloc();
 	term->type = TYPE_ATOM;
 	term_set_string(term, atom);
+	return term;
+}
+
+/**
+  * 
+  * This function initializes a variable returning a pointer
+  * to a newly initialized Term struct.
+  * 
+  **/
+Term *term_init_variable(wchar_t *var) {
+	Term *term = term_alloc();
+	term->type = TYPE_VARIABLE;
+	term_set_string(term, var);
 	return term;
 }
 
