@@ -184,6 +184,13 @@ int term_is_float(Term *term);
 
 /**
   * 
+  * This function checks if term is a list.
+  * 
+  **/
+int term_is_list(Term *term);
+
+/**
+  * 
   * This function checks if term is a catcher.
   * 
   **/
