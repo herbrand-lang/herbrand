@@ -11,3 +11,8 @@
 (predicate r 1 _
 	(c)
 	(d))
+
+(predicate append 3 ((list X) (list X) (list X))
+	(() Ys Ys)
+	((X|Xs) Ys (X|Zs)
+		(append Xs Ys Zs)))

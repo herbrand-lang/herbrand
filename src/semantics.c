@@ -83,8 +83,8 @@ Substitution *semantics_answer(Program *program, Derivation *D) {
 	State *point, *state;
 	Rule *rule;
 	Clause *clause;
-	Term *term, *body, *error, *head;
-	Substitution *mgu;
+	Term *term, *body, *error, *head, *type;
+	Substitution *mgu, *subs;
 	wchar_t *name;
 	while(1) {
 		point = D->points;
@@ -153,6 +153,17 @@ Substitution *semantics_answer(Program *program, Derivation *D) {
 				derivation_push_state(D, state_error(point, error));
 				term_free(error);
 				continue;
+			}
+			// Check type
+			type = rule->type;
+			subs = tc_check_type_expr(term, type);
+			if(subs == NULL) {
+				error = exception_type_error(type, term, term->parent);
+				derivation_push_state(D, state_error(point, error));
+				term_free(error);
+				continue;
+			} else {
+				substitution_free(subs);
 			}
 			// Check tail recursion
 			if(term->parent != NULL && rule->tail_recursive && wcscmp(term_list_get_head(term)->term.string, term->parent) == 0) {
