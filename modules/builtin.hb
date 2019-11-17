@@ -162,18 +162,18 @@
 ;; (and ... +callable_term)
 ;;
 ;; Conjunction.
-;; (and | Goals) is true if and only if every goal in Goals is true.
+;; (and Goals) is true if and only if every goal in Goals is true.
 #builtin #nondet
-(predicate and N callable)
+(predicate and 1 ((list callable)))
 
 ;; call/*
 ;; (call +callable_term ... +term)
 ;;
 ;; Invoke a callable term as a goal.
-;; (call Goal | Args) is true if and only if Goal represents a goal which is true after appending Args to
+;; (call (Goal | Args)) is true if and only if Goal represents a goal which is true after appending Args to
 ;; its list of arguments. 
 #builtin #nondet
-(predicate call N callable)
+(predicate call 1 ((list callable)))
 
 ;; catch/3
 ;; (catch +callable_term ?term +callable_term)
@@ -253,9 +253,9 @@
 ;; (or ... +callable_term)
 ;;
 ;; Disjunction.
-;; (or | Goals) is true if and only if any goal in Goals is true.
+;; (or Goals) is true if and only if any goal in Goals is true.
 #builtin #nondet
-(predicate or N callable)
+(predicate or 1 ((list callable)))
 
 ;; repeat/0
 ;; (repeat)
@@ -317,12 +317,12 @@
 (predicate consult 1 (string))
 
 ;; import/1
-;; (import +string)
+;; (import +atom)
 ;;
 ;; Load a Herbrand module.
 ;; (import Module) is true when Module is a valid Herbrand module.
 #builtin #nondet
-(predicate import 1 (string))
+(predicate import 1 (atom))
 
 
 

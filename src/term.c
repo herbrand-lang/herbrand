@@ -155,14 +155,21 @@ void term_increase_references(Term *term) {
   * 
   **/
 int term_is_callable(Term *term) {
+	Term *head;
+	int type_list;
 	if(term->type != TYPE_LIST)
 		return 0;
-	else if(term_list_is_null(term))
+	if(term_list_is_null(term))
 		return 1;
-	else if(term->term.list->head->type != TYPE_ATOM)
+	head = term->term.list->head;
+	if(head->type != TYPE_ATOM && head->type != TYPE_LIST)
 		return 0;
-	while(term->type == TYPE_LIST && !term_list_is_null(term))
+	type_list = head->type == TYPE_LIST;
+	while(term->type == TYPE_LIST && !term_list_is_null(term)) {
+		if(type_list && !term_is_callable(term->term.list->head))
+			return 0;
 		term = term->term.list->tail;
+	}
 	return term_is_list(term) && term_list_is_null(term);
 }
 

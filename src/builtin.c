@@ -3,7 +3,7 @@
  * FILENAME: builtin.c
  * DESCRIPTION: Functions for evaluating built-in predicates
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 16.11.2019
+ * UPDATED: 17.11.2019
  * 
  *H*/
 
@@ -197,7 +197,7 @@ int builtin_arities[BUILTIN_HASH_SIZE] = {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 
-	0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+	0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -213,9 +213,9 @@ int builtin_arities[BUILTIN_HASH_SIZE] = {
 	0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 1, 
 	0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 0, 0, 0, 0, 0, 
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
@@ -252,13 +252,7 @@ int builtin_run_predicate(Program *program, Derivation *D, State *point, Term *t
 	if(builtin_keys[key] != NULL && wcscmp(head->term.string, builtin_keys[key]) == 0) {
 		arity = builtin_arities[key];
 		length = term_list_length(term)-1;
-		if(length == -1) {
-			callable = term_init_atom(L"callable");
-			error = exception_type_error(callable, term, term->parent);
-			derivation_push_state(D, state_error(point, error));
-			term_free(error);
-			term_free(callable);
-		} else if(length == arity || arity == -1) {
+		if(length == arity) {
 			// type check
 			type = program_get_predicate(program, name, L"builtin")->type;
 			subs = tc_check_type_expr(term, type);
@@ -321,7 +315,7 @@ void builtin_consult(Program *program, Derivation *D, State *point, Term *term) 
 /**
   * 
   * import/1
-  * (import +atom_or_string)
+  * (import +atom)
   * 
   * Load a Herbrand module.
   * (import Module) is true when Module is a valid Herbrand module.
@@ -362,22 +356,22 @@ void builtin_import(Program *program, Derivation *D, State *point, Term *term) {
 
 /**
   * 
-  * and/*
-  * (and ...+callable_term)
+  * and/1
+  * (and +(list callable_term))
   * 
   * Conjunction.
-  * (and | Goals) is true if and only if every goal in Goals is true.
+  * (and Goals) is true if and only if every goal in Goals is true.
   * 
   **/
 void builtin_and(Program *program, Derivation *D, State *point, Term *term) {
-	Term *tail;
-	tail = term_list_get_tail(term);
-	derivation_push_state(D, state_success(point, tail));
+	Term *goals;
+	goals = term_list_get_nth(term, 1);
+	derivation_push_state(D, state_success(point, goals));
 }
 
 /**
   * 
-  * or/*
+  * or/1
   * (or ...+callable_term)
   * 
   * Disjunction.
@@ -387,7 +381,7 @@ void builtin_and(Program *program, Derivation *D, State *point, Term *term) {
 void builtin_or(Program *program, Derivation *D, State *point, Term *term) {
 	Term *list, *head;
 	State *state = NULL, *prev;
-	list = term_list_get_tail(term);
+	list = term_list_get_nth(term, 1);
 	while(!term_list_is_null(list)) {
 		prev = state;
 		state = state_alloc();
@@ -545,8 +539,8 @@ void builtin_not(Program *program, Derivation *D, State *point, Term *term) {
 
 /**
   * 
-  * call/*
-  * (call +callable_term ...+term)
+  * call/1
+  * (call +(list callable_term))
   * 
   * Invoke a callable term as a goal.
   * (call Goal | Args) is true if and only if Goal represents a goal which is

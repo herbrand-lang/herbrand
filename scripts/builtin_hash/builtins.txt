@@ -1,11 +1,11 @@
 consult consult 1
 import import 1
-and and -1
-or or -1
+and and 1
+or or 1
 ite ite 3
 ! cut 0
 not not 1
-call call -1
+call call 1
 once once 1
 repeat repeat 0
 true true 0
