@@ -8,6 +8,7 @@
  *H*/
 
 #include "term.h"
+#include "type_check.h"
 
 
 

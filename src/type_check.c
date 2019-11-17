@@ -35,7 +35,7 @@ Term *tc_get_type_term(Term *term) {
         return type_list;
     } else if(term_is_list(term)) {
         type_list = NULL;
-        while(!term_list_is_null(term)) {
+        while(term_is_list(term) && !term_list_is_null(term)) {
             type_head = tc_get_type_term(term_list_get_head(term));
             term = term_list_get_tail(term);
             if(type_list == NULL) {
@@ -55,6 +55,13 @@ Term *tc_get_type_term(Term *term) {
                     term_list_add_element(type_head, term_init_atom(L"term"));
                     return type_list;
                 }
+            }
+        }
+        if(!term_is_list(term) && !term_is_variable(term)) {
+            if(type_list == NULL || !term_is_atom(type_list)
+            || wcscmp(L"char", type_list->term.string) != 0 || !term_is_string(term)) {
+                term_free(type_list);
+                return term_init_atom(L"term");
             }
         }
         type_head = term_list_empty();
@@ -77,13 +84,17 @@ Term *tc_get_type_term(Term *term) {
 Term *tc_get_type_expr(Term *expr) {
     Term *type, *head;
     if(!term_is_list(expr) || term_list_is_null(expr))
-        return NULL;
+        return tc_get_type_term(expr);
     expr = term_list_get_tail(expr);
     type = term_list_empty();
-    while(!term_list_is_null(expr)) {
+    while(term_is_list(expr) && !term_list_is_null(expr)) {
         head = tc_get_type_term(term_list_get_head(expr));
         expr = term_list_get_tail(expr);
         term_list_add_element(type, head);
+    }
+    if(!term_is_list(expr)) {
+        term_free(type);
+        return term_init_atom(L"term");
     }
     return type;
 }

@@ -40,7 +40,7 @@ Term *exception_instantiation_error(wchar_t *level) {
   * 
   **/
 Term *exception_type_error(Term *type, Term *found, wchar_t *level) {
-	Term *list, *list_type, *error, *type_error, *expected, *level_term;
+	Term *list, *list_type, *list_expected, *list_given, *error, *type_error, *expected, *given, *level_term;
 	error = term_init_atom(L"error");
 	type_error = term_init_atom(L"type_error");
 	// Level term
@@ -50,10 +50,19 @@ Term *exception_type_error(Term *type, Term *found, wchar_t *level) {
 	// Found term
 	term_increase_references(found);
 	term_increase_references(type);
+	// Given type
+	given = tc_get_type_expr(found);
 	// Error term
+	list_expected = term_list_empty();
+	term_list_add_element(list_expected, term_init_atom(L"expected"));
+	term_list_add_element(list_expected, type);
+	list_given = term_list_empty();
+	term_list_add_element(list_given, term_init_atom(L"found"));
+	term_list_add_element(list_given, given);
 	list_type = term_list_empty();
 	term_list_add_element(list_type, type_error);
-	term_list_add_element(list_type, type);
+	term_list_add_element(list_type, list_expected);
+	term_list_add_element(list_type, list_given);
 	term_list_add_element(list_type, found);
 	list = term_list_empty();
 	term_list_add_element(list, error);

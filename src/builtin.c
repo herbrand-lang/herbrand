@@ -295,8 +295,6 @@ void builtin_consult(Program *program, Derivation *D, State *point, Term *term) 
 	path = term_list_get_nth(term, 1);
 	if(term_is_variable(path))
 		error = exception_instantiation_error(term->parent);
-	else if(!term_is_atom(path) && !term_is_string(path)) 
-		error = exception_type_error(term_init_atom(L"string_or_atom"), path, term->parent);
 	if(error != NULL) {
 		derivation_push_state(D, state_error(point, error));
 		term_free(error);
@@ -336,8 +334,6 @@ void builtin_import(Program *program, Derivation *D, State *point, Term *term) {
 	path = term_list_get_nth(term, 1);
 	if(term_is_variable(path))
 		error = exception_instantiation_error(term->parent);
-	else if(!term_is_atom(path) && !term_is_string(path)) 
-		error = exception_type_error(term_init_atom(L"string_or_atom"), path, term->parent);
 	if(error != NULL) {
 		derivation_push_state(D, state_error(point, error));
 		term_free(error);
@@ -426,12 +422,6 @@ void builtin_ite(Program *program, Derivation *D, State *point, Term *term) {
 	els = term_list_get_nth(term, 3);
 	if(term_is_variable(cond) || term_is_variable(then) || term_is_variable(els))
 		error = exception_instantiation_error(term->parent);
-	else if(!term_is_callable(cond))
-		error = exception_type_error(term_init_atom(L"callable"), cond, term->parent);
-	else if(!term_is_callable(then))
-		error = exception_type_error(term_init_atom(L"callable"), then, term->parent);
-	else if(!term_is_callable(els))
-		error = exception_type_error(term_init_atom(L"callable"), els, term->parent);
 	if(error != NULL) {
 		derivation_push_state(D, state_error(point, error));
 		term_free(error);
@@ -1255,8 +1245,6 @@ void builtin_atom_chars(Program *program, Derivation *D, State *point, Term *ter
 	chars = term_list_get_nth(term, 2);
 	if(atom->type == TYPE_VARIABLE && chars->type == TYPE_VARIABLE)
 		error = exception_instantiation_error(term->parent);
-	else if(atom->type == TYPE_VARIABLE && !term_is_string(chars) && !term_list_is_string(chars))
-		error = exception_type_error(term_init_atom(L"string"), chars, chars->parent); 
 	if(error != NULL) {
 		derivation_push_state(D, state_error(point, error));
 		term_free(error);
@@ -1399,10 +1387,6 @@ void builtin_succ(Program *program, Derivation *D, State *point, Term *term) {
 	succ = term_list_get_nth(term, 2);
 	if(term_is_variable(integer) && term_is_variable(succ))
 		error = exception_instantiation_error(term->parent);
-	else if(!term_is_variable(integer) && !term_is_integer(integer))
-		error = exception_type_error(term_init_atom(L"int"), integer, term->parent);
-	else if(!term_is_variable(succ) && !term_is_integer(succ))
-		error = exception_type_error(term_init_atom(L"int"), succ, term->parent);
 	else if(term_is_integer(integer) && integer->term.numeral < 0)
 		error = exception_domain_error(L"not_less_than_zero", integer, term->parent);
 	else if(term_is_integer(succ) && succ->term.numeral < 0)
@@ -1445,8 +1429,6 @@ void builtin_halt(Program *program, Derivation *D, State *point, Term *term) {
 	Term *error = NULL, *message = term_list_get_nth(term, 1);
 	if(term_is_variable(message))
 		error = exception_instantiation_error(term->parent);
-	else if(!term_is_integer(message)) 
-		error = exception_type_error(term_init_atom(L"int"), message, term->parent);
 	if(error != NULL) {
 		derivation_push_state(D, state_error(point, error));
 		term_free(error);
