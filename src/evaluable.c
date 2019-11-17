@@ -53,7 +53,7 @@ Term *evaluable_eval_term(Term *term) {
 	} else if(term->type == TYPE_VARIABLE) {
 		return exception_instantiation_error(term->parent);
 	} else if(!term_is_evaluable(term)) {
-		return exception_type_error(L"evaluable", term, term->parent);
+		return exception_type_error(term_init_atom(L"evaluable"), term, term->parent);
 	}
 	head = term_list_get_head(term);
 	key = hashmap_function(EVALUABLE_HASH_SIZE, head->term.string);
@@ -61,7 +61,7 @@ Term *evaluable_eval_term(Term *term) {
 		arity = evaluable_arities[key];
 		length = term_list_length(term)-1;
 		if(length == -1) {
-			return exception_type_error(L"callable_term", term, term->parent);
+			return exception_type_error(term_init_atom(L"evaluable"), term, term->parent);
 		} else if(length == arity || arity == -1) {
 			list = term_list_empty();
 			term_list_add_element(list, head);
@@ -82,7 +82,7 @@ Term *evaluable_eval_term(Term *term) {
 				return exception_instantiation_error(pointer->parent);
 			} else if(!term_list_is_null(term)) {
 				term_free(list);
-				return exception_type_error(L"evaluable", pointer, pointer->parent);
+				return exception_type_error(term_init_atom(L"evaluable"), pointer, pointer->parent);
 			}
 			eval = evaluable_handlers[key](list);
 			term_free(list);
@@ -91,7 +91,7 @@ Term *evaluable_eval_term(Term *term) {
 			return exception_arity_error(arity, length, term, term->parent);
 		}
 	} else {
-		return exception_type_error(L"evaluable", term, term->parent);
+		return exception_type_error(term_init_atom(L"evaluable"), term, term->parent);
 	}
 	return NULL;
 }

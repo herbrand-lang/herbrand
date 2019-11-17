@@ -164,7 +164,7 @@
 ;; Conjunction.
 ;; (and | Goals) is true if and only if every goal in Goals is true.
 #builtin #nondet
-(predicate and _ _)
+(predicate and N callable)
 
 ;; call/*
 ;; (call +callable_term ... +term)
@@ -173,7 +173,7 @@
 ;; (call Goal | Args) is true if and only if Goal represents a goal which is true after appending Args to
 ;; its list of arguments. 
 #builtin #nondet
-(predicate call _ _)
+(predicate call N callable)
 
 ;; catch/3
 ;; (catch +callable_term ?term +callable_term)
@@ -185,7 +185,7 @@
 ;; backtracks to the start of catch/3 while preserving the thrown exception term, and Handler is called
 ;; as in call/1.
 #builtin #nondet
-(predicate catch 3 (term term term))
+(predicate catch 3 (callable term callable))
 
 ;; (!)/0
 ;; (!)
@@ -213,7 +213,7 @@
 ;; so Instances is filled with the values that make Goal succeed. If there is not a single value that
 ;; make Goal unify, Instances will be an empty list.
 #builtin #semidet
-(predicate findall 3 (term term (list term)))
+(predicate findall 3 (term callable (list term)))
 
 ;; halt/1
 ;; (halt +number)
@@ -231,7 +231,7 @@
 ;; (ite If Then Else) is true if and only if If is true and Then is true for the first solution of If,
 ;; or if If is false and Else is true for the first value with which If fails.
 #builtin #nondet
-(predicate ite 3 (term term term))
+(predicate ite 3 (callable callable callable))
 
 ;; not/1
 ;; (not @callable_term)
@@ -239,7 +239,7 @@
 ;; Not provable.
 ;; (not Term) is true if and only if (call Term) is false.
 #builtin #semidet
-(predicate not 1 (term))
+(predicate not 1 (callable))
 
 ;; once/1
 ;; (once @callable_term)
@@ -247,7 +247,7 @@
 ;; Evaluate a term just once.
 ;; (once Term) is true. once/1 makes sure that Term fails or succeeds just once.
 #builtin #semidet
-(predicate once 1 (term))
+(predicate once 1 (callable))
 
 ;; or/*
 ;; (or ... +callable_term)
@@ -255,7 +255,7 @@
 ;; Disjunction.
 ;; (or | Goals) is true if and only if any goal in Goals is true.
 #builtin #nondet
-(predicate or _ _)
+(predicate or N callable)
 
 ;; repeat/0
 ;; (repeat)
@@ -317,12 +317,12 @@
 (predicate consult 1 (string))
 
 ;; import/1
-;; (import +atom_or_string)
+;; (import +string)
 ;;
 ;; Load a Herbrand module.
 ;; (import Module) is true when Module is a valid Herbrand module.
 #builtin #nondet
-(predicate import 1 (atom_or_string))
+(predicate import 1 (string))
 
 
 

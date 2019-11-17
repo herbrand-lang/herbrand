@@ -121,7 +121,7 @@ Substitution *semantics_answer(Program *program, Derivation *D) {
 		// If not callable term, error
 		if(!term_is_callable(term)) {
 			derivation_pop_state(D);
-			error = exception_type_error(L"callable_term", term, term->parent);
+			error = exception_type_error(term_init_atom(L"callable"), term, term->parent);
 			derivation_push_state(D, state_error(point, error));
 			state_free(point);
 			term_free(error);

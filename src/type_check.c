@@ -3,7 +3,7 @@
  * FILENAME: clause.c
  * DESCRIPTION: Data structures and functions for type checking
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 14.11.2019
+ * UPDATED: 16.11.2019
  * 
  *H*/
 
@@ -75,7 +75,76 @@ Term *tc_get_type_term(Term *term) {
   * 
   **/
 Term *tc_get_type_expr(Term *expr) {
+    Term *type, *head;
+    if(!term_is_list(expr) || term_list_is_null(expr))
+        return NULL;
+    expr = term_list_get_tail(expr);
+    type = term_list_empty();
+    while(!term_list_is_null(expr)) {
+        head = tc_get_type_term(term_list_get_head(expr));
+        expr = term_list_get_tail(expr);
+        term_list_add_element(type, head);
+    }
+    return type;
+}
 
+/**
+  * 
+  * This function returns a pointer to a term
+  * containing normlized version of the type
+  * 
+  * callable => (list _)
+  * string => (list char)
+  * term => _ (anonymous variable)
+  * var => _ (anonymous variable)
+  * int => (num numeral)
+  * float => (num decimal)
+  * number => (num _)
+  * 
+  **/
+Term *tc_normalize_type(Term *type) {
+    Term *list;
+    if(term_is_atom(type)) {
+        if(wcscmp(L"term", type->term.string) == 0) {
+            return term_init_variable(L"_");
+        } else if(wcscmp(L"var", type->term.string) == 0) {
+            return term_init_variable(L"_");
+        } else if(wcscmp(L"string", type->term.string) == 0) {
+            list = term_list_empty();
+            term_list_add_element(list, term_init_atom(L"list"));
+            term_list_add_element(list, term_init_atom(L"char"));
+            return list;
+        } else if(wcscmp(L"callable", type->term.string) == 0) {
+            list = term_list_empty();
+            term_list_add_element(list, term_init_atom(L"list"));
+            term_list_add_element(list, term_init_variable(L"_"));
+            return list;
+        } else if(wcscmp(L"int", type->term.string) == 0) {
+            list = term_list_empty();
+            term_list_add_element(list, term_init_atom(L"num"));
+            term_list_add_element(list, term_init_atom(L"numeral"));
+            return list;
+        } else if(wcscmp(L"float", type->term.string) == 0) {
+            list = term_list_empty();
+            term_list_add_element(list, term_init_atom(L"num"));
+            term_list_add_element(list, term_init_atom(L"decimal"));
+            return list;
+        } else if(wcscmp(L"number", type->term.string) == 0) {
+            list = term_list_empty();
+            term_list_add_element(list, term_init_atom(L"num"));
+            term_list_add_element(list, term_init_variable(L"_"));
+            return list;
+        }
+    } else if(term_is_list(type)) {
+        list = term_list_empty();
+        while(!term_list_is_null(type)) {
+            term_list_add_element(list, tc_normalize_type(term_list_get_head(type)));
+            type = term_list_get_tail(type);
+        }
+        return list;
+    }
+    term_increase_references(type);
+    return type;
 }
 
 /**
@@ -86,10 +155,14 @@ Term *tc_get_type_expr(Term *expr) {
   * 
   **/
 Substitution *tc_check_type_expr(Term *expr, Term *type) {
-    Term *type_expr;
+    Term *type_expr, *norm_type, *norm_type_expr;
     Substitution *subs;
     type_expr = tc_get_type_expr(expr);
-    subs = semantics_unify_terms(type, type_expr, 1);
+    norm_type_expr = tc_normalize_type(type_expr);
+    norm_type = tc_normalize_type(type);
+    subs = semantics_unify_terms(norm_type, norm_type_expr, 1);
     term_free(type_expr);
+    term_free(norm_type_expr);
+    term_free(norm_type);
     return subs;
 }

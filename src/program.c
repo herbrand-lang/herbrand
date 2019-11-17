@@ -3,7 +3,7 @@
  * FILENAME: program.c
  * DESCRIPTION: Data structures and functions for storing and manipuling programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 16.11.2019
  * 
  *H*/
 
@@ -59,6 +59,35 @@ void program_free(Program *program) {
 	hashmap_free(program->indices);
 	free(program->modules);
 	free(program);
+}
+
+/**
+  * 
+  * This function creates a program with all information
+  * about builtin predicates, returning a pointer to a
+  * newly initialized Program struct.
+  * 
+  **/
+Program *program_init() {
+  Program *program;
+  FILE *file;
+  wchar_t *path;
+  char *c_path;
+  int size;
+  size = wcslen(HERBRAND_PATH) + wcslen(L"modules/builtin.hb") + 1;
+  program = program_alloc();
+  path = malloc(sizeof(wchar_t) * size);
+  c_path = malloc(sizeof(char) * size);
+	swprintf(path, size, HERBRAND_PATH L"modules/builtin.hb");
+  wcstombs(c_path, path, size);
+	file = fopen(c_path, "r");
+	free(path);
+  free(c_path);
+	if(file != NULL) {
+		parser_stream(program, file);
+		fclose(file);
+	}
+  return program;
 }
 
 /**

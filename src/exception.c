@@ -3,7 +3,7 @@
  * FILENAME: exception.c
  * DESCRIPTION: Functions for throwing Herbrand errors
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 16.11.2019
  * 
  *H*/
 
@@ -39,21 +39,21 @@ Term *exception_instantiation_error(wchar_t *level) {
   * to a newly initialized Term struct.
   * 
   **/
-Term *exception_type_error(wchar_t *type, Term *found, wchar_t *level) {
+Term *exception_type_error(Term *type, Term *found, wchar_t *level) {
 	Term *list, *list_type, *error, *type_error, *expected, *level_term;
 	error = term_init_atom(L"error");
 	type_error = term_init_atom(L"type_error");
-	expected = term_init_atom(type);
 	// Level term
 	level_term = term_alloc();
 	level_term->type = TYPE_ATOM;
 	term_set_string(level_term, level == NULL ? L"top_level" : level);
 	// Found term
 	term_increase_references(found);
+	term_increase_references(type);
 	// Error term
 	list_type = term_list_empty();
 	term_list_add_element(list_type, type_error);
-	term_list_add_element(list_type, expected);
+	term_list_add_element(list_type, type);
 	term_list_add_element(list_type, found);
 	list = term_list_empty();
 	term_list_add_element(list, error);

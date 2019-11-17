@@ -3,7 +3,7 @@
  * FILENAME: program.h
  * DESCRIPTION: Data structures and functions for storing and manipuling programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 16.11.2019
  * 
  *H*/
 
@@ -17,6 +17,10 @@
 
 #ifndef LOGIC_PROGRAM_H
 #define LOGIC_PROGRAM_H
+
+#ifndef HERBRAND_PATH
+#define HERBRAND_PATH L"/usr/local/herbrand/"
+#endif
 
 typedef struct Program {
 	Module **modules;
@@ -55,6 +59,15 @@ int program_realloc(Program *program);
   * 
   **/
 void program_free(Program *program);
+
+/**
+  * 
+  * This function creates a program with all information
+  * about builtin predicates, returning a pointer to a
+  * newly initialized Program struct.
+  * 
+  **/
+Program *program_init();
 
 /**
   * This function checks if a program cannot store new

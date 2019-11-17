@@ -3,7 +3,7 @@
  * FILENAME: parse.c
  * DESCRIPTION: Parse programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 11.04.2019
+ * UPDATED: 16.11.2019
  * 
  *H*/
 
@@ -226,18 +226,22 @@ Parser *parser_predicate(Tokenizer *tokenizer, int start) {
 	start++;
 	state->next = start;
 	token = tokenizer->tokens[start];
-	if(token->category != TOKEN_NUMERAL) {
+	if(token->category != TOKEN_NUMERAL && token->category != TOKEN_VARIABLE) {
 		wcscpy(state->error, L"arity (a non-negative numeral) expected in predicate declaration");
 		state->success = 0;
 		return state;
 	}
-	arity = wcstol(token->text, &end, 10);
-	if(arity < 0) {
-		wcscpy(state->error, L"arity (a non-negative numeral) expected in predicate declaration");
-		state->success = 0;
-		return state;
+	if(token->category == TOKEN_NUMERAL) {
+		arity = wcstol(token->text, &end, 10);
+		if(arity < 0) {
+			wcscpy(state->error, L"arity (a non-negative numeral) expected in predicate declaration");
+			state->success = 0;
+			return state;
+		}
+		rule->arity = arity;
+	} else {
+		rule->arity = -1;
 	}
-	rule->arity = arity;
 	// Type
 	start++;
 	state->next = start;

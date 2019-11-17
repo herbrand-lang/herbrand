@@ -34,6 +34,17 @@ Term *tc_get_type_expr(Term *expr);
 
 /**
   * 
+  * This function returns a pointer to a term
+  * containing normlized version of the type
+  * 
+  * string => (list char)
+  * term => _ (anonymous variable)
+  * 
+  **/
+Term *tc_normalize_type(Term *type);
+
+/**
+  * 
   * This function checks the type of an expression,
   * returning a pointer to a substitution if the
   * expression type checks. Otherwise, returns null.

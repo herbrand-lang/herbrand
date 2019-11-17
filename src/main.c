@@ -3,7 +3,7 @@
  * FILENAME: main.c
  * DESCRIPTION: Main file
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 07.04.2019
+ * UPDATED: 16.11.2019
  * COMPILING: gcc -I/usr/include -L *.h *.c -o herbrand -lm -g
  * 
  *H*/
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
 	if(argc == 2) {
 		file = fopen(argv[1], "r");
 		if(file != NULL) {
-			program = program_alloc();
+			program = program_init();
 			parser_stream(program, file);
 			fclose(file);
 			printf("\nPARSED RULES:\n");
@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
   * This function starts the interactive
   * query mode.
   * 
-  */
+  **/
 void interactive_query() {
 	Program *program;
 	FILE *file;
@@ -54,7 +54,7 @@ void interactive_query() {
 	Substitution *answer;
 	char c, d;
 	Term *term = NULL;
-	program = program_alloc();
+	program = program_init();
 	while(1) {
 		while(term == NULL) {
 			printf("\x1b[1m\x1b[31mherbrand>\x1b[0m ");

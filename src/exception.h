@@ -25,7 +25,7 @@ Term *exception_instantiation_error(wchar_t *level);
   * to a newly initialized Term struct.
   * 
   **/
-Term *exception_type_error(wchar_t *type, Term *found, wchar_t *level);
+Term *exception_type_error(Term *type, Term *found, wchar_t *level);
 
 /**
   * 
