@@ -12,6 +12,9 @@
 	(c)
 	(d))
 
+(predicate s 1 ((list number))
+	((X Y Z)))
+
 (predicate append 3 ((list X) (list X) (list X))
 	(() Ys Ys)
 	((X|Xs) Ys (X|Zs)

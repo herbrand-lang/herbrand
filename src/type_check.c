@@ -12,11 +12,75 @@
 /**
   * 
   * This function returns a pointer to a term
+  * containing the unification of two types.
+  * 
+  **/
+Term *tc_join_types(Term *type1, Term *type2) {
+    Term *type, *head;
+    if(term_is_atom(type1) && term_is_atom(type2)) {
+        if(wcscmp(type1->term.string, type2->term.string) == 0) {
+            term_increase_references(type1);
+            return type1;
+        } else if(wcscmp(type1->term.string, L"var") == 0) {
+            term_increase_references(type2);
+            return type2;
+        } else if(wcscmp(type2->term.string, L"var") == 0) {
+            term_increase_references(type1);
+            return type1;
+        } else if(wcscmp(type1->term.string, L"int") == 0 && (
+            wcscmp(type2->term.string, L"float") == 0 ||
+            wcscmp(type2->term.string, L"number") == 0)
+        ) {
+            return term_init_atom(L"number");
+        } else if(wcscmp(type1->term.string, L"float") == 0 && (
+            wcscmp(type2->term.string, L"int") == 0 ||
+            wcscmp(type2->term.string, L"number") == 0)
+        ) {
+            return term_init_atom(L"number");
+        } else if(wcscmp(type2->term.string, L"int") == 0 && (
+            wcscmp(type1->term.string, L"float") == 0 ||
+            wcscmp(type1->term.string, L"number") == 0)
+        ) {
+            return term_init_atom(L"number");
+        } else if(wcscmp(type2->term.string, L"float") == 0 && (
+            wcscmp(type1->term.string, L"int") == 0 ||
+            wcscmp(type1->term.string, L"number") == 0)
+        ) {
+            return term_init_atom(L"number");
+        } else {
+            return term_init_atom(L"term");
+        }
+    } else if(term_is_list(type1) && term_is_list(type2)) {
+        head = term_list_get_head(type1);
+        if(wcscmp(head->term.string, term_list_get_head(type2)->term.string) != 0)
+            return term_init_atom(L"term");
+        type = term_list_empty();
+        term_increase_references(head);
+        term_list_add_element(type, head);
+        type1 = term_list_get_tail(type1);
+        type2 = term_list_get_tail(type2);
+        while(term_is_list(type1) && term_is_list(type2)
+           && !term_list_is_null(type1) && !term_list_is_null(type2)) {
+            term_list_add_element(type, tc_join_types(
+                term_list_get_head(type1),
+                term_list_get_head(type2)));
+            type1 = term_list_get_tail(type1);
+            type2 = term_list_get_tail(type2);
+        }
+        return type;
+    } else {
+        return term_init_atom(L"term");
+    }
+}
+
+/**
+  * 
+  * This function returns a pointer to a term
   * containing the type of a given term.
   * 
   **/
 Term *tc_get_type_term(Term *term) {
-    Term *type_list, *type_head;
+    Term *type_list, *type_head, *type;
     Substitution *subs;
     if(term_is_atom(term))
         return term_init_atom(L"atom");
@@ -34,6 +98,12 @@ Term *tc_get_type_term(Term *term) {
         term_list_add_element(type_list, term_init_atom(L"char"));
         return type_list;
     } else if(term_is_list(term)) {
+        if(term_list_is_null(term)) {
+            type = term_list_empty();
+            term_list_add_element(type, term_init_atom(L"list"));
+            term_list_add_element(type, term_init_atom(L"var"));
+            return type;
+        }
         type_list = NULL;
         while(term_is_list(term) && !term_list_is_null(term)) {
             type_head = tc_get_type_term(term_list_get_head(term));
@@ -41,36 +111,16 @@ Term *tc_get_type_term(Term *term) {
             if(type_list == NULL) {
                 type_list = type_head;
             } else {
-                subs = semantics_unify_terms(type_list, type_head, 1);
-                term_free(type_head);
-                if(subs != NULL) {
-                    type_head = type_list;
-                    type_list = term_apply_substitution(type_list, subs);
-                    term_free(type_head);
-                    substitution_free(subs);
-                } else {
-                    term_free(type_list);
-                    type_list = term_list_empty();
-                    type_head = term_list_add_element(type_list, term_init_atom(L"list"));
-                    term_list_add_element(type_head, term_init_atom(L"term"));
-                    return type_list;
-                }
-            }
-        }
-        if(!term_is_list(term) && !term_is_variable(term)) {
-            if(type_list == NULL || !term_is_atom(type_list)
-            || wcscmp(L"char", type_list->term.string) != 0 || !term_is_string(term)) {
+                type = tc_join_types(type_list, type_head);
                 term_free(type_list);
-                return term_init_atom(L"term");
+                term_free(type_head);
+                type_list = type;
             }
         }
-        type_head = term_list_empty();
-        term_list_add_element(type_head, term_init_atom(L"list"));
-        if(type_list == NULL)
-            term_list_add_element(type_head, term_init_atom(L"term"));
-        else
-            term_list_add_element(type_head, type_list);
-        return type_head;
+        type = term_list_empty();
+        term_list_add_element(type, term_init_atom(L"list"));
+        term_list_add_element(type, type_list);
+        return type;
     }
 }
 
@@ -102,21 +152,22 @@ Term *tc_get_type_expr(Term *expr) {
 /**
   * 
   * This function returns a pointer to a term
-  * containing normlized version of the type
+  * containing normlized version of the type.
   * 
   * callable => (list _)
   * string => (list char)
-  * term => _ (anonymous variable)
+  * term => _ (anonymous variable) | term
   * var => _ (anonymous variable)
   * int => (num numeral)
   * float => (num decimal)
-  * number => (num _)
+  * number => (num _) | (num any)
+  * (num any) => (num any) | (num _)
   * 
   **/
-Term *tc_normalize_type(Term *type) {
+Term *tc_normalize_type(Term *type, int general) {
     Term *list;
     if(term_is_atom(type)) {
-        if(wcscmp(L"term", type->term.string) == 0) {
+        if(general && wcscmp(L"term", type->term.string) == 0) {
             return term_init_variable(L"_");
         } else if(wcscmp(L"var", type->term.string) == 0) {
             return term_init_variable(L"_");
@@ -143,13 +194,16 @@ Term *tc_normalize_type(Term *type) {
         } else if(wcscmp(L"number", type->term.string) == 0) {
             list = term_list_empty();
             term_list_add_element(list, term_init_atom(L"num"));
-            term_list_add_element(list, term_init_variable(L"_"));
+            if(general)
+                term_list_add_element(list, term_init_variable(L"_"));
+            else
+                term_list_add_element(list, term_init_atom(L"any"));
             return list;
         }
     } else if(term_is_list(type)) {
         list = term_list_empty();
         while(!term_list_is_null(type)) {
-            term_list_add_element(list, tc_normalize_type(term_list_get_head(type)));
+            term_list_add_element(list, tc_normalize_type(term_list_get_head(type), general));
             type = term_list_get_tail(type);
         }
         return list;
@@ -169,8 +223,8 @@ Substitution *tc_check_type_expr(Term *expr, Term *type) {
     Term *type_expr, *norm_type, *norm_type_expr;
     Substitution *subs;
     type_expr = tc_get_type_expr(expr);
-    norm_type_expr = tc_normalize_type(type_expr);
-    norm_type = tc_normalize_type(type);
+    norm_type_expr = tc_normalize_type(type_expr, 0);
+    norm_type = tc_normalize_type(type, 1);
     subs = semantics_unify_terms(norm_type, norm_type_expr, 1);
     term_free(type_expr);
     term_free(norm_type_expr);

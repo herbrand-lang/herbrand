@@ -2,6 +2,18 @@
 
 
 
+; LANGUAGE
+
+;; typedef 2
+;; (typedef +term +term)
+;;
+;; Type synonym.
+;; (Synonim Type) is true if Synonim is a type synonym for Type.
+(predicate typedef 2 (term term)
+    (string (list char)))
+
+
+
 ; ARITHMETIC COMPARISON
 
 ;; (:==)/2

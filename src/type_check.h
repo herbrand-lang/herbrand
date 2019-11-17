@@ -3,7 +3,7 @@
  * FILENAME: clause.c
  * DESCRIPTION: Data structures and functions for type checking
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 14.11.2019
+ * UPDATED: 17.11.2019
  * 
  *H*/
 
@@ -35,13 +35,18 @@ Term *tc_get_type_expr(Term *expr);
 /**
   * 
   * This function returns a pointer to a term
-  * containing normlized version of the type
+  * containing normlized version of the type.
   * 
+  * callable => (list _)
   * string => (list char)
-  * term => _ (anonymous variable)
+  * term => _ (anonymous variable) | term
+  * var => _ (anonymous variable)
+  * int => (num numeral)
+  * float => (num decimal)
+  * number => (num _) | (num any)
   * 
   **/
-Term *tc_normalize_type(Term *type);
+Term *tc_normalize_type(Term *type, int general);
 
 /**
   * 
