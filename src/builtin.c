@@ -242,7 +242,7 @@ int builtin_check_predicate(Term *term) {
   * 
   **/
 int builtin_run_predicate(Program *program, Derivation *D, State *point, Term *term) {
-	Term *error, *head, *type;
+	Term *error, *head, *type, *callable;
 	Substitution *subs;
 	int arity, length, key;
 	wchar_t *name;
@@ -253,9 +253,11 @@ int builtin_run_predicate(Program *program, Derivation *D, State *point, Term *t
 		arity = builtin_arities[key];
 		length = term_list_length(term)-1;
 		if(length == -1) {
-			error = exception_type_error(term_init_atom(L"callable"), term, term->parent);
+			callable = term_init_atom(L"callable");
+			error = exception_type_error(callable, term, term->parent);
 			derivation_push_state(D, state_error(point, error));
 			term_free(error);
+			term_free(callable);
 		} else if(length == arity || arity == -1) {
 			// type check
 			type = program_get_predicate(program, name, L"builtin")->type;

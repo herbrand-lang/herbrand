@@ -163,7 +163,7 @@ int term_is_callable(Term *term) {
 		return 0;
 	while(term->type == TYPE_LIST && !term_list_is_null(term))
 		term = term->term.list->tail;
-	return term_list_is_null(term);
+	return term_is_list(term) && term_list_is_null(term);
 }
 
 /**

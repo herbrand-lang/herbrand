@@ -20,7 +20,17 @@
   **/
 Derivation *semantics_query(Term *goal) {
 	Derivation *D = derivation_alloc();
-	State *state = state_init_goal(goal);
+	State *state;
+	Term *error, *callable;
+	if(term_is_callable(goal))
+		state = state_init_goal(goal);
+	else {
+		callable = term_init_atom(L"callable");
+		error = exception_type_error(callable, goal, NULL);
+		state = state_error(NULL, error);
+		term_free(error);
+		term_free(callable);
+	}
 	derivation_push_state(D, state);
 	return D;
 }
@@ -83,7 +93,7 @@ Substitution *semantics_answer(Program *program, Derivation *D) {
 	State *point, *state;
 	Rule *rule;
 	Clause *clause;
-	Term *term, *body, *error, *head, *type;
+	Term *term, *body, *error, *head, *type, *callable;
 	Substitution *mgu, *subs;
 	wchar_t *name;
 	while(1) {
@@ -121,10 +131,12 @@ Substitution *semantics_answer(Program *program, Derivation *D) {
 		// If not callable term, error
 		if(!term_is_callable(term)) {
 			derivation_pop_state(D);
-			error = exception_type_error(term_init_atom(L"callable"), term, term->parent);
+			callable = term_init_atom(L"callable");
+			error = exception_type_error(callable, term, term->parent);
 			derivation_push_state(D, state_error(point, error));
 			state_free(point);
 			term_free(error);
+			term_free(callable);
 		// If is a built-in predicate
 		} else if(builtin_check_predicate(term_list_get_head(term))) {
 			// Remove point
