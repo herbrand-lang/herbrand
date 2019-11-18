@@ -3,28 +3,22 @@
  * FILENAME: clause.h
  * DESCRIPTION: Data structures and functions for storing and manipuling clauses
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 29.03.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
+
+#ifndef HERBRAND_CLAUSE_H
+#define HERBRAND_CLAUSE_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "term.h"
 #include "hashmap.h"
 
-
-
-#ifndef LOGIC_CLAUSE_H
-#define LOGIC_CLAUSE_H
-
 typedef struct Clause {
 	Term *head;
 	Term *body;
 } Clause;
-
-#endif
-
-
 
 /**
   * 
@@ -56,3 +50,5 @@ Clause *clause_rename_variables(Clause *clause, int *id);
   * 
   **/
 void clause_print(Clause *clause);
+
+#endif

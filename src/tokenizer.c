@@ -3,7 +3,7 @@
  * FILENAME: tokenizer.c
  * DESCRIPTION: Split source code into lexical components
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 07.04.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
 
@@ -121,7 +121,7 @@ int tokenizer_add_char_token(Tokenizer *tokenizer, int token, wchar_t character)
   **/
 Tokenizer *tokenizer_read_stream(FILE *stream) {
 	wchar_t character;
-	int token, token_number_dot = 0, token_graphic = 0, token_char_open = 0, token_string_open = 0, token_start = 1, token_cat = -1, nb_paren = 0;
+	int token, ignore, token_number_dot = 0, token_graphic = 0, token_char_open = 0, token_string_open = 0, token_start = 1, token_cat = -1, nb_paren = 0;
 	Tokenizer *tokenizer = tokenizer_alloc();
 	while(fscanf(stream, "%lc", &character) == 1 && !feof(stream) && stream != stdin ||
 	stream == stdin && (nb_paren > 0 || tokenizer->nb_tokens == 0 || tokenizer->nb_tokens > 0 && character != L'\n' || !token_start && token_cat == TOKEN_STRING)) {
@@ -179,7 +179,7 @@ Tokenizer *tokenizer_read_stream(FILE *stream) {
 		} else if(character == L';') {
 			while(!feof(stream) && character != L'\n') {
 				tokenizer->column++;
-				fscanf(stream, "%lc", &character);
+				ignore = fscanf(stream, "%lc", &character);
 			}
 			tokenizer->column = 1;
 			tokenizer->line++;

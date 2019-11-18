@@ -1,9 +1,9 @@
 /*H*
  * 
- * FILENAME: program.c
+ * FILENAME: substitution.c
  * DESCRIPTION: Data structures and functions for storing and manipuling substitutions
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
 

@@ -3,14 +3,15 @@
  * FILENAME: exception.c
  * DESCRIPTION: Functions for throwing Herbrand errors
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
 
+#ifndef HERBRAND_EXCEPTION_H
+#define HERBRAND_EXCEPTION_H
+
 #include "term.h"
 #include "type_check.h"
-
-
 
 /**
   * 
@@ -51,3 +52,5 @@ Term *exception_existence_error(wchar_t *source, Term *found, wchar_t *level);
   * 
   **/
 Term *exception_arity_error(int arity, int given, Term *found, wchar_t *level);
+
+#endif

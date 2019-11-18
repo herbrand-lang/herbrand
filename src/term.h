@@ -3,19 +3,17 @@
  * FILENAME: term.h
  * DESCRIPTION: Data structures and functions for storing and manipuling terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 16.11.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
+
+#ifndef HERBRAND_TERM_H
+#define HERBRAND_TERM_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
 #include "hashmap.h"
-
-
-
-#ifndef LOGIC_TERM_H
-#define LOGIC_TERM_H
 
 typedef enum {TYPE_CHAR, TYPE_VARIABLE, TYPE_ATOM, TYPE_NUMERAL, TYPE_DECIMAL, TYPE_STRING, TYPE_LIST} Type;
 
@@ -36,10 +34,6 @@ typedef struct List {
 	struct Term *head;
 	struct Term *tail;
 } List;
-
-#endif
-
-
 
 /**
   * 
@@ -339,3 +333,5 @@ Term *term_replace_most_left(Term *term, Term *head);
   * 
   **/
 int term_search_term(Term *term, Term *needle);
+
+#endif

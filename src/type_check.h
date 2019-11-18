@@ -1,14 +1,14 @@
 /*H*
  * 
- * FILENAME: clause.c
+ * FILENAME: type_check.h
  * DESCRIPTION: Data structures and functions for type checking
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 17.11.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
 
-#ifndef LOGIC_TYPE_CHECK_H
-#define LOGIC_TYPE_CHECK_H
+#ifndef HERBRAND_TYPE_CHECK_H
+#define HERBRAND_TYPE_CHECK_H
 
 #include <stdlib.h>
 #include "term.h"

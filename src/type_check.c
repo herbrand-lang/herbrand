@@ -1,9 +1,9 @@
 /*H*
  * 
- * FILENAME: clause.c
+ * FILENAME: type_check.c
  * DESCRIPTION: Data structures and functions for type checking
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 16.11.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
 

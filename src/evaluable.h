@@ -3,19 +3,17 @@
  * FILENAME: evaluable.h
  * DESCRIPTION: Functions for evaluating arithmetic terms
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 11.04.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
+
+#ifndef HERBRAND_EVALUABLE_H
+#define HERBRAND_EVALUABLE_H
 
 #include <math.h>
 #include "term.h"
 #include "hashmap.h"
 #include "exception.h"
-
-
-
-#ifndef LOGIC_EVALUABLE_H
-#define LOGIC_EVALUABLE_H
 
 #define EVALUABLE_PI 3.14159265359
 #define EVALUABLE_TAU 6.28318530718
@@ -24,10 +22,6 @@
 wchar_t *evaluable_keys[EVALUABLE_HASH_SIZE];
 Term *(*evaluable_handlers[EVALUABLE_HASH_SIZE])();
 int evaluable_arities[EVALUABLE_HASH_SIZE];
-
-#endif
-
-
 
 /**
   * 
@@ -51,6 +45,7 @@ Term *evaluable_eval_term(Term *term);
   **/
 int evaluable_compare_terms(Term *term1, Term* term2, Term **error);
 
+// Evaluable terms
 Term *evaluable_pi(Term *term);
 Term *evaluable_e(Term *term);
 Term *evaluable_tau(Term *term);
@@ -58,3 +53,5 @@ Term *evaluable_add(Term *term);
 Term *evaluable_sub(Term *term);
 Term *evaluable_mul(Term *term);
 Term *evaluable_div(Term *term);
+
+#endif

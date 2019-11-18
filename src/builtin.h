@@ -3,9 +3,12 @@
  * FILENAME: builtin.h
  * DESCRIPTION: Functions for evaluating built-in predicates
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 16.11.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
+
+#ifndef HERBRAND_BUILTIN_H
+#define HERBRAND_BUILTIN_H
 
 #include "term.h"
 #include "derivation.h"
@@ -18,11 +21,6 @@
 #include "evaluable.h"
 #include "type_check.h"
 
-
-
-#ifndef LOGIC_BUILTIN_H
-#define LOGIC_BUILTIN_H
-
 #ifndef HERBRAND_PATH
 #define HERBRAND_PATH L"/usr/local/herbrand/"
 #endif
@@ -31,10 +29,6 @@
 wchar_t *builtin_keys[BUILTIN_HASH_SIZE];
 void (*builtin_handlers[BUILTIN_HASH_SIZE])();
 int builtin_arities[BUILTIN_HASH_SIZE];
-
-#endif
-
-
 
 /**
   * 
@@ -51,6 +45,7 @@ int builtin_check_predicate(Term *term);
   **/
 int builtin_run_predicate(Program *program, Derivation *D, State *point, Term *term);
 
+// Builtin predicates
 void builtin_consult(Program *program, Derivation *D, State *point, Term *term);
 void builtin_import(Program *program, Derivation *D, State *point, Term *term);
 void builtin_and(Program *program, Derivation *D, State *point, Term *term);
@@ -105,3 +100,5 @@ void builtin_succ(Program *program, Derivation *D, State *point, Term *term);
 void builtin_halt(Program *program, Derivation *D, State *point, Term *term);
 void builtin_current_herbrand_flag(Program *program, Derivation *D, State *point, Term *term);
 void builtin_set_herbrand_flag(Program *program, Derivation *D, State *point, Term *term);
+
+#endif

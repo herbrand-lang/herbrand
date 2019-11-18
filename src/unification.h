@@ -3,15 +3,16 @@
  * FILENAME: unification.h
  * DESCRIPTION: Functions for syntactic unification
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
+
+#ifndef HERBRAND_UNIFICATION_H
+#define HERBRAND_UNIFICATION_H
 
 #include <wchar.h>
 #include "term.h"
 #include "substitution.h"
-
-
 
 /**
   * 
@@ -68,3 +69,5 @@ Substitution *semantics_unify_chars(Term *char1, Term *char2);
   * 
   **/
 Substitution *semantics_unify_strings(Term *str1, Term *str2);
+
+#endif

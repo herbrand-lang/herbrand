@@ -3,24 +3,19 @@
  * FILENAME: program.h
  * DESCRIPTION: Data structures and functions for storing and manipuling programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 16.11.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
+
+#ifndef HERBRAND_PROGRAM_H
+#define HERBRAND_PROGRAM_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "module.h"
 #include "hashmap.h"
+
 #define N_MODULES 8
-
-
-
-#ifndef LOGIC_PROGRAM_H
-#define LOGIC_PROGRAM_H
-
-#ifndef HERBRAND_PATH
-#define HERBRAND_PATH L"/usr/local/herbrand/"
-#endif
 
 typedef struct Program {
 	Module **modules;
@@ -29,10 +24,6 @@ typedef struct Program {
 	int max_modules;
   int renames;
 } Program;
-
-#endif
-
-
 
 /**
   * 
@@ -59,15 +50,6 @@ int program_realloc(Program *program);
   * 
   **/
 void program_free(Program *program);
-
-/**
-  * 
-  * This function creates a program with all information
-  * about builtin predicates, returning a pointer to a
-  * newly initialized Program struct.
-  * 
-  **/
-Program *program_init();
 
 /**
   * This function checks if a program cannot store new
@@ -119,3 +101,5 @@ void program_listing(Program *program);
   * 
   **/
 void program_print(Program *program);
+
+#endif

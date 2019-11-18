@@ -3,18 +3,16 @@
  * FILENAME: hashmap.h
  * DESCRIPTION: 
  * AUTHORS: José Antonio Riaza Valverde
- * DATE: 06.04.2019
+ * DATE: 18.11.2019
  * 
  *H*/
+
+#ifndef HERBRAND_HASHMAP_H
+#define HERBRAND_HASHMAP_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
-
-
-
-#ifndef LOGIC_HASHMAP_H
-#define LOGIC_HASHMAP_H
 
 typedef struct HashmapRegister {
     struct HashmapRegister *next;
@@ -26,10 +24,6 @@ typedef struct Hashmap {
     HashmapRegister **map;
     int nb_registers;
 } Hashmap;
-
-#endif
-
-
 
 /**
   *
@@ -85,3 +79,5 @@ void hashmap_free(Hashmap *map);
   * 
   **/
 void hashmap_print(Hashmap *map);
+
+#endif

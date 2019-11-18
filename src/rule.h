@@ -3,22 +3,21 @@
  * FILENAME: rule.h
  * DESCRIPTION: Data structures and functions for storing and manipuling rules
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
+
+#ifndef HERBRAND_RULE_H
+#define HERBRAND_RULE_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
 #include "clause.h"
 #include "term.h"
+
 #define N_CLAUSES 1
 #define N_DYN_CLAUSES 32
-
-
-
-#ifndef LOGIC_RULE_H
-#define LOGIC_RULE_H
 
 typedef struct Rule {
 	Clause **clauses;
@@ -32,10 +31,6 @@ typedef struct Rule {
 	int local;
   int tail_recursive;
 } Rule;
-
-#endif
-
-
 
 /**
   * 
@@ -94,3 +89,5 @@ int rule_add_clause(Rule *rule, Clause *clause);
   * 
   **/
 void rule_print(Rule *rule);
+
+#endif

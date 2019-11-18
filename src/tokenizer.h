@@ -3,18 +3,17 @@
  * FILENAME: tokenizer.h
  * DESCRIPTION: Split source code into lexical components
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
+
+#ifndef HERBRAND_TOKENIZER_H
+#define HERBRAND_TOKENIZER_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
 
-
-
-#ifndef LOGIC_TOKENIZER_H
-#define LOGIC_TOKENIZER_H
 #define N_TOKENS 100
 #define N_CHARS_TOKEN 16
 
@@ -36,10 +35,6 @@ typedef struct Tokenizer {
     int line;
     int column;
 } Tokenizer;
-
-#endif
-
-
 
 /**
   * 
@@ -96,3 +91,5 @@ int tokenizer_add_char_token(Tokenizer *tokenizer, int token, wchar_t character)
   * 
   **/
 Tokenizer *tokenizer_read_stream(FILE *stream);
+
+#endif

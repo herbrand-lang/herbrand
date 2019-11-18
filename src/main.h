@@ -3,9 +3,16 @@
  * FILENAME: main.h
  * DESCRIPTION: Main file
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
+
+#ifndef HERBRAND_MAIN_H
+#define HERBRAND_MAIN_H
+
+#ifndef HERBRAND_PATH
+#define HERBRAND_PATH L"/usr/local/herbrand/"
+#endif
 
 #include <stdio.h>
 #include <locale.h>
@@ -13,8 +20,6 @@
 #include "program.h"
 #include "parser.h"
 #include "semantics.h"
-
-
 
 /**
   * 
@@ -38,3 +43,14 @@ void interactive_query();
   * 
   **/
 void interactive_unification();
+
+/**
+  * 
+  * This function creates a program with all information
+  * about builtin predicates, returning a pointer to a
+  * newly initialized Program struct.
+  * 
+  **/
+Program *program_init();
+
+#endif

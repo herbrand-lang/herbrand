@@ -1,21 +1,19 @@
 /*H*
  * 
- * FILENAME: program.c
+ * FILENAME: substitution.h
  * DESCRIPTION: Data structures and functions for storing and manipuling substitutions
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
+
+#ifndef HERBRAND_SUBSTITUTION_H
+#define HERBRAND_SUBSTITUTION_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include "term.h"
 #include "hashmap.h"
-
-
-
-#ifndef LOGIC_SUBSTITUTION_H
-#define LOGIC_SUBSTITUTION_H
 
 typedef struct Substitution {
 	wchar_t **domain;
@@ -25,10 +23,6 @@ typedef struct Substitution {
 	int nb_vars;
   int references;
 } Substitution;
-
-#endif
-
-
 
 /**
   * 
@@ -108,3 +102,5 @@ Term *term_apply_substitution(Term *term, Substitution *subs);
   * 
   **/
 void substitution_print(Substitution *subs);
+
+#endif

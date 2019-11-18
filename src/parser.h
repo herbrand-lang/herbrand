@@ -3,9 +3,12 @@
  * FILENAME: parse.h
  * DESCRIPTION: Parse programs
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
+
+#ifndef HERBRAND_PARSER_H
+#define HERBRAND_PARSER_H
 
 #include <string.h>
 #include "tokenizer.h"
@@ -15,11 +18,6 @@
 #include "clause.h"
 #include "term.h"
 
-
-
-#ifndef LOGIC_PARSER_H
-#define LOGIC_PARSER_H
-
 typedef struct Parser {
     void *value;
     int start;
@@ -27,10 +25,6 @@ typedef struct Parser {
     int success;
     wchar_t error[100];
 } Parser;
-
-#endif
-
-
 
 /**
   * 
@@ -88,3 +82,5 @@ Parser *parser_clause(Tokenizer *tokenizer, int start, wchar_t *rule_name, int a
   * 
   **/
 Parser *parser_expression(Tokenizer *tokenizer, int start);
+
+#endif

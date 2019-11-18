@@ -3,17 +3,15 @@
  * FILENAME: derivation.h
  * DESCRIPTION: Data structures and functions for derivations
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 03.04.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
 
+#ifndef HREBRAND_DERIVATION_H
+#define HREBRAND_DERIVATION_H
+
 #include "term.h"
 #include "substitution.h"
-
-
-
-#ifndef LOGIC_DERIVATION_H
-#define LOGIC_DERIVATION_H
 
 typedef struct State {
   Term *goal;
@@ -30,10 +28,6 @@ typedef struct Derivation {
   int nb_visited_states;
   int nb_inferences;
 } Derivation;
-
-#endif
-
-
 
 /**
   * 
@@ -136,3 +130,5 @@ State *state_init_goal(Term *goal);
   * 
   **/
 void state_print(State *state);
+
+#endif

@@ -3,9 +3,12 @@
  * FILENAME: module.h
  * DESCRIPTION: Data structures and functions for storing and manipuling modules
  * AUTHORS: José Antonio Riaza Valverde
- * UPDATED: 06.04.2019
+ * UPDATED: 18.11.2019
  * 
  *H*/
+
+#ifndef HERBRAND_MODULE_H
+#define HERBRAND_MODULE_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,11 +17,6 @@
 #include "hashmap.h"
 #define N_PREDICATES 32
 
-
-
-#ifndef LOGIC_MODULE_H
-#define LOGIC_MODULE_H
-
 typedef struct Module {
 	Rule **predicates;
 	Hashmap *indices;
@@ -26,10 +24,6 @@ typedef struct Module {
 	int nb_predicates;
 	int max_predicates;
 } Module;
-
-#endif
-
-
 
 /**
   * 
@@ -105,3 +99,5 @@ void module_listing(Module *module);
   * 
   **/
 void module_print(Module *module);
+
+#endif
